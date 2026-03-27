@@ -13,6 +13,8 @@ func newInitCmd() *cobra.Command {
 	var docsLang string
 	var agentLang string
 	var commentsLang string
+	var agentTargets []string
+	var legacyAgentTargets []string
 
 	cmd := &cobra.Command{
 		Use:   "init [path]",
@@ -30,6 +32,7 @@ func newInitCmd() *cobra.Command {
 				DocsLang:     docsLang,
 				AgentLang:    agentLang,
 				CommentsLang: commentsLang,
+				AgentTargets: append(agentTargets, legacyAgentTargets...),
 			})
 			if err != nil {
 				return err
@@ -48,6 +51,9 @@ func newInitCmd() *cobra.Command {
 	cmd.Flags().StringVar(&docsLang, "docs-lang", "", "language for generated project documentation: en or ru")
 	cmd.Flags().StringVar(&agentLang, "agent-lang", "", "language for generated agent prompts and AGENTS guidance: en or ru")
 	cmd.Flags().StringVar(&commentsLang, "comments-lang", "", "preferred language for code comments: en or ru")
+	cmd.Flags().StringSliceVar(&agentTargets, "agents", nil, "generate project-local agent command files for one or more targets: claude, codex, copilot, cursor, kilocode, trae, all")
+	cmd.Flags().StringSliceVar(&legacyAgentTargets, "agent", nil, "deprecated alias for --agents")
+	cmd.Flags().MarkHidden("agent")
 
 	return cmd
 }

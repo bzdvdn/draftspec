@@ -23,6 +23,11 @@ The MVP exposes only a few commands:
 
 ```text
 draftspec init [path]
+draftspec add-agent [path]
+draftspec list-agents [path]
+draftspec remove-agent [path]
+draftspec cleanup-agents [path]
+draftspec doctor [path]
 draftspec list-specs [path]
 draftspec show-spec <name> [path]
 ```
@@ -36,9 +41,14 @@ Flags:
 ```text
 draftspec init --lang en
 draftspec init --lang ru
-draftspec init TESTS/demo-project --lang en --docs-lang ru --agent-lang en --comments-lang en
+draftspec init TESTS/demo-project --lang en --docs-lang ru --agent-lang en --comments-lang en --agents claude --agents cursor --agents kilocode
 draftspec list-specs TESTS/demo-project
 draftspec show-spec auth-login TESTS/demo-project
+draftspec add-agent TESTS/demo-project --agents copilot
+draftspec list-agents TESTS/demo-project
+draftspec remove-agent TESTS/demo-project --agents cursor
+draftspec cleanup-agents TESTS/demo-project
+draftspec doctor TESTS/demo-project
 ```
 
 Rules:
@@ -47,8 +57,11 @@ Rules:
 - `--docs-lang` controls generated project docs such as `constitution.md`, `memory.md`, spec templates, and plan templates
 - `--agent-lang` controls generated prompts and the inserted `AGENTS.md` guidance snippet
 - `--comments-lang` records the preferred code comment language in config and generated policy docs
+- `--agents` generates project-local agent command/prompt files for `claude`, `codex`, `copilot`, `cursor`, `kilocode`, `trae`, or `all`
 
-Generated language settings are written to `.draftspec/draftspec.yaml` and echoed in the constitution and memory files. During `implement`, agents should use the configured comment language for new or edited code comments unless an existing file has a different local convention that should be preserved.
+Generated language settings are written to `.draftspec/draftspec.yaml` and echoed in the constitution and memory files. Selected agent targets are also recorded there. During `implement`, agents should use the configured comment language for new or edited code comments unless an existing file has a different local convention that should be preserved.
+
+When `--agents` is used, Draftspec also generates project-local command/prompt files in agent-specific folders such as `.claude/commands/`, `.codex/prompts/`, and `.github/prompts/`.
 
 ## Workflow chain
 
@@ -139,3 +152,8 @@ In practice, the biggest token savers are:
 Inside this repository, generated `/.draftspec/`, `/AGENTS.md`, and `/TESTS/` are local development artifacts.
 
 They are useful for testing `draftspec`, but they should not be committed as product source files.
+
+
+`cleanup-agents` removes orphaned agent artifacts for targets that are no longer enabled in config.
+
+`doctor` reports `error` for missing required files and `warning` for orphaned agent artifacts that remain on disk after a target has been disabled in config.

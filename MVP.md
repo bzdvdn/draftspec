@@ -113,7 +113,7 @@ Dependency rules:
 
 ## Language model
 
-`draftspec init` supports a compact language configuration and an optional target path.
+`draftspec init` supports a compact language configuration, an optional target path, and optional agent-target generation.
 
 Defaults:
 
@@ -321,6 +321,7 @@ agents:
   update_agents_md: true
   agents_file: AGENTS.md
   memory_link: .draftspec/memory.md
+  targets: []
 
 templates:
   spec: spec.md
@@ -350,3 +351,8 @@ scripts:
   list_specs: list-specs.sh
   show_spec: show-spec.sh
 ```
+
+
+`cleanup-agents` removes orphaned agent artifacts for targets that are no longer enabled in config.
+
+`doctor` reports `error` for missing required files and `warning` for orphaned agent artifacts that remain on disk after a target has been disabled in config.

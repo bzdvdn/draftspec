@@ -34,6 +34,7 @@ var defaultConfig = Config{
 		UpdateAgentsMD: true,
 		AgentsFile:     "AGENTS.md",
 		MemoryLink:     ".draftspec/memory.md",
+		Targets:        nil,
 	},
 	Templates: Templates{
 		Spec:               "spec.md",
@@ -102,9 +103,10 @@ type Language struct {
 }
 
 type Agents struct {
-	UpdateAgentsMD bool   `yaml:"update_agents_md"`
-	AgentsFile     string `yaml:"agents_file"`
-	MemoryLink     string `yaml:"memory_link"`
+	UpdateAgentsMD bool     `yaml:"update_agents_md"`
+	AgentsFile     string   `yaml:"agents_file"`
+	MemoryLink     string   `yaml:"memory_link"`
+	Targets        []string `yaml:"targets,omitempty"`
 }
 
 type Templates struct {
@@ -170,6 +172,23 @@ func Load(root string) (Config, error) {
 
 	cfg.applyDefaults()
 	return cfg, nil
+}
+
+func Save(root string, cfg Config) error {
+	root, err := filepath.Abs(root)
+	if err != nil {
+		return err
+	}
+	cfg.applyDefaults()
+	configPath := filepath.Join(root, draftspecDirName, "draftspec.yaml")
+	if err := os.MkdirAll(filepath.Dir(configPath), 0o755); err != nil {
+		return err
+	}
+	content, err := yaml.Marshal(cfg)
+	if err != nil {
+		return fmt.Errorf("marshal draftspec config: %w", err)
+	}
+	return os.WriteFile(configPath, content, 0o644)
 }
 
 func (c Config) DraftspecDir(root string) (string, error) { return resolve(root, draftspecDirName) }

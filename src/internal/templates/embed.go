@@ -21,10 +21,11 @@ type File struct {
 }
 
 type LanguageSettings struct {
-	Default  string
-	Docs     string
-	Agent    string
-	Comments string
+	Default      string
+	Docs         string
+	Agent        string
+	Comments     string
+	AgentTargets []string
 }
 
 func ResolveLanguageSettings(defaultLang, docsLang, agentLang, commentsLang string) (LanguageSettings, error) {
@@ -185,6 +186,7 @@ func generateConfig(settings LanguageSettings) string {
 	cfg.Language.Docs = settings.Docs
 	cfg.Language.Agent = settings.Agent
 	cfg.Language.Comments = settings.Comments
+	cfg.Agents.Targets = settings.AgentTargets
 	content, err := yaml.Marshal(cfg)
 	if err != nil {
 		panic(fmt.Sprintf("marshal generated draftspec config: %v", err))
