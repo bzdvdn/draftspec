@@ -52,6 +52,16 @@ For deeper guidance, use:
 - [Workflow Model](docs/en/workflow.md)
 - [Examples](docs/en/examples.md)
 
+
+## Development
+
+```bash
+go test ./...
+go build -o bin/draftspec ./src/cmd/draftspec
+```
+
+The repository includes unit tests for config, project lifecycle, doctor checks, specs, templates, agents, and CLI-level behavior.
+
 ## License
 
 Released under the [MIT License](LICENSE).

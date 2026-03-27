@@ -1,0 +1,114 @@
+package config
+
+import (
+	"path/filepath"
+	"testing"
+)
+
+func TestDefaultAppliesExpectedDefaults(t *testing.T) {
+	cfg := Default()
+
+	if cfg.Version != 1 {
+		t.Fatalf("Version = %d, want 1", cfg.Version)
+	}
+	if cfg.Language.Default != "en" || cfg.Language.Docs != "en" || cfg.Language.Agent != "en" || cfg.Language.Comments != "en" {
+		t.Fatalf("unexpected default languages: %+v", cfg.Language)
+	}
+	if cfg.Paths.SpecsDir != ".draftspec/specs" {
+		t.Fatalf("SpecsDir = %q, want %q", cfg.Paths.SpecsDir, ".draftspec/specs")
+	}
+	if cfg.Templates.SpecPrompt != "prompts/spec.md" {
+		t.Fatalf("SpecPrompt = %q, want %q", cfg.Templates.SpecPrompt, "prompts/spec.md")
+	}
+	if cfg.Scripts.CheckInspectReady != "check-inspect-ready.sh" {
+		t.Fatalf("CheckInspectReady = %q, want %q", cfg.Scripts.CheckInspectReady, "check-inspect-ready.sh")
+	}
+}
+
+func TestLoadReturnsDefaultsWhenConfigDoesNotExist(t *testing.T) {
+	root := t.TempDir()
+
+	cfg, err := Load(root)
+	if err != nil {
+		t.Fatalf("Load returned error: %v", err)
+	}
+
+	if cfg.Language.Docs != "en" {
+		t.Fatalf("Docs language = %q, want en", cfg.Language.Docs)
+	}
+	if cfg.Project.ConstitutionFile != ".draftspec/constitution.md" {
+		t.Fatalf("ConstitutionFile = %q", cfg.Project.ConstitutionFile)
+	}
+}
+
+func TestSaveAndLoadPreserveConfigAndApplyDefaults(t *testing.T) {
+	root := t.TempDir()
+
+	cfg := Config{}
+	cfg.Project.Name = "demo"
+	cfg.Language.Default = "ru"
+	cfg.Language.Docs = "ru"
+	cfg.Paths.SpecsDir = "workspace/specs"
+	cfg.Agents.Targets = []string{"claude", "cursor"}
+
+	if err := Save(root, cfg); err != nil {
+		t.Fatalf("Save returned error: %v", err)
+	}
+
+	loaded, err := Load(root)
+	if err != nil {
+		t.Fatalf("Load returned error: %v", err)
+	}
+
+	if loaded.Project.Name != "demo" {
+		t.Fatalf("Project.Name = %q, want demo", loaded.Project.Name)
+	}
+	if loaded.Language.Default != "ru" || loaded.Language.Docs != "ru" {
+		t.Fatalf("unexpected loaded languages: %+v", loaded.Language)
+	}
+	if loaded.Language.Agent != "ru" || loaded.Language.Comments != "ru" {
+		t.Fatalf("expected missing language values to inherit default, got %+v", loaded.Language)
+	}
+	if got, want := loaded.Paths.SpecsDir, "workspace/specs"; got != want {
+		t.Fatalf("SpecsDir = %q, want %q", got, want)
+	}
+	if len(loaded.Agents.Targets) != 2 || loaded.Agents.Targets[0] != "claude" || loaded.Agents.Targets[1] != "cursor" {
+		t.Fatalf("unexpected agent targets: %+v", loaded.Agents.Targets)
+	}
+	if loaded.Templates.Spec == "" || loaded.Scripts.ShowSpec == "" {
+		t.Fatalf("expected template and script defaults to be applied: templates=%+v scripts=%+v", loaded.Templates, loaded.Scripts)
+	}
+}
+
+func TestResolvePathHelpersRespectConfiguredPaths(t *testing.T) {
+	root := t.TempDir()
+	cfg := Default()
+	cfg.Paths.SpecsDir = "workspace/specs"
+	cfg.Paths.PlansDir = "workspace/plans"
+	cfg.Paths.ArchiveDir = "workspace/archive"
+	cfg.Paths.TemplatesDir = "workspace/templates"
+	cfg.Paths.ScriptsDir = "workspace/scripts"
+
+	specsDir, err := cfg.SpecsDir(root)
+	if err != nil {
+		t.Fatalf("SpecsDir returned error: %v", err)
+	}
+	plansDir, err := cfg.PlansDir(root)
+	if err != nil {
+		t.Fatalf("PlansDir returned error: %v", err)
+	}
+	scriptsDir, err := cfg.ScriptsDir(root)
+	if err != nil {
+		t.Fatalf("ScriptsDir returned error: %v", err)
+	}
+
+	if specsDir != filepath.Join(root, "workspace", "specs") {
+		t.Fatalf("SpecsDir resolved to %q", specsDir)
+	}
+	if plansDir != filepath.Join(root, "workspace", "plans") {
+		t.Fatalf("PlansDir resolved to %q", plansDir)
+	}
+	if scriptsDir != filepath.Join(root, "workspace", "scripts") {
+		t.Fatalf("ScriptsDir resolved to %q", scriptsDir)
+	}
+}

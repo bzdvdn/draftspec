@@ -13,6 +13,18 @@ go build -o bin/draftspec ./src/cmd/draftspec
 ./bin/draftspec doctor TESTS/demo
 ```
 
+## Current Test Coverage
+
+The repository already includes unit tests for:
+
+- config loading, defaults, save, and path resolution
+- project initialization and agent lifecycle operations
+- workspace health checks through `doctor`
+- spec listing, reading, and template-based creation
+- localized template asset consistency
+- agent file generation
+- CLI-level command behavior
+
 ## Why `doctor` and `cleanup-agents` Matter
 
 When you test multiple agent targets, it is easy to leave stale generated files behind. Draftspec separates these concerns:
