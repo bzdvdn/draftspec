@@ -113,7 +113,7 @@ Dependency rules:
 
 ## Language model
 
-`draftspec init` supports a compact language configuration.
+`draftspec init` supports a compact language configuration and an optional target path.
 
 Defaults:
 

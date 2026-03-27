@@ -15,10 +15,16 @@ func newInitCmd() *cobra.Command {
 	var commentsLang string
 
 	cmd := &cobra.Command{
-		Use:   "init",
-		Short: "Initialize a .draftspec workspace in the current project",
+		Use:   "init [path]",
+		Short: "Initialize a .draftspec workspace in the target project",
+		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			result, err := project.Initialize(".", project.InitOptions{
+			root := "."
+			if len(args) == 1 {
+				root = args[0]
+			}
+
+			result, err := project.Initialize(root, project.InitOptions{
 				InitGit:      initGit,
 				DefaultLang:  defaultLang,
 				DocsLang:     docsLang,

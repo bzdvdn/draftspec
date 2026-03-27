@@ -9,11 +9,16 @@ import (
 
 func newShowSpecCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   "show-spec <name>",
+		Use:   "show-spec <name> [path]",
 		Short: "Show a specification by slug",
-		Args:  cobra.ExactArgs(1),
+		Args:  cobra.RangeArgs(1, 2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			content, err := specs.Show(".", args[0])
+			root := "."
+			if len(args) == 2 {
+				root = args[1]
+			}
+
+			content, err := specs.Show(root, args[0])
 			if err != nil {
 				return err
 			}

@@ -22,21 +22,23 @@ The goal is to keep project intent, feature specs, plans, task breakdowns, and w
 The MVP exposes only a few commands:
 
 ```text
-draftspec init
-draftspec list-specs
-draftspec show-spec <name>
+draftspec init [path]
+draftspec list-specs [path]
+draftspec show-spec <name> [path]
 ```
 
 ## `init` language options
 
-`draftspec init` supports a small language model for generated artifacts.
+`draftspec init` supports a small language model for generated artifacts and accepts an optional target path.
 
 Flags:
 
 ```text
 draftspec init --lang en
 draftspec init --lang ru
-draftspec init --lang en --docs-lang ru --agent-lang en --comments-lang en
+draftspec init TESTS/demo-project --lang en --docs-lang ru --agent-lang en --comments-lang en
+draftspec list-specs TESTS/demo-project
+draftspec show-spec auth-login TESTS/demo-project
 ```
 
 Rules:
