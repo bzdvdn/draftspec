@@ -15,7 +15,7 @@ Always read these first:
 
 ## Load Only If Needed
 
-Read these when they exist:
+Read plan artifacts only to inform `summary.md`. If the summary can be written from the spec and memory alone, do not read them:
 
 - `.draftspec/plans/<slug>/plan.md`
 - `.draftspec/plans/<slug>/tasks.md`
@@ -40,7 +40,7 @@ Stop and ask a minimal follow-up question if:
 ## Rules
 
 - Archive under `.draftspec/archive/<slug>/<YYYY-MM-DD>/`.
-- Use copy-based archiving in MVP; do not delete active files unless explicitly instructed.
+- Use copy-based archiving in MVP; do not delete active files (`specs/<slug>.md` and `plans/<slug>/`) unless explicitly instructed by the user.
 - Write `summary.md` inside the archive directory.
 - If plan artifacts exist, archive them together with the spec.
 - If `research.md` does not exist, do not invent it.

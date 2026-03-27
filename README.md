@@ -107,6 +107,8 @@ Recommended minimal read sets:
 
 This is the main way to keep Draftspec less token-hungry than Speckit.
 
+Generated specs should use explicit `Given/When/Then` acceptance criteria. These BDD markers remain canonical regardless of `docs-lang`, while the surrounding explanatory text follows the configured documentation language. Generated tasks should include a simple acceptance-to-task coverage section so `inspect` can enforce traceability without inventing structure later.
+
 ## Token usage
 
 What usually makes systems like `speckit` expensive is that each command pulls in many large artifacts by default.

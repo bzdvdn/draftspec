@@ -198,7 +198,7 @@ Inputs:
 Outputs:
 
 - a focused inspection report for one feature
-- optional Given/When/Then strengthening suggestions when acceptance criteria are weak
+- explicit Given/When/Then acceptance criteria, with `Given`, `When`, and `Then` kept canonical across documentation languages and inspect treating missing G/W/T as an error
 
 ## Archive workflow
 

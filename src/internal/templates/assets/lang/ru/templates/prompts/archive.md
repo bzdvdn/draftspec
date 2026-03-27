@@ -15,7 +15,7 @@
 
 ## Load Only If Needed
 
-Читайте это, если файлы существуют:
+Читайте plan artifacts только чтобы сформировать `summary.md`. Если summary достаточно написать по spec и memory — не читайте их:
 
 - `.draftspec/plans/<slug>/plan.md`
 - `.draftspec/plans/<slug>/tasks.md`
@@ -40,7 +40,7 @@
 ## Rules
 
 - Архивируйте в `.draftspec/archive/<slug>/<YYYY-MM-DD>/`.
-- В MVP используйте copy-based archive; не удаляйте active files без явного указания.
+- В MVP используйте copy-based archive; не удаляйте active files (`specs/<slug>.md` и `plans/<slug>/`) без явного указания пользователя.
 - Записывайте `summary.md` внутри директории архива.
 - Если plan artifacts существуют, архивируйте их вместе со spec.
 - Если `research.md` не существует, не выдумывайте его.

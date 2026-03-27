@@ -49,7 +49,9 @@ Do not jump ahead into implementation.
 - Preserve an established local task-document convention only when needed to keep an existing file coherent.
 - Do not mix task languages inside the same task list without a strong project reason.
 - Load deeper artifacts only when the current decomposition needs them.
-- Group tasks into ordered phases.
+- Follow the structure of `.draftspec/templates/tasks.md`: group tasks into ordered phases (`## Phase N: Name`).
+- Each task MUST follow the format: `- [ ] <action verb> — <concrete measurable outcome>`
+- The tasks taken together MUST cover all acceptance criteria from the spec. Any uncovered criterion is a blocker.
 - Prefer tasks that are concrete, testable, and implementation-oriented.
 - Include validation and documentation alignment work where needed.
 - Do not generate vague umbrella tasks.

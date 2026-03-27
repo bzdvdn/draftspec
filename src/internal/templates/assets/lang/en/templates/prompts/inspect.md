@@ -43,6 +43,8 @@ Stop and ask a minimal follow-up question only if:
 
 - Check constitutional consistency first.
 - Inspect spec completeness and clarity.
+- Every acceptance criterion in the spec MUST have an explicit Given/When/Then format. The `Given`, `When`, and `Then` markers remain canonical regardless of the documentation language. Missing G/W/T is an `Error`, not a `Suggestion`.
+- If `tasks.md` exists, verify that every acceptance criterion from the spec is covered by at least one task. An uncovered criterion is an `Error`.
 - If plan artifacts exist, check alignment between spec, plan, data model, contracts, and tasks.
 - Keep the inspection report in the project's configured documentation language when writing it to disk.
 - Prefer concrete findings over generic advice.
@@ -51,9 +53,9 @@ Stop and ask a minimal follow-up question only if:
   - `Warnings`
   - `Questions`
   - `Suggestions`
-- Suggest Given/When/Then scenarios only when they would materially strengthen weak acceptance criteria.
 
 ## Output expectations
 
-- Write or patch an inspection report for the feature
+- Output the report to the conversation unless the user specifies an explicit file path
+- If writing to a file, use the path provided by the user
 - Summarize errors, warnings, open questions, and suggestions

@@ -14,7 +14,11 @@
 
 ## Acceptance Criteria
 
-- Criterion 1
+### Criterion 1
+
+- **Given** the initial state or precondition
+- **When** the action or event
+- **Then** the expected observable outcome
 
 ## Edge Cases
 

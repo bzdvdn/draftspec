@@ -43,6 +43,8 @@ Stop and request refinement if:
 - the plan conflicts with the constitution
 - implementation requires scope beyond the current task list
 
+If all tasks in `tasks.md` are already marked complete, say so and do not continue.
+
 Do not broaden scope to solve these problems.
 
 ## Rules
@@ -57,7 +59,7 @@ Do not broaden scope to solve these problems.
 - Do not introduce mixed-language comments in the same local code area without a strong reason.
 - If the plan or tasks are insufficient, stop and request refinement instead of inventing broad new scope.
 - Mark completed tasks in `tasks.md`.
-- Update `.draftspec/memory.md` after meaningful implementation changes.
+- Update `.draftspec/memory.md` when: a full phase is complete, a new public entry point is added, a data schema or contract changes, or all tasks are done.
 
 ## Output expectations
 
@@ -65,3 +67,4 @@ Do not broaden scope to solve these problems.
 - Update `tasks.md` checkboxes for completed items
 - Update `.draftspec/memory.md`
 - Summarize completed tasks, remaining tasks, and any blockers
+- Explicitly state which acceptance criteria from the spec are now covered by the implementation
