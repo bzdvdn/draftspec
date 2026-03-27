@@ -1,0 +1,336 @@
+package config
+
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+
+	"gopkg.in/yaml.v3"
+)
+
+const draftspecDirName = ".draftspec"
+
+var defaultConfig = Config{
+	Version: 1,
+	Project: Project{
+		Name:             "my-project",
+		MemoryFile:       ".draftspec/memory.md",
+		ConstitutionFile: ".draftspec/constitution.md",
+	},
+	Paths: Paths{
+		SpecsDir:     ".draftspec/specs",
+		PlansDir:     ".draftspec/plans",
+		ArchiveDir:   ".draftspec/archive",
+		TemplatesDir: ".draftspec/templates",
+		ScriptsDir:   ".draftspec/scripts",
+	},
+	Language: Language{
+		Default:  "en",
+		Docs:     "en",
+		Agent:    "en",
+		Comments: "en",
+	},
+	Agents: Agents{
+		UpdateAgentsMD: true,
+		AgentsFile:     "AGENTS.md",
+		MemoryLink:     ".draftspec/memory.md",
+	},
+	Templates: Templates{
+		Spec:               "spec.md",
+		Plan:               "plan.md",
+		Tasks:              "tasks.md",
+		DataModel:          "data-model.md",
+		ContractsAPI:       "contracts/api.md",
+		ContractsEvents:    "contracts/events.md",
+		ArchiveSummary:     "archive/summary.md",
+		Constitution:       "constitution.md",
+		ConstitutionPrompt: "prompts/constitution.md",
+		SpecPrompt:         "prompts/spec.md",
+		InspectPrompt:      "prompts/inspect.md",
+		PlanPrompt:         "prompts/plan.md",
+		TasksPrompt:        "prompts/tasks.md",
+		ImplementPrompt:    "prompts/implement.md",
+		ArchivePrompt:      "prompts/archive.md",
+		Memory:             "memory.md",
+	},
+	Scripts: Scripts{
+		InspectSpec:         "inspect-spec.sh",
+		CheckConstitution:   "check-constitution.sh",
+		CheckSpecReady:      "check-spec-ready.sh",
+		CheckInspectReady:   "check-inspect-ready.sh",
+		CheckPlanReady:      "check-plan-ready.sh",
+		CheckTasksReady:     "check-tasks-ready.sh",
+		CheckImplementReady: "check-implement-ready.sh",
+		CheckArchiveReady:   "check-archive-ready.sh",
+		ListOpenTasks:       "list-open-tasks.sh",
+		SyncMemory:          "sync-memory.sh",
+		LinkAgents:          "link-agents.sh",
+		ListSpecs:           "list-specs.sh",
+		ShowSpec:            "show-spec.sh",
+	},
+}
+
+type Config struct {
+	Version   int       `yaml:"version"`
+	Project   Project   `yaml:"project"`
+	Paths     Paths     `yaml:"paths"`
+	Language  Language  `yaml:"language"`
+	Agents    Agents    `yaml:"agents"`
+	Templates Templates `yaml:"templates"`
+	Scripts   Scripts   `yaml:"scripts"`
+}
+
+type Project struct {
+	Name             string `yaml:"name"`
+	MemoryFile       string `yaml:"memory_file"`
+	ConstitutionFile string `yaml:"constitution_file"`
+}
+
+type Paths struct {
+	SpecsDir     string `yaml:"specs_dir"`
+	PlansDir     string `yaml:"plans_dir"`
+	ArchiveDir   string `yaml:"archive_dir"`
+	TemplatesDir string `yaml:"templates_dir"`
+	ScriptsDir   string `yaml:"scripts_dir"`
+}
+
+type Language struct {
+	Default  string `yaml:"default"`
+	Docs     string `yaml:"docs"`
+	Agent    string `yaml:"agent"`
+	Comments string `yaml:"comments"`
+}
+
+type Agents struct {
+	UpdateAgentsMD bool   `yaml:"update_agents_md"`
+	AgentsFile     string `yaml:"agents_file"`
+	MemoryLink     string `yaml:"memory_link"`
+}
+
+type Templates struct {
+	Spec               string `yaml:"spec"`
+	Plan               string `yaml:"plan"`
+	Tasks              string `yaml:"tasks"`
+	DataModel          string `yaml:"data_model"`
+	ContractsAPI       string `yaml:"contracts_api"`
+	ContractsEvents    string `yaml:"contracts_events"`
+	ArchiveSummary     string `yaml:"archive_summary"`
+	Constitution       string `yaml:"constitution"`
+	ConstitutionPrompt string `yaml:"constitution_prompt"`
+	SpecPrompt         string `yaml:"spec_prompt"`
+	InspectPrompt      string `yaml:"inspect_prompt"`
+	PlanPrompt         string `yaml:"plan_prompt"`
+	TasksPrompt        string `yaml:"tasks_prompt"`
+	ImplementPrompt    string `yaml:"implement_prompt"`
+	ArchivePrompt      string `yaml:"archive_prompt"`
+	Memory             string `yaml:"memory"`
+}
+
+type Scripts struct {
+	InspectSpec         string `yaml:"inspect_spec"`
+	CheckConstitution   string `yaml:"check_constitution"`
+	CheckSpecReady      string `yaml:"check_spec_ready"`
+	CheckInspectReady   string `yaml:"check_inspect_ready"`
+	CheckPlanReady      string `yaml:"check_plan_ready"`
+	CheckTasksReady     string `yaml:"check_tasks_ready"`
+	CheckImplementReady string `yaml:"check_implement_ready"`
+	CheckArchiveReady   string `yaml:"check_archive_ready"`
+	ListOpenTasks       string `yaml:"list_open_tasks"`
+	SyncMemory          string `yaml:"sync_memory"`
+	LinkAgents          string `yaml:"link_agents"`
+	ListSpecs           string `yaml:"list_specs"`
+	ShowSpec            string `yaml:"show_spec"`
+}
+
+func Default() Config {
+	cfg := defaultConfig
+	cfg.applyDefaults()
+	return cfg
+}
+
+func Load(root string) (Config, error) {
+	root, err := filepath.Abs(root)
+	if err != nil {
+		return Config{}, err
+	}
+
+	cfg := Default()
+	configPath := filepath.Join(root, draftspecDirName, "draftspec.yaml")
+	content, err := os.ReadFile(configPath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return cfg, nil
+		}
+		return Config{}, fmt.Errorf("read draftspec config: %w", err)
+	}
+
+	if err := yaml.Unmarshal(content, &cfg); err != nil {
+		return Config{}, fmt.Errorf("parse draftspec config: %w", err)
+	}
+
+	cfg.applyDefaults()
+	return cfg, nil
+}
+
+func (c Config) DraftspecDir(root string) (string, error) { return resolve(root, draftspecDirName) }
+func (c Config) ConfigPath(root string) (string, error) {
+	draftspecDir, err := c.DraftspecDir(root)
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(draftspecDir, "draftspec.yaml"), nil
+}
+func (c Config) SpecsDir(root string) (string, error)     { return resolve(root, c.Paths.SpecsDir) }
+func (c Config) PlansDir(root string) (string, error)     { return resolve(root, c.Paths.PlansDir) }
+func (c Config) ArchiveDir(root string) (string, error)   { return resolve(root, c.Paths.ArchiveDir) }
+func (c Config) TemplatesDir(root string) (string, error) { return resolve(root, c.Paths.TemplatesDir) }
+func (c Config) ScriptsDir(root string) (string, error)   { return resolve(root, c.Paths.ScriptsDir) }
+
+func (c *Config) applyDefaults() {
+	if c.Version == 0 {
+		c.Version = defaultConfig.Version
+	}
+	if c.Project.Name == "" {
+		c.Project.Name = defaultConfig.Project.Name
+	}
+	if c.Project.MemoryFile == "" {
+		c.Project.MemoryFile = defaultConfig.Project.MemoryFile
+	}
+	if c.Project.ConstitutionFile == "" {
+		c.Project.ConstitutionFile = defaultConfig.Project.ConstitutionFile
+	}
+	if c.Paths.SpecsDir == "" {
+		c.Paths.SpecsDir = defaultConfig.Paths.SpecsDir
+	}
+	if c.Paths.PlansDir == "" {
+		c.Paths.PlansDir = defaultConfig.Paths.PlansDir
+	}
+	if c.Paths.ArchiveDir == "" {
+		c.Paths.ArchiveDir = defaultConfig.Paths.ArchiveDir
+	}
+	if c.Paths.TemplatesDir == "" {
+		c.Paths.TemplatesDir = defaultConfig.Paths.TemplatesDir
+	}
+	if c.Paths.ScriptsDir == "" {
+		c.Paths.ScriptsDir = defaultConfig.Paths.ScriptsDir
+	}
+	if c.Language.Default == "" {
+		c.Language.Default = defaultConfig.Language.Default
+	}
+	if c.Language.Docs == "" {
+		c.Language.Docs = c.Language.Default
+	}
+	if c.Language.Agent == "" {
+		c.Language.Agent = c.Language.Default
+	}
+	if c.Language.Comments == "" {
+		c.Language.Comments = c.Language.Default
+	}
+	if c.Agents.AgentsFile == "" {
+		c.Agents.AgentsFile = defaultConfig.Agents.AgentsFile
+	}
+	if c.Agents.MemoryLink == "" {
+		c.Agents.MemoryLink = defaultConfig.Agents.MemoryLink
+	}
+	if !c.Agents.UpdateAgentsMD {
+		c.Agents.UpdateAgentsMD = defaultConfig.Agents.UpdateAgentsMD
+	}
+	if c.Templates.Spec == "" {
+		c.Templates.Spec = defaultConfig.Templates.Spec
+	}
+	if c.Templates.Plan == "" {
+		c.Templates.Plan = defaultConfig.Templates.Plan
+	}
+	if c.Templates.Tasks == "" {
+		c.Templates.Tasks = defaultConfig.Templates.Tasks
+	}
+	if c.Templates.DataModel == "" {
+		c.Templates.DataModel = defaultConfig.Templates.DataModel
+	}
+	if c.Templates.ContractsAPI == "" {
+		c.Templates.ContractsAPI = defaultConfig.Templates.ContractsAPI
+	}
+	if c.Templates.ContractsEvents == "" {
+		c.Templates.ContractsEvents = defaultConfig.Templates.ContractsEvents
+	}
+	if c.Templates.ArchiveSummary == "" {
+		c.Templates.ArchiveSummary = defaultConfig.Templates.ArchiveSummary
+	}
+	if c.Templates.Constitution == "" {
+		c.Templates.Constitution = defaultConfig.Templates.Constitution
+	}
+	if c.Templates.ConstitutionPrompt == "" {
+		c.Templates.ConstitutionPrompt = defaultConfig.Templates.ConstitutionPrompt
+	}
+	if c.Templates.SpecPrompt == "" {
+		c.Templates.SpecPrompt = defaultConfig.Templates.SpecPrompt
+	}
+	if c.Templates.InspectPrompt == "" {
+		c.Templates.InspectPrompt = defaultConfig.Templates.InspectPrompt
+	}
+	if c.Templates.PlanPrompt == "" {
+		c.Templates.PlanPrompt = defaultConfig.Templates.PlanPrompt
+	}
+	if c.Templates.TasksPrompt == "" {
+		c.Templates.TasksPrompt = defaultConfig.Templates.TasksPrompt
+	}
+	if c.Templates.ImplementPrompt == "" {
+		c.Templates.ImplementPrompt = defaultConfig.Templates.ImplementPrompt
+	}
+	if c.Templates.ArchivePrompt == "" {
+		c.Templates.ArchivePrompt = defaultConfig.Templates.ArchivePrompt
+	}
+	if c.Templates.Memory == "" {
+		c.Templates.Memory = defaultConfig.Templates.Memory
+	}
+	if c.Scripts.InspectSpec == "" {
+		c.Scripts.InspectSpec = defaultConfig.Scripts.InspectSpec
+	}
+	if c.Scripts.CheckConstitution == "" {
+		c.Scripts.CheckConstitution = defaultConfig.Scripts.CheckConstitution
+	}
+	if c.Scripts.CheckSpecReady == "" {
+		c.Scripts.CheckSpecReady = defaultConfig.Scripts.CheckSpecReady
+	}
+	if c.Scripts.CheckInspectReady == "" {
+		c.Scripts.CheckInspectReady = defaultConfig.Scripts.CheckInspectReady
+	}
+	if c.Scripts.CheckPlanReady == "" {
+		c.Scripts.CheckPlanReady = defaultConfig.Scripts.CheckPlanReady
+	}
+	if c.Scripts.CheckTasksReady == "" {
+		c.Scripts.CheckTasksReady = defaultConfig.Scripts.CheckTasksReady
+	}
+	if c.Scripts.CheckImplementReady == "" {
+		c.Scripts.CheckImplementReady = defaultConfig.Scripts.CheckImplementReady
+	}
+	if c.Scripts.CheckArchiveReady == "" {
+		c.Scripts.CheckArchiveReady = defaultConfig.Scripts.CheckArchiveReady
+	}
+	if c.Scripts.ListOpenTasks == "" {
+		c.Scripts.ListOpenTasks = defaultConfig.Scripts.ListOpenTasks
+	}
+	if c.Scripts.SyncMemory == "" {
+		c.Scripts.SyncMemory = defaultConfig.Scripts.SyncMemory
+	}
+	if c.Scripts.LinkAgents == "" {
+		c.Scripts.LinkAgents = defaultConfig.Scripts.LinkAgents
+	}
+	if c.Scripts.ListSpecs == "" {
+		c.Scripts.ListSpecs = defaultConfig.Scripts.ListSpecs
+	}
+	if c.Scripts.ShowSpec == "" {
+		c.Scripts.ShowSpec = defaultConfig.Scripts.ShowSpec
+	}
+}
+
+func resolve(root, configuredPath string) (string, error) {
+	root, err := filepath.Abs(root)
+	if err != nil {
+		return "", err
+	}
+	if filepath.IsAbs(configuredPath) {
+		return configuredPath, nil
+	}
+	return filepath.Join(root, filepath.FromSlash(configuredPath)), nil
+}

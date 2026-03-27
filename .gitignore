@@ -1,0 +1,32 @@
+# Local Draftspec self-hosting output
+/.draftspec/
+# /AGENTS.md
+/TESTS/
+
+# Binaries
+/draftspec
+bin/
+
+# Build outputs
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Coverage
+coverage.out
+*.coverprofile
+
+# Go workspace
+go.work
+go.work.sum
+
+# Editor and OS files
+.DS_Store
+.idea/
+.vscode/
+TESTS/*
+.claude

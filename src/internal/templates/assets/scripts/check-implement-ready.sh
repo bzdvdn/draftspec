@@ -1,0 +1,38 @@
+#!/bin/sh
+
+set -eu
+
+SPEC_SLUG="${1:-}"
+PLAN_DIR=".draftspec/plans/$SPEC_SLUG"
+
+if [ -z "$SPEC_SLUG" ]; then
+  echo "usage: check-implement-ready.sh <spec-slug>" >&2
+  exit 1
+fi
+
+check_file() {
+  path="$1"
+  if [ -f "$path" ]; then
+    echo "OK: $path"
+  else
+    echo "ERROR: missing $path"
+  fi
+}
+
+check_file ".draftspec/constitution.md"
+check_file ".draftspec/memory.md"
+check_file ".draftspec/specs/$SPEC_SLUG.md"
+check_file "$PLAN_DIR/plan.md"
+check_file "$PLAN_DIR/tasks.md"
+check_file "$PLAN_DIR/data-model.md"
+check_file ".draftspec/templates/prompts/implement.md"
+
+if [ -d "$PLAN_DIR/contracts" ]; then
+  echo "OK: $PLAN_DIR/contracts"
+else
+  echo "ERROR: missing $PLAN_DIR/contracts"
+fi
+
+if [ -x ".draftspec/scripts/check-constitution.sh" ]; then
+  ./.draftspec/scripts/check-constitution.sh .draftspec/constitution.md
+fi
