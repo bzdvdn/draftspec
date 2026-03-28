@@ -30,17 +30,21 @@ func TestFiles(t *testing.T) {
 		t.Fatalf("Files returned error: %v", err)
 	}
 
-	if len(files) != 36 {
+	if len(files) != 41 {
 		t.Fatalf("expected 36 generated agent files, got %d", len(files))
 	}
 
 	required := map[string]bool{
-		".claude/commands/draftspec.inspect.md":    false,
-		".codex/prompts/draftspec.plan.md":         false,
-		".github/prompts/draftspec-spec.prompt.md": false,
-		".cursor/rules/draftspec-implement.mdc":    false,
-		".kilocode/rules/draftspec-archive.md":     false,
-		".trae/project_rules.md":                   false,
+		".claude/commands/draftspec.inspect.md":      false,
+		".claude/commands/draftspec.verify.md":       false,
+		".codex/prompts/draftspec.plan.md":           false,
+		".github/prompts/draftspec-spec.prompt.md":   false,
+		".github/prompts/draftspec-verify.prompt.md": false,
+		".cursor/rules/draftspec-implement.mdc":      false,
+		".cursor/rules/draftspec-verify.mdc":         false,
+		".kilocode/rules/draftspec-archive.md":       false,
+		".kilocode/rules/draftspec-verify.md":        false,
+		".trae/project_rules.md":                     false,
 	}
 
 	for _, file := range files {

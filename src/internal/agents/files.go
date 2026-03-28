@@ -134,6 +134,7 @@ func commandSpecs() []commandSpec {
 		{Name: "plan", Description: "Create or update one feature plan package", PromptPath: ".draftspec/templates/prompts/plan.md", Extras: []string{".draftspec/scripts/check-plan-ready.sh"}},
 		{Name: "tasks", Description: "Create or update tasks for one feature", PromptPath: ".draftspec/templates/prompts/tasks.md", Extras: []string{".draftspec/scripts/check-tasks-ready.sh"}},
 		{Name: "implement", Description: "Implement one feature from tasks", PromptPath: ".draftspec/templates/prompts/implement.md", Extras: []string{".draftspec/scripts/check-implement-ready.sh", ".draftspec/scripts/list-open-tasks.sh"}},
+		{Name: "verify", Description: "Verify one implemented feature package", PromptPath: ".draftspec/templates/prompts/verify.md", Extras: []string{".draftspec/scripts/check-verify-ready.sh", ".draftspec/scripts/verify-task-state.sh"}},
 		{Name: "archive", Description: "Archive one feature package", PromptPath: ".draftspec/templates/prompts/archive.md", Extras: []string{".draftspec/scripts/check-archive-ready.sh"}},
 	}
 }
