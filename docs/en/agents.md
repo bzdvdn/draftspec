@@ -43,6 +43,12 @@ Each prompt is designed to:
 - respect the configured documentation and agent languages
 - preserve constitutional authority over specs, plans, tasks, and implementation
 
+`spec` should stay branch-first:
+
+- it should create or switch to `feature/<slug>` before writing `.draftspec/specs/<slug>.md` when the environment allows it
+- when the input comes from a local prompt file, it should prefer top-of-file `name:` and optional `slug:` metadata over a generic filename
+- if the request is ambiguous, multi-feature, URL-like, or tries to derive one spec from multiple constitutional changes, it should stop and ask for one concrete feature
+
 `verify` is intentionally lightweight:
 
 - it starts from `tasks.md`

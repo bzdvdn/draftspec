@@ -6,7 +6,7 @@
 constitution -> spec -> inspect -> plan -> tasks -> implement -> verify -> archive
 ```
 
-Draftspec assumes branch-based delivery: each active feature should be developed in its own git branch, with the feature spec and plan package acting as the shared source of truth instead of a mutable global memory file.
+Draftspec assumes branch-based delivery: each active feature should be developed in its own git branch, with the feature spec and plan package acting as the shared source of truth instead of a mutable global memory file. The default branch naming convention is `feature/<slug>`.
 
 ## Phase Responsibilities
 
@@ -27,6 +27,17 @@ Mandatory sections:
 ### `spec`
 
 Captures one feature request as a concrete spec. Acceptance criteria should use canonical `Given / When / Then` markers even when the surrounding document language is Russian.
+
+When `/draftspec.spec` starts from a prompt file, Draftspec should prefer top-of-file metadata such as:
+
+```text
+name: Add dark mode
+slug: add-dark-mode
+```
+
+`slug:` is optional. If it is missing, Draftspec should derive the slug from `name:`. If neither field is present, falling back to the filename is only safe when the filename is already specific enough.
+
+If the request is ambiguous, combines multiple features, or asks to derive one spec from multiple constitutional changes, Draftspec should stop and ask for one concrete feature before creating the branch or spec.
 
 ### `inspect`
 

@@ -41,7 +41,7 @@
 ## Development Workflow
 
 - Each feature MUST be developed in a dedicated git branch.
-- Feature branches SHOULD follow the project's spec branch naming convention.
+- Feature branches SHOULD follow the project's feature branch naming convention such as `feature/<slug>`.
 - Work SHOULD begin from an explicit spec before implementation starts.
 - Plans and tasks SHOULD be derived from the active spec and remain aligned with it.
 - Implementation, specs, plans, and tasks MUST comply with this constitution.

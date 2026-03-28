@@ -9,7 +9,7 @@ Preferred language settings:
 
 Workflow commands:
 - `/draftspec.constitution`: patch `.draftspec/constitution.md`
-- `/draftspec.spec`: create or refine one file in `.draftspec/specs/<slug>.md`
+- `/draftspec.spec`: create or refine one file in `.draftspec/specs/<slug>.md` and work from `feature/<slug>`
 - `/draftspec.inspect`: inspect one feature for consistency and quality before or after planning
 - `/draftspec.plan`: create or patch `.draftspec/plans/<slug>/plan.md`, `data-model.md`, and `contracts/`
 - `/draftspec.tasks`: create or patch `.draftspec/plans/<slug>/tasks.md`
@@ -20,6 +20,7 @@ Read discipline:
 - Follow `constitution -> spec -> inspect -> plan -> tasks -> implement -> archive`
 - Do not skip prerequisites
 - Load only the current feature slug by default
+- For file-based `/draftspec.spec` input, prefer a top-of-file `name:` and optional `slug:` before falling back to the filename
 - During `tasks`, start with `plan.md` and read deeper artifacts only if required
 - During `implement`, start with `tasks.md` and read deeper artifacts only if required
 

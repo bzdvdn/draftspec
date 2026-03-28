@@ -138,6 +138,7 @@ Draftspec should stay meaningfully lighter than Speckit by default.
 Draftspec should also stay team-safe by default:
 
 - each feature should be worked in a dedicated git branch
+- the default feature branch naming convention should be `feature/<slug>`
 - active feature state should live in the feature spec and plan package, not in a shared mutable memory file
 - archive should preserve historical context without creating frequent merge conflicts across parallel work
 
@@ -224,9 +225,17 @@ Inputs:
 - user request
 - minimal repository context when needed
 
+If the request is file-based, Draftspec should prefer explicit top-of-file metadata:
+
+- `name: <feature name>`
+- optional `slug: <feature-slug>`
+
+If `slug:` is missing, derive the slug from `name:`. Fall back to the filename only when it is specific enough to produce a safe slug and feature branch.
+
 Output:
 
 - `.draftspec/specs/<slug>.md`
+- work should happen from `feature/<slug>` when the environment can create or switch branches
 
 ## Plan workflow
 

@@ -17,6 +17,21 @@ Draftspec is a lean SDD kit for real codebases.
 
 In short: Draftspec aims to be as strict as practical while staying lightweight enough for everyday use.
 
+## Draftspec vs OpenSpec vs Spec Kit
+
+| Dimension | Draftspec | OpenSpec | Spec Kit |
+| --- | --- | --- | --- |
+| Workflow style | Strict phase chain with narrow context | Fluid artifact-guided workflow | Thorough multi-step SDD workflow |
+| Default context size | Smallest by default | Moderate | Largest |
+| Artifact overhead | Low | Medium | High |
+| Phase discipline | High | Medium | Highest |
+| Brownfield ergonomics | High | High | Medium |
+| Team collaboration model | Branch-first, feature-local artifacts | Change-folder oriented | Branch and workflow heavy |
+| Shared mutable state | Avoided by design | Low | Varies by setup |
+| Best fit | Lean strict SDD on real codebases | Flexible SDD-lite for fast iteration | Full-featured rigorous SDD |
+
+In short, Draftspec aims to sit between OpenSpec and Spec Kit: stricter than OpenSpec, lighter than Spec Kit, and optimized for branch-based collaboration with minimal default context.
+
 ## Documentation
 
 Extended documentation lives in [`docs/`](docs/README.md):
@@ -51,6 +66,7 @@ constitution -> spec -> inspect -> plan -> tasks -> implement -> verify -> archi
 - Specs use canonical `Given / When / Then` markers across documentation languages.
 - Agent workflows are designed to load only the minimum context required.
 - Strictness comes from phase entrypoints, templates, and readiness checks rather than large default prompts.
+- Agent-facing `/draftspec.spec` is branch-first: it should work from `feature/<slug>` and prefer explicit `name:` / `slug:` metadata for prompt files.
 - Generated docs and prompts support English and Russian.
 
 ## Quick Example

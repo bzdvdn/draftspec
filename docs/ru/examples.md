@@ -59,6 +59,25 @@ draftspec doctor .
 - adoption идет по одной фиче за раз
 - это снижает токеноемкость и уменьшает риск бюрократии
 
+### Вход Через Prompt-Файл
+
+Когда `/draftspec.spec` запускается от локального prompt-файла, лучше использовать явные метаданные, а не полагаться на generic filename вроде `spec_prompt.md`.
+
+Пример prompt-файла:
+
+```text
+name: Add dark mode
+slug: add-dark-mode
+
+Add a user-selectable dark theme for the dashboard and settings pages.
+```
+
+Это позволяет Draftspec:
+
+- вывести безопасный путь спецификации вроде `.draftspec/specs/add-dark-mode.md`
+- создать или переключить `feature/add-dark-mode`
+- избежать неоднозначных slug из generic filename
+
 ## 1. Создание Конституции для Brownfield-проекта
 
 Пример запроса:

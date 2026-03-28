@@ -2,6 +2,7 @@ package specs
 
 import (
 	"os"
+	"os/exec"
 	"path/filepath"
 	"reflect"
 	"strings"
@@ -78,7 +79,7 @@ func TestCreateGeneratesSpecAndTasksFromTemplates(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Create returned error: %v", err)
 	}
-	if len(result.Messages) == 0 || result.Messages[0] != "skipped spec branch creation" {
+	if len(result.Messages) == 0 || result.Messages[0] != "skipped feature branch creation" {
 		t.Fatalf("unexpected messages: %v", result.Messages)
 	}
 
@@ -113,5 +114,111 @@ func TestCreateFailsOnEmptySlug(t *testing.T) {
 	_, err = Create(root, "---", CreateOptions{CreateBranch: false})
 	if err == nil {
 		t.Fatal("expected error for empty slug, got nil")
+	}
+}
+
+func TestResolveInputFromPlainText(t *testing.T) {
+	resolved, err := ResolveInput("Add dark mode")
+	if err != nil {
+		t.Fatalf("ResolveInput returned error: %v", err)
+	}
+	if got, want := resolved.Title, "Add Dark Mode"; got != want {
+		t.Fatalf("Title = %q, want %q", got, want)
+	}
+	if got, want := resolved.Slug, "add-dark-mode"; got != want {
+		t.Fatalf("Slug = %q, want %q", got, want)
+	}
+}
+
+func TestResolveInputFromFileMetadataName(t *testing.T) {
+	root := t.TempDir()
+	path := filepath.Join(root, "spec_prompt.md")
+	content := "name: Add dark mode\n\nUse the new theme tokens.\n"
+	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
+		t.Fatalf("WriteFile returned error: %v", err)
+	}
+
+	resolved, err := ResolveInput(path)
+	if err != nil {
+		t.Fatalf("ResolveInput returned error: %v", err)
+	}
+	if got, want := resolved.Title, "Add dark mode"; got != want {
+		t.Fatalf("Title = %q, want %q", got, want)
+	}
+	if got, want := resolved.Slug, "add-dark-mode"; got != want {
+		t.Fatalf("Slug = %q, want %q", got, want)
+	}
+}
+
+func TestResolveInputFromFileMetadataSlug(t *testing.T) {
+	root := t.TempDir()
+	path := filepath.Join(root, "spec_prompt.md")
+	content := "name: Add dark mode\nslug: ui-dark-mode\n\nUse the new theme tokens.\n"
+	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
+		t.Fatalf("WriteFile returned error: %v", err)
+	}
+
+	resolved, err := ResolveInput(path)
+	if err != nil {
+		t.Fatalf("ResolveInput returned error: %v", err)
+	}
+	if got, want := resolved.Title, "Add dark mode"; got != want {
+		t.Fatalf("Title = %q, want %q", got, want)
+	}
+	if got, want := resolved.Slug, "ui-dark-mode"; got != want {
+		t.Fatalf("Slug = %q, want %q", got, want)
+	}
+}
+
+func TestResolveInputRejectsGenericPromptFileWithoutMetadata(t *testing.T) {
+	root := t.TempDir()
+	path := filepath.Join(root, "spec_prompt.md")
+	if err := os.WriteFile(path, []byte("Add dark mode.\n"), 0o644); err != nil {
+		t.Fatalf("WriteFile returned error: %v", err)
+	}
+
+	_, err := ResolveInput(path)
+	if err == nil {
+		t.Fatal("expected error for generic prompt file name, got nil")
+	}
+	if !strings.Contains(err.Error(), "needs a top-level name: or slug:") {
+		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
+func TestResolveInputRejectsURLInput(t *testing.T) {
+	_, err := ResolveInput("https://example.com/spec_prompt.md")
+	if err == nil {
+		t.Fatal("expected error for URL input, got nil")
+	}
+	if !strings.Contains(err.Error(), "looks like a URL") {
+		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
+func TestCreateCreatesAndSwitchesFeatureBranch(t *testing.T) {
+	root := t.TempDir()
+
+	_, err := project.Initialize(root, project.InitOptions{InitGit: true, DefaultLang: "en"})
+	if err != nil {
+		t.Fatalf("Initialize returned error: %v", err)
+	}
+
+	result, err := Create(root, "Partner Scheduling", CreateOptions{CreateBranch: true})
+	if err != nil {
+		t.Fatalf("Create returned error: %v", err)
+	}
+	if len(result.Messages) == 0 || !strings.Contains(result.Messages[0], "feature/partner-scheduling") {
+		t.Fatalf("unexpected messages: %v", result.Messages)
+	}
+
+	cmd := exec.Command("git", "symbolic-ref", "--short", "HEAD")
+	cmd.Dir = root
+	output, err := cmd.Output()
+	if err != nil {
+		t.Fatalf("git rev-parse returned error: %v", err)
+	}
+	if got, want := strings.TrimSpace(string(output)), "feature/partner-scheduling"; got != want {
+		t.Fatalf("HEAD = %q, want %q", got, want)
 	}
 }

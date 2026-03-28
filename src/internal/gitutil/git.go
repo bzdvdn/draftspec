@@ -58,13 +58,13 @@ func EnsureBranch(root, branch string) (string, error) {
 }
 
 func branchExists(root, branch string) (bool, error) {
-	_, _, err := run(root, "git", "show-ref", "--verify", "refs/heads/"+branch)
+	_, _, err := run(root, "git", "rev-parse", "--verify", "--quiet", "refs/heads/"+branch)
 	if err == nil {
 		return true, nil
 	}
 
 	var exitErr *exec.ExitError
-	if errors.As(err, &exitErr) && exitErr.ExitCode() == 1 {
+	if errors.As(err, &exitErr) && exitErr.ExitCode() != 0 {
 		return false, nil
 	}
 

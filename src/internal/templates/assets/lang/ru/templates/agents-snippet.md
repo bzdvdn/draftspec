@@ -9,7 +9,7 @@
 
 Workflow-команды:
 - `/draftspec.constitution`: patch-обновить `.draftspec/constitution.md`
-- `/draftspec.spec`: создать или уточнить один файл `.draftspec/specs/<slug>.md`
+- `/draftspec.spec`: создать или уточнить один файл `.draftspec/specs/<slug>.md` и работать из `feature/<slug>`
 - `/draftspec.inspect`: проанализировать одну фичу на согласованность и качество до или после планирования
 - `/draftspec.plan`: создать или обновить `.draftspec/plans/<slug>/plan.md`, `data-model.md` и `contracts/`
 - `/draftspec.tasks`: создать или обновить `.draftspec/plans/<slug>/tasks.md`
@@ -20,6 +20,7 @@ Workflow-команды:
 - Следуйте цепочке `constitution -> spec -> inspect -> plan -> tasks -> implement -> archive`
 - Не пропускайте prerequisites
 - По умолчанию загружайте только текущий feature slug
+- Для file-based входа в `/draftspec.spec` предпочитайте `name:` и опциональный `slug:` в начале файла, а не fallback на filename
 - В `tasks` начинайте с `plan.md` и грузите более глубокие артефакты только при необходимости
 - В `implement` начинайте с `tasks.md` и грузите более глубокие артефакты только при необходимости
 

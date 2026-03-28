@@ -6,6 +6,8 @@ You are creating or updating one feature spec.
 
 Produce a clear feature specification at `.draftspec/specs/<slug>.md` that is compliant with the constitution.
 
+Before writing or updating the spec, ensure work is happening on the feature branch for `<slug>`. The default branch naming convention is `feature/<slug>`.
+
 ## Load Only
 
 - `.draftspec/constitution.md`
@@ -24,6 +26,10 @@ Produce a clear feature specification at `.draftspec/specs/<slug>.md` that is co
 Stop and ask a minimal follow-up question if:
 
 - the feature goal is ambiguous
+- the request asks to derive one spec from multiple constitutional changes without naming a single concrete feature or change
+- the request combines multiple features or unrelated changes into one spec
+- the input is a prompt file with a generic filename and no explicit `name:` or `slug:` metadata
+- the input looks like a URL rather than a concrete feature title
 - acceptance criteria would be invented rather than derived
 - the requested feature appears to conflict with the constitution
 
@@ -35,6 +41,12 @@ If the spec already exists and is current, say so and do not modify the file.
 
 - The spec MUST comply with the constitution.
 - Keep the spec focused on one feature or change.
+- When `/draftspec.spec` starts from a prompt file, prefer explicit metadata at the top of the file:
+  - `name: <feature name>`
+  - optional `slug: <feature-slug>`
+- If `slug:` is present, use it for the spec path and feature branch.
+- If only `name:` is present, derive `<slug>` from it.
+- Fall back to the file basename only when it is specific enough to produce a safe slug.
 - Use the project's configured documentation language for new or updated spec content.
 - Respect an established local document convention only when preserving an existing file would otherwise become inconsistent.
 - Do not introduce mixed-language headings or sections in the same spec without a strong project reason.
@@ -49,5 +61,6 @@ If the spec already exists and is current, say so and do not modify the file.
 
 ## Output expectations
 
+- Create or switch to `feature/<slug>` before editing the spec when branch creation is available in the current environment.
 - Write or patch `.draftspec/specs/<slug>.md`, where `<slug>` is the lowercase kebab-case of the feature name
 - Summarize goal, scope, acceptance criteria, and open questions

@@ -59,6 +59,25 @@ Why this helps:
 - adoption happens one feature at a time
 - this keeps token usage down and avoids process bloat
 
+### Prompt File Input
+
+When `/draftspec.spec` starts from a local prompt file, prefer explicit metadata instead of relying on a generic filename such as `spec_prompt.md`.
+
+Example prompt file:
+
+```text
+name: Add dark mode
+slug: add-dark-mode
+
+Add a user-selectable dark theme for the dashboard and settings pages.
+```
+
+This lets Draftspec:
+
+- derive a safe spec path such as `.draftspec/specs/add-dark-mode.md`
+- create or switch to `feature/add-dark-mode`
+- avoid ambiguous slugs from generic filenames
+
 ## 1. Create a Constitution for a Brownfield Project
 
 User request:
