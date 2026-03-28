@@ -101,6 +101,9 @@ func Check(root string) (Result, error) {
 			findings = append(findings, Finding{Level: "error", Message: fmt.Sprintf("unsupported configured language: %s", value)})
 		}
 	}
+	if _, err := config.NormalizeShell(cfg.Runtime.Shell); err != nil {
+		findings = append(findings, Finding{Level: "error", Message: err.Error()})
+	}
 
 	enabledTargets := map[string]struct{}{}
 	for _, target := range cfg.Agents.Targets {

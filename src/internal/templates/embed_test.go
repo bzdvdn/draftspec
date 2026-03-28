@@ -37,6 +37,7 @@ func TestFilesBuildForSupportedLanguages(t *testing.T) {
 				Docs:     "en",
 				Agent:    "en",
 				Comments: "en",
+				Shell:    "sh",
 			},
 		},
 		{
@@ -46,6 +47,7 @@ func TestFilesBuildForSupportedLanguages(t *testing.T) {
 				Docs:     "ru",
 				Agent:    "ru",
 				Comments: "ru",
+				Shell:    "sh",
 			},
 		},
 		{
@@ -55,6 +57,17 @@ func TestFilesBuildForSupportedLanguages(t *testing.T) {
 				Docs:     "ru",
 				Agent:    "en",
 				Comments: "ru",
+				Shell:    "sh",
+			},
+		},
+		{
+			name: "powershell",
+			settings: LanguageSettings{
+				Default:  "en",
+				Docs:     "en",
+				Agent:    "en",
+				Comments: "en",
+				Shell:    "powershell",
 			},
 		},
 	}
@@ -80,7 +93,7 @@ func TestFilesBuildForSupportedLanguages(t *testing.T) {
 				targets[file.TargetPath] = struct{}{}
 			}
 
-			for _, required := range []string{
+			requiredFiles := []string{
 				"draftspec.yaml",
 				"constitution.md",
 				"templates/spec.md",
@@ -96,11 +109,18 @@ func TestFilesBuildForSupportedLanguages(t *testing.T) {
 				"templates/prompts/implement.md",
 				"templates/prompts/archive.md",
 				"templates/prompts/verify.md",
-				"scripts/check-inspect-ready.sh",
-				"scripts/check-archive-ready.sh",
-				"scripts/check-verify-ready.sh",
-				"scripts/verify-task-state.sh",
-			} {
+			}
+			ext := ".sh"
+			if tc.settings.Shell == "powershell" {
+				ext = ".ps1"
+			}
+			requiredFiles = append(requiredFiles,
+				"scripts/check-inspect-ready"+ext,
+				"scripts/check-archive-ready"+ext,
+				"scripts/check-verify-ready"+ext,
+				"scripts/verify-task-state"+ext,
+			)
+			for _, required := range requiredFiles {
 				if _, ok := targets[required]; !ok {
 					t.Fatalf("expected generated file set to include %s", required)
 				}

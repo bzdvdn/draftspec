@@ -121,6 +121,7 @@ Controls:
 - `docs language`: generated project docs and templates
 - `agent language`: generated prompts and inserted `AGENTS.md` guidance
 - `comments language`: preferred code comment language recorded in policy docs and config
+- `shell`: generated workflow script family; supported values are `sh` and `powershell`
 
 The language settings are stored in `.draftspec/draftspec.yaml` and reflected in:
 
@@ -306,6 +307,9 @@ project:
   name: my-project
   constitution_file: .draftspec/constitution.md
 
+runtime:
+  shell: sh
+
 paths:
   specs_dir: .draftspec/specs
   plans_dir: .draftspec/plans
@@ -354,3 +358,5 @@ scripts:
 `cleanup-agents` removes orphaned agent artifacts for targets that are no longer enabled in config.
 
 `doctor` reports `error` for missing required files and `warning` for orphaned agent artifacts that remain on disk after a target has been disabled in config.
+
+For PowerShell projects, the same generated script names should use `.ps1` extensions instead of `.sh`.

@@ -10,14 +10,15 @@
 
 ```bash
 draftspec init
-draftspec init my-project --lang ru
-draftspec init my-project --docs-lang ru --agent-lang en --comments-lang en --agents claude --agents cursor
+draftspec init my-project --lang ru --shell sh
+draftspec init my-project --docs-lang ru --agent-lang en --comments-lang en --shell powershell --agents claude --agents cursor
 ```
 
 Важные флаги:
 
 - `--git` инициализирует Git-репозиторий; по умолчанию включен
 - `--lang` задает базовый язык; по умолчанию `en`
+- `--shell` выбирает семейство генерируемых workflow scripts; обязателен: `sh` или `powershell`
 - `--docs-lang` задает язык генерируемой документации
 - `--agent-lang` задает язык генерируемых промтов и guidance для агентов
 - `--comments-lang` фиксирует предпочитаемый язык комментариев в коде

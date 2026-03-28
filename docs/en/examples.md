@@ -11,7 +11,7 @@ When starting a greenfield project, Draftspec works best as a minimal project-co
 Example:
 
 ```bash
-draftspec init my-project --lang en --agents codex
+draftspec init my-project --lang en --shell sh --agents codex
 cd my-project
 draftspec doctor .
 ```
@@ -37,7 +37,7 @@ Example:
 
 ```bash
 cd existing-project
-draftspec init . --lang en --agents codex
+draftspec init . --lang en --shell sh --agents codex
 draftspec doctor .
 ```
 

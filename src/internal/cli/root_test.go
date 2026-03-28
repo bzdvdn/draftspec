@@ -26,7 +26,7 @@ func executeRoot(t *testing.T, args ...string) (string, string, error) {
 func TestInitCommandCreatesWorkspace(t *testing.T) {
 	root := t.TempDir()
 
-	stdout, _, err := executeRoot(t, "init", root, "--git=false", "--lang", "en", "--agents", "claude")
+	stdout, _, err := executeRoot(t, "init", root, "--git=false", "--lang", "en", "--shell", "sh", "--agents", "claude")
 	if err != nil {
 		t.Fatalf("init command returned error: %v", err)
 	}
@@ -49,7 +49,7 @@ func TestInitCommandCreatesWorkspace(t *testing.T) {
 func TestListSpecsAndShowSpecCommands(t *testing.T) {
 	root := t.TempDir()
 
-	if _, _, err := executeRoot(t, "init", root, "--git=false", "--lang", "en"); err != nil {
+	if _, _, err := executeRoot(t, "init", root, "--git=false", "--lang", "en", "--shell", "sh"); err != nil {
 		t.Fatalf("init command returned error: %v", err)
 	}
 
@@ -81,7 +81,7 @@ func TestListSpecsAndShowSpecCommands(t *testing.T) {
 func TestAddAgentAndDoctorCommands(t *testing.T) {
 	root := t.TempDir()
 
-	if _, _, err := executeRoot(t, "init", root, "--git=false", "--lang", "en"); err != nil {
+	if _, _, err := executeRoot(t, "init", root, "--git=false", "--lang", "en", "--shell", "sh"); err != nil {
 		t.Fatalf("init command returned error: %v", err)
 	}
 
@@ -105,7 +105,7 @@ func TestAddAgentAndDoctorCommands(t *testing.T) {
 func TestDoctorCommandJSONOutput(t *testing.T) {
 	root := t.TempDir()
 
-	if _, _, err := executeRoot(t, "init", root, "--git=false", "--lang", "en"); err != nil {
+	if _, _, err := executeRoot(t, "init", root, "--git=false", "--lang", "en", "--shell", "sh"); err != nil {
 		t.Fatalf("init command returned error: %v", err)
 	}
 
@@ -134,7 +134,7 @@ func TestDoctorCommandJSONOutput(t *testing.T) {
 func TestCleanupAgentsCommandRemovesOrphanedArtifacts(t *testing.T) {
 	root := t.TempDir()
 
-	if _, _, err := executeRoot(t, "init", root, "--git=false", "--lang", "en", "--agents", "cursor"); err != nil {
+	if _, _, err := executeRoot(t, "init", root, "--git=false", "--lang", "en", "--shell", "sh", "--agents", "cursor"); err != nil {
 		t.Fatalf("init command returned error: %v", err)
 	}
 	if _, _, err := executeRoot(t, "remove-agent", root, "--agents", "cursor"); err != nil {
@@ -158,5 +158,14 @@ func TestCleanupAgentsCommandRemovesOrphanedArtifacts(t *testing.T) {
 	}
 	if _, err := os.Stat(orphanPath); !os.IsNotExist(err) {
 		t.Fatalf("expected orphaned file to be removed, got err=%v", err)
+	}
+}
+
+func TestInitCommandRequiresShell(t *testing.T) {
+	root := t.TempDir()
+
+	_, _, err := executeRoot(t, "init", root, "--git=false", "--lang", "en")
+	if err == nil {
+		t.Fatal("expected init without --shell to fail")
 	}
 }

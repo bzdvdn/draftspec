@@ -11,7 +11,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-//go:embed assets/scripts/* assets/lang/* assets/lang/*/* assets/lang/*/templates/* assets/lang/*/templates/prompts/* assets/lang/*/templates/contracts/* assets/lang/*/templates/archive/*
+//go:embed assets/scripts/* assets/scripts/powershell/* assets/lang/* assets/lang/*/* assets/lang/*/templates/* assets/lang/*/templates/prompts/* assets/lang/*/templates/contracts/* assets/lang/*/templates/archive/*
 var embedded embed.FS
 
 type File struct {
@@ -25,6 +25,7 @@ type LanguageSettings struct {
 	Docs         string
 	Agent        string
 	Comments     string
+	Shell        string
 	AgentTargets []string
 }
 
@@ -93,35 +94,67 @@ func Files(settings LanguageSettings) ([]File, error) {
 			return nil, err
 		}
 		content = applyLanguagePlaceholders(content, definition.Language, settings)
+		content = applyShellPlaceholders(content, settings)
 		files = append(files, File{TargetPath: definition.TargetPath, Content: content, Mode: definition.Mode})
 	}
-	for _, definition := range []struct {
-		AssetPath, TargetPath string
-		Mode                  fs.FileMode
-	}{
-		{"assets/scripts/inspect-spec.sh", "scripts/inspect-spec.sh", 0o755},
-		{"assets/scripts/check-constitution.sh", "scripts/check-constitution.sh", 0o755},
-		{"assets/scripts/check-spec-ready.sh", "scripts/check-spec-ready.sh", 0o755},
-		{"assets/scripts/check-inspect-ready.sh", "scripts/check-inspect-ready.sh", 0o755},
-		{"assets/scripts/check-plan-ready.sh", "scripts/check-plan-ready.sh", 0o755},
-		{"assets/scripts/check-tasks-ready.sh", "scripts/check-tasks-ready.sh", 0o755},
-		{"assets/scripts/check-implement-ready.sh", "scripts/check-implement-ready.sh", 0o755},
-		{"assets/scripts/check-archive-ready.sh", "scripts/check-archive-ready.sh", 0o755},
-		{"assets/scripts/check-verify-ready.sh", "scripts/check-verify-ready.sh", 0o755},
-		{"assets/scripts/verify-task-state.sh", "scripts/verify-task-state.sh", 0o755},
-		{"assets/scripts/list-open-tasks.sh", "scripts/list-open-tasks.sh", 0o755},
-		{"assets/scripts/link-agents.sh", "scripts/link-agents.sh", 0o755},
-		{"assets/scripts/list-specs.sh", "scripts/list-specs.sh", 0o755},
-		{"assets/scripts/show-spec.sh", "scripts/show-spec.sh", 0o755},
-	} {
+	for _, definition := range shellScriptDefinitions(settings.Shell) {
 		content, err := FileContent(definition.AssetPath)
 		if err != nil {
 			return nil, err
 		}
+		content = applyShellPlaceholders(content, settings)
 		files = append(files, File{TargetPath: definition.TargetPath, Content: content, Mode: definition.Mode})
 	}
 	sort.Slice(files, func(i, j int) bool { return files[i].TargetPath < files[j].TargetPath })
 	return files, nil
+}
+
+func shellScriptDefinitions(shell string) []struct {
+	AssetPath, TargetPath string
+	Mode                  fs.FileMode
+} {
+	normalizedShell := normalizeShellValue(shell)
+	ext := ".sh"
+	mode := fs.FileMode(0o755)
+	if normalizedShell == "powershell" {
+		ext = ".ps1"
+		mode = 0o644
+	}
+	names := []string{
+		"inspect-spec",
+		"check-constitution",
+		"check-spec-ready",
+		"check-inspect-ready",
+		"check-plan-ready",
+		"check-tasks-ready",
+		"check-implement-ready",
+		"check-archive-ready",
+		"check-verify-ready",
+		"verify-task-state",
+		"list-open-tasks",
+		"link-agents",
+		"list-specs",
+		"show-spec",
+	}
+	definitions := make([]struct {
+		AssetPath, TargetPath string
+		Mode                  fs.FileMode
+	}, 0, len(names))
+	for _, name := range names {
+		assetPath := fmt.Sprintf("assets/scripts/%s%s", name, ext)
+		if normalizedShell == "powershell" {
+			assetPath = fmt.Sprintf("assets/scripts/powershell/%s%s", name, ext)
+		}
+		definitions = append(definitions, struct {
+			AssetPath, TargetPath string
+			Mode                  fs.FileMode
+		}{
+			AssetPath:  assetPath,
+			TargetPath: fmt.Sprintf("scripts/%s%s", name, ext),
+			Mode:       mode,
+		})
+	}
+	return definitions
 }
 
 func FileContent(path string) (string, error) {
@@ -162,6 +195,51 @@ func applyLanguagePlaceholders(content, outputLanguage string, settings Language
 	).Replace(content)
 }
 
+func applyShellPlaceholders(content string, settings LanguageSettings) string {
+	replacements := scriptReplacements(settings.Shell)
+	oldNew := make([]string, 0, len(replacements)*2)
+	for oldValue, newValue := range replacements {
+		oldNew = append(oldNew, oldValue, newValue)
+	}
+	return strings.NewReplacer(oldNew...).Replace(content)
+}
+
+func scriptReplacements(shell string) map[string]string {
+	normalizedShell := normalizeShellValue(shell)
+	ext := ".sh"
+	if normalizedShell == "powershell" {
+		ext = ".ps1"
+	}
+	names := []string{
+		"inspect-spec",
+		"check-constitution",
+		"check-spec-ready",
+		"check-inspect-ready",
+		"check-plan-ready",
+		"check-tasks-ready",
+		"check-implement-ready",
+		"check-archive-ready",
+		"check-verify-ready",
+		"verify-task-state",
+		"list-open-tasks",
+		"link-agents",
+		"list-specs",
+		"show-spec",
+	}
+	replacements := make(map[string]string, len(names))
+	for _, name := range names {
+		replacements[name+".sh"] = name + ext
+	}
+	return replacements
+}
+
+func normalizeShellValue(shell string) string {
+	if strings.EqualFold(strings.TrimSpace(shell), "powershell") {
+		return "powershell"
+	}
+	return "sh"
+}
+
 func languageLabel(code, outputLanguage string) string {
 	switch strings.ToLower(strings.TrimSpace(outputLanguage)) {
 	case "ru":
@@ -184,6 +262,8 @@ func languageLabel(code, outputLanguage string) string {
 
 func generateConfig(settings LanguageSettings) string {
 	cfg := config.Default()
+	cfg.Runtime.Shell = normalizeShellValue(settings.Shell)
+	cfg.Scripts = config.ScriptDefaultsForShell(cfg.Runtime.Shell)
 	cfg.Language.Default = settings.Default
 	cfg.Language.Docs = settings.Docs
 	cfg.Language.Agent = settings.Agent

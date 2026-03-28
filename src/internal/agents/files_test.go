@@ -25,13 +25,13 @@ func TestNormalizeTargetsAll(t *testing.T) {
 }
 
 func TestFiles(t *testing.T) {
-	files, err := Files([]string{"claude", "codex", "copilot", "cursor", "kilocode", "trae"}, "en")
+	files, err := Files([]string{"claude", "codex", "copilot", "cursor", "kilocode", "trae"}, "en", "sh")
 	if err != nil {
 		t.Fatalf("Files returned error: %v", err)
 	}
 
 	if len(files) != 41 {
-		t.Fatalf("expected 36 generated agent files, got %d", len(files))
+		t.Fatalf("expected 41 generated agent files, got %d", len(files))
 	}
 
 	required := map[string]bool{

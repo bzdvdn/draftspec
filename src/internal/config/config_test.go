@@ -11,6 +11,9 @@ func TestDefaultAppliesExpectedDefaults(t *testing.T) {
 	if cfg.Version != 1 {
 		t.Fatalf("Version = %d, want 1", cfg.Version)
 	}
+	if cfg.Runtime.Shell != "sh" {
+		t.Fatalf("Runtime.Shell = %q, want sh", cfg.Runtime.Shell)
+	}
 	if cfg.Language.Default != "en" || cfg.Language.Docs != "en" || cfg.Language.Agent != "en" || cfg.Language.Comments != "en" {
 		t.Fatalf("unexpected default languages: %+v", cfg.Language)
 	}
@@ -66,6 +69,9 @@ func TestSaveAndLoadPreserveConfigAndApplyDefaults(t *testing.T) {
 	if loaded.Project.Name != "demo" {
 		t.Fatalf("Project.Name = %q, want demo", loaded.Project.Name)
 	}
+	if loaded.Runtime.Shell != "sh" {
+		t.Fatalf("Runtime.Shell = %q, want sh", loaded.Runtime.Shell)
+	}
 	if loaded.Language.Default != "ru" || loaded.Language.Docs != "ru" {
 		t.Fatalf("unexpected loaded languages: %+v", loaded.Language)
 	}
@@ -80,6 +86,16 @@ func TestSaveAndLoadPreserveConfigAndApplyDefaults(t *testing.T) {
 	}
 	if loaded.Templates.Spec == "" || loaded.Scripts.ShowSpec == "" {
 		t.Fatalf("expected template and script defaults to be applied: templates=%+v scripts=%+v", loaded.Templates, loaded.Scripts)
+	}
+}
+
+func TestScriptDefaultsForShell(t *testing.T) {
+	ps := ScriptDefaultsForShell("powershell")
+	if ps.CheckSpecReady != "check-spec-ready.ps1" {
+		t.Fatalf("CheckSpecReady = %q, want check-spec-ready.ps1", ps.CheckSpecReady)
+	}
+	if ps.VerifyTaskState != "verify-task-state.ps1" {
+		t.Fatalf("VerifyTaskState = %q, want verify-task-state.ps1", ps.VerifyTaskState)
 	}
 }
 

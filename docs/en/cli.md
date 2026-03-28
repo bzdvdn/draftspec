@@ -10,14 +10,15 @@ Examples:
 
 ```bash
 draftspec init
-draftspec init my-project --lang en
-draftspec init my-project --docs-lang ru --agent-lang en --comments-lang en --agents claude --agents cursor
+draftspec init my-project --lang en --shell sh
+draftspec init my-project --docs-lang ru --agent-lang en --comments-lang en --shell powershell --agents claude --agents cursor
 ```
 
 Important flags:
 
 - `--git` initializes a Git repository when true; default is enabled
 - `--lang` sets the base language; default is `en`
+- `--shell` selects the generated workflow script family; required: `sh` or `powershell`
 - `--docs-lang` sets the generated documentation language
 - `--agent-lang` sets the generated prompt and agent guidance language
 - `--comments-lang` records the preferred code comment language

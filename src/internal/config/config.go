@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 )
@@ -15,6 +16,9 @@ var defaultConfig = Config{
 	Project: Project{
 		Name:             "my-project",
 		ConstitutionFile: ".draftspec/constitution.md",
+	},
+	Runtime: Runtime{
+		Shell: "sh",
 	},
 	Paths: Paths{
 		SpecsDir:     ".draftspec/specs",
@@ -54,27 +58,13 @@ var defaultConfig = Config{
 		ArchivePrompt:      "prompts/archive.md",
 		VerifyPrompt:       "prompts/verify.md",
 	},
-	Scripts: Scripts{
-		InspectSpec:         "inspect-spec.sh",
-		CheckConstitution:   "check-constitution.sh",
-		CheckSpecReady:      "check-spec-ready.sh",
-		CheckInspectReady:   "check-inspect-ready.sh",
-		CheckPlanReady:      "check-plan-ready.sh",
-		CheckTasksReady:     "check-tasks-ready.sh",
-		CheckImplementReady: "check-implement-ready.sh",
-		CheckArchiveReady:   "check-archive-ready.sh",
-		CheckVerifyReady:    "check-verify-ready.sh",
-		VerifyTaskState:     "verify-task-state.sh",
-		ListOpenTasks:       "list-open-tasks.sh",
-		LinkAgents:          "link-agents.sh",
-		ListSpecs:           "list-specs.sh",
-		ShowSpec:            "show-spec.sh",
-	},
+	Scripts: ScriptDefaultsForShell("sh"),
 }
 
 type Config struct {
 	Version   int       `yaml:"version"`
 	Project   Project   `yaml:"project"`
+	Runtime   Runtime   `yaml:"runtime"`
 	Paths     Paths     `yaml:"paths"`
 	Language  Language  `yaml:"language"`
 	Agents    Agents    `yaml:"agents"`
@@ -85,6 +75,10 @@ type Config struct {
 type Project struct {
 	Name             string `yaml:"name"`
 	ConstitutionFile string `yaml:"constitution_file"`
+}
+
+type Runtime struct {
+	Shell string `yaml:"shell"`
 }
 
 type Paths struct {
@@ -144,6 +138,45 @@ type Scripts struct {
 	LinkAgents          string `yaml:"link_agents"`
 	ListSpecs           string `yaml:"list_specs"`
 	ShowSpec            string `yaml:"show_spec"`
+}
+
+func NormalizeShell(shell string) (string, error) {
+	value := strings.ToLower(strings.TrimSpace(shell))
+	switch value {
+	case "sh", "powershell":
+		return value, nil
+	default:
+		return "", fmt.Errorf("unsupported shell %q, expected sh or powershell", shell)
+	}
+}
+
+func ScriptDefaultsForShell(shell string) Scripts {
+	normalized, err := NormalizeShell(shell)
+	if err != nil {
+		normalized = "sh"
+	}
+
+	ext := ".sh"
+	if normalized == "powershell" {
+		ext = ".ps1"
+	}
+
+	return Scripts{
+		InspectSpec:         "inspect-spec" + ext,
+		CheckConstitution:   "check-constitution" + ext,
+		CheckSpecReady:      "check-spec-ready" + ext,
+		CheckInspectReady:   "check-inspect-ready" + ext,
+		CheckPlanReady:      "check-plan-ready" + ext,
+		CheckTasksReady:     "check-tasks-ready" + ext,
+		CheckImplementReady: "check-implement-ready" + ext,
+		CheckArchiveReady:   "check-archive-ready" + ext,
+		CheckVerifyReady:    "check-verify-ready" + ext,
+		VerifyTaskState:     "verify-task-state" + ext,
+		ListOpenTasks:       "list-open-tasks" + ext,
+		LinkAgents:          "link-agents" + ext,
+		ListSpecs:           "list-specs" + ext,
+		ShowSpec:            "show-spec" + ext,
+	}
 }
 
 func Default() Config {
@@ -216,6 +249,9 @@ func (c *Config) applyDefaults() {
 	}
 	if c.Project.ConstitutionFile == "" {
 		c.Project.ConstitutionFile = defaultConfig.Project.ConstitutionFile
+	}
+	if c.Runtime.Shell == "" {
+		c.Runtime.Shell = defaultConfig.Runtime.Shell
 	}
 	if c.Paths.SpecsDir == "" {
 		c.Paths.SpecsDir = defaultConfig.Paths.SpecsDir
@@ -304,47 +340,48 @@ func (c *Config) applyDefaults() {
 	if c.Templates.VerifyPrompt == "" {
 		c.Templates.VerifyPrompt = defaultConfig.Templates.VerifyPrompt
 	}
+	defaultScripts := ScriptDefaultsForShell(c.Runtime.Shell)
 	if c.Scripts.InspectSpec == "" {
-		c.Scripts.InspectSpec = defaultConfig.Scripts.InspectSpec
+		c.Scripts.InspectSpec = defaultScripts.InspectSpec
 	}
 	if c.Scripts.CheckConstitution == "" {
-		c.Scripts.CheckConstitution = defaultConfig.Scripts.CheckConstitution
+		c.Scripts.CheckConstitution = defaultScripts.CheckConstitution
 	}
 	if c.Scripts.CheckSpecReady == "" {
-		c.Scripts.CheckSpecReady = defaultConfig.Scripts.CheckSpecReady
+		c.Scripts.CheckSpecReady = defaultScripts.CheckSpecReady
 	}
 	if c.Scripts.CheckInspectReady == "" {
-		c.Scripts.CheckInspectReady = defaultConfig.Scripts.CheckInspectReady
+		c.Scripts.CheckInspectReady = defaultScripts.CheckInspectReady
 	}
 	if c.Scripts.CheckPlanReady == "" {
-		c.Scripts.CheckPlanReady = defaultConfig.Scripts.CheckPlanReady
+		c.Scripts.CheckPlanReady = defaultScripts.CheckPlanReady
 	}
 	if c.Scripts.CheckTasksReady == "" {
-		c.Scripts.CheckTasksReady = defaultConfig.Scripts.CheckTasksReady
+		c.Scripts.CheckTasksReady = defaultScripts.CheckTasksReady
 	}
 	if c.Scripts.CheckImplementReady == "" {
-		c.Scripts.CheckImplementReady = defaultConfig.Scripts.CheckImplementReady
+		c.Scripts.CheckImplementReady = defaultScripts.CheckImplementReady
 	}
 	if c.Scripts.CheckArchiveReady == "" {
-		c.Scripts.CheckArchiveReady = defaultConfig.Scripts.CheckArchiveReady
+		c.Scripts.CheckArchiveReady = defaultScripts.CheckArchiveReady
 	}
 	if c.Scripts.CheckVerifyReady == "" {
-		c.Scripts.CheckVerifyReady = defaultConfig.Scripts.CheckVerifyReady
+		c.Scripts.CheckVerifyReady = defaultScripts.CheckVerifyReady
 	}
 	if c.Scripts.VerifyTaskState == "" {
-		c.Scripts.VerifyTaskState = defaultConfig.Scripts.VerifyTaskState
+		c.Scripts.VerifyTaskState = defaultScripts.VerifyTaskState
 	}
 	if c.Scripts.ListOpenTasks == "" {
-		c.Scripts.ListOpenTasks = defaultConfig.Scripts.ListOpenTasks
+		c.Scripts.ListOpenTasks = defaultScripts.ListOpenTasks
 	}
 	if c.Scripts.LinkAgents == "" {
-		c.Scripts.LinkAgents = defaultConfig.Scripts.LinkAgents
+		c.Scripts.LinkAgents = defaultScripts.LinkAgents
 	}
 	if c.Scripts.ListSpecs == "" {
-		c.Scripts.ListSpecs = defaultConfig.Scripts.ListSpecs
+		c.Scripts.ListSpecs = defaultScripts.ListSpecs
 	}
 	if c.Scripts.ShowSpec == "" {
-		c.Scripts.ShowSpec = defaultConfig.Scripts.ShowSpec
+		c.Scripts.ShowSpec = defaultScripts.ShowSpec
 	}
 }
 

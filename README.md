@@ -67,12 +67,13 @@ constitution -> spec -> inspect -> plan -> tasks -> implement -> verify -> archi
 - Agent workflows are designed to load only the minimum context required.
 - Strictness comes from phase entrypoints, templates, and readiness checks rather than large default prompts.
 - Agent-facing `/draftspec.spec` is branch-first: it should work from `feature/<slug>` and prefer explicit `name:` / `slug:` metadata for prompt files.
+- `draftspec init` requires an explicit `--shell` and generates one script family: `sh` or `powershell`.
 - Generated docs and prompts support English and Russian.
 
 ## Quick Example
 
 ```bash
-draftspec init my-project --lang en --agents claude --agents codex
+draftspec init my-project --lang en --shell sh --agents claude --agents codex
 draftspec doctor my-project
 draftspec doctor my-project --json
 ```

@@ -65,7 +65,7 @@ func NormalizeTargets(values []string) ([]string, error) {
 	return out, nil
 }
 
-func Files(targets []string, language string) ([]File, error) {
+func Files(targets []string, language string, shell string) ([]File, error) {
 	normalized, err := NormalizeTargets(targets)
 	if err != nil {
 		return nil, err
@@ -73,7 +73,7 @@ func Files(targets []string, language string) ([]File, error) {
 
 	var files []File
 	for _, target := range normalized {
-		for _, file := range filesForTarget(target, language) {
+		for _, file := range filesForTarget(target, language, shell) {
 			files = append(files, file)
 		}
 	}
@@ -82,7 +82,7 @@ func Files(targets []string, language string) ([]File, error) {
 	return files, nil
 }
 
-func FilesForTarget(target, language string) ([]File, error) {
+func FilesForTarget(target, language, shell string) ([]File, error) {
 	normalized, err := NormalizeTargets([]string{target})
 	if err != nil {
 		return nil, err
@@ -90,11 +90,11 @@ func FilesForTarget(target, language string) ([]File, error) {
 	if len(normalized) == 0 {
 		return nil, nil
 	}
-	return filesForTarget(normalized[0], language), nil
+	return filesForTarget(normalized[0], language, shell), nil
 }
 
 func PathsForTarget(target string) ([]string, error) {
-	files, err := FilesForTarget(target, "en")
+	files, err := FilesForTarget(target, "en", "sh")
 	if err != nil {
 		return nil, err
 	}
@@ -106,13 +106,13 @@ func PathsForTarget(target string) ([]string, error) {
 	return paths, nil
 }
 
-func filesForTarget(target, language string) []File {
+func filesForTarget(target, language, shell string) []File {
 	if target == "trae" {
-		return []File{{Path: ".trae/project_rules.md", Content: renderTrae(language), Mode: 0o644}}
+		return []File{{Path: ".trae/project_rules.md", Content: renderTrae(language, shell), Mode: 0o644}}
 	}
 
 	var files []File
-	for _, command := range commandSpecs() {
+	for _, command := range commandSpecs(shell) {
 		path, content := render(target, language, command)
 		files = append(files, File{Path: path, Content: content, Mode: 0o644})
 	}
@@ -126,17 +126,26 @@ type commandSpec struct {
 	Extras      []string
 }
 
-func commandSpecs() []commandSpec {
+func commandSpecs(shell string) []commandSpec {
+	normalizedShell := normalizeShell(shell)
 	return []commandSpec{
-		{Name: "constitution", Description: "Create or update the project constitution", PromptPath: ".draftspec/templates/prompts/constitution.md", Extras: []string{".draftspec/scripts/check-constitution.sh"}},
-		{Name: "spec", Description: "Create or update one feature spec", PromptPath: ".draftspec/templates/prompts/spec.md", Extras: []string{".draftspec/scripts/check-spec-ready.sh"}},
-		{Name: "inspect", Description: "Inspect one feature for consistency and quality", PromptPath: ".draftspec/templates/prompts/inspect.md", Extras: []string{".draftspec/scripts/check-inspect-ready.sh", ".draftspec/scripts/inspect-spec.sh"}},
-		{Name: "plan", Description: "Create or update one feature plan package", PromptPath: ".draftspec/templates/prompts/plan.md", Extras: []string{".draftspec/scripts/check-plan-ready.sh"}},
-		{Name: "tasks", Description: "Create or update tasks for one feature", PromptPath: ".draftspec/templates/prompts/tasks.md", Extras: []string{".draftspec/scripts/check-tasks-ready.sh"}},
-		{Name: "implement", Description: "Implement one feature from tasks", PromptPath: ".draftspec/templates/prompts/implement.md", Extras: []string{".draftspec/scripts/check-implement-ready.sh", ".draftspec/scripts/list-open-tasks.sh"}},
-		{Name: "verify", Description: "Verify one implemented feature package", PromptPath: ".draftspec/templates/prompts/verify.md", Extras: []string{".draftspec/scripts/check-verify-ready.sh", ".draftspec/scripts/verify-task-state.sh"}},
-		{Name: "archive", Description: "Archive one feature package", PromptPath: ".draftspec/templates/prompts/archive.md", Extras: []string{".draftspec/scripts/check-archive-ready.sh"}},
+		{Name: "constitution", Description: "Create or update the project constitution", PromptPath: ".draftspec/templates/prompts/constitution.md", Extras: []string{scriptPath("check-constitution", normalizedShell)}},
+		{Name: "spec", Description: "Create or update one feature spec", PromptPath: ".draftspec/templates/prompts/spec.md", Extras: []string{scriptPath("check-spec-ready", normalizedShell)}},
+		{Name: "inspect", Description: "Inspect one feature for consistency and quality", PromptPath: ".draftspec/templates/prompts/inspect.md", Extras: []string{scriptPath("check-inspect-ready", normalizedShell), scriptPath("inspect-spec", normalizedShell)}},
+		{Name: "plan", Description: "Create or update one feature plan package", PromptPath: ".draftspec/templates/prompts/plan.md", Extras: []string{scriptPath("check-plan-ready", normalizedShell)}},
+		{Name: "tasks", Description: "Create or update tasks for one feature", PromptPath: ".draftspec/templates/prompts/tasks.md", Extras: []string{scriptPath("check-tasks-ready", normalizedShell)}},
+		{Name: "implement", Description: "Implement one feature from tasks", PromptPath: ".draftspec/templates/prompts/implement.md", Extras: []string{scriptPath("check-implement-ready", normalizedShell), scriptPath("list-open-tasks", normalizedShell)}},
+		{Name: "verify", Description: "Verify one implemented feature package", PromptPath: ".draftspec/templates/prompts/verify.md", Extras: []string{scriptPath("check-verify-ready", normalizedShell), scriptPath("verify-task-state", normalizedShell)}},
+		{Name: "archive", Description: "Archive one feature package", PromptPath: ".draftspec/templates/prompts/archive.md", Extras: []string{scriptPath("check-archive-ready", normalizedShell)}},
 	}
+}
+
+func scriptPath(name, shell string) string {
+	ext := ".sh"
+	if shell == "powershell" {
+		ext = ".ps1"
+	}
+	return ".draftspec/scripts/" + name + ext
 }
 
 func render(target, language string, spec commandSpec) (string, string) {
@@ -164,6 +173,13 @@ func normalizeLanguage(language string) string {
 		return "ru"
 	}
 	return "en"
+}
+
+func normalizeShell(shell string) string {
+	if strings.EqualFold(strings.TrimSpace(shell), "powershell") {
+		return "powershell"
+	}
+	return "sh"
 }
 
 func renderClaude(spec commandSpec, lang string) string {
@@ -313,14 +329,14 @@ Related scripts:
 `, spec.Name, spec.PromptPath, spec.Name, bulletList(spec.Extras))
 }
 
-func renderTrae(language string) string {
+func renderTrae(language, shell string) string {
 	lang := normalizeLanguage(language)
 	if lang == "ru" {
 		var sections []string
 		sections = append(sections, "# Draftspec Project Rules")
 		sections = append(sections, "")
 		sections = append(sections, "Используйте .draftspec как основной источник проектного контекста. Следуйте AGENTS.md и соответствующим prompt-файлам в .draftspec/templates/prompts/.")
-		for _, spec := range commandSpecs() {
+		for _, spec := range commandSpecs(shell) {
 			sections = append(sections, "")
 			sections = append(sections, fmt.Sprintf("## /draftspec.%s", spec.Name))
 			sections = append(sections, fmt.Sprintf("- Основной prompt: %s", spec.PromptPath))
@@ -335,7 +351,7 @@ func renderTrae(language string) string {
 	sections = append(sections, "# Draftspec Project Rules")
 	sections = append(sections, "")
 	sections = append(sections, "Use .draftspec as the primary source of project context. Follow AGENTS.md and the matching prompt files under .draftspec/templates/prompts/.")
-	for _, spec := range commandSpecs() {
+	for _, spec := range commandSpecs(shell) {
 		sections = append(sections, "")
 		sections = append(sections, fmt.Sprintf("## /draftspec.%s", spec.Name))
 		sections = append(sections, fmt.Sprintf("- Primary prompt: %s", spec.PromptPath))

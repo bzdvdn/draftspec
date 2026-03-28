@@ -15,6 +15,7 @@ func TestInitializeCreatesWorkspaceAndAgentTargets(t *testing.T) {
 	_, err := Initialize(root, InitOptions{
 		InitGit:      false,
 		DefaultLang:  "en",
+		Shell:        "sh",
 		AgentTargets: []string{"claude", "cursor"},
 	})
 	if err != nil {
@@ -31,6 +32,9 @@ func TestInitializeCreatesWorkspaceAndAgentTargets(t *testing.T) {
 	}
 	if got, want := strings.Join(cfg.Agents.Targets, ","), "claude,cursor"; got != want {
 		t.Fatalf("agent targets = %q, want %q", got, want)
+	}
+	if got, want := cfg.Runtime.Shell, "sh"; got != want {
+		t.Fatalf("shell = %q, want %q", got, want)
 	}
 
 	required := []string{
@@ -53,6 +57,7 @@ func TestAddRemoveAndCleanupAgents(t *testing.T) {
 	_, err := Initialize(root, InitOptions{
 		InitGit:      false,
 		DefaultLang:  "en",
+		Shell:        "sh",
 		AgentTargets: []string{"claude"},
 	})
 	if err != nil {
@@ -108,7 +113,7 @@ func TestAddRemoveAndCleanupAgents(t *testing.T) {
 func TestCleanupAgentsNoop(t *testing.T) {
 	root := t.TempDir()
 
-	_, err := Initialize(root, InitOptions{InitGit: false, DefaultLang: "en"})
+	_, err := Initialize(root, InitOptions{InitGit: false, DefaultLang: "en", Shell: "sh"})
 	if err != nil {
 		t.Fatalf("Initialize returned error: %v", err)
 	}
@@ -119,5 +124,28 @@ func TestCleanupAgentsNoop(t *testing.T) {
 	}
 	if len(result.Messages) != 1 || result.Messages[0] != "no orphaned agent artifacts found" {
 		t.Fatalf("unexpected cleanup messages: %v", result.Messages)
+	}
+}
+
+func TestInitializeWithPowerShellGeneratesPS1Scripts(t *testing.T) {
+	root := t.TempDir()
+
+	_, err := Initialize(root, InitOptions{
+		InitGit:     false,
+		DefaultLang: "en",
+		Shell:       "powershell",
+	})
+	if err != nil {
+		t.Fatalf("Initialize returned error: %v", err)
+	}
+
+	required := []string{
+		filepath.Join(root, ".draftspec", "scripts", "check-spec-ready.ps1"),
+		filepath.Join(root, ".draftspec", "scripts", "verify-task-state.ps1"),
+	}
+	for _, path := range required {
+		if _, err := os.Stat(path); err != nil {
+			t.Fatalf("expected %s to exist: %v", path, err)
+		}
 	}
 }

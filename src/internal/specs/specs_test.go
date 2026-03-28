@@ -14,7 +14,7 @@ import (
 func TestListReturnsSortedMarkdownSpecsOnly(t *testing.T) {
 	root := t.TempDir()
 
-	_, err := project.Initialize(root, project.InitOptions{InitGit: false, DefaultLang: "en"})
+	_, err := project.Initialize(root, project.InitOptions{InitGit: false, DefaultLang: "en", Shell: "sh"})
 	if err != nil {
 		t.Fatalf("Initialize returned error: %v", err)
 	}
@@ -47,7 +47,7 @@ func TestListReturnsSortedMarkdownSpecsOnly(t *testing.T) {
 func TestShowReturnsSpecContent(t *testing.T) {
 	root := t.TempDir()
 
-	_, err := project.Initialize(root, project.InitOptions{InitGit: false, DefaultLang: "en"})
+	_, err := project.Initialize(root, project.InitOptions{InitGit: false, DefaultLang: "en", Shell: "sh"})
 	if err != nil {
 		t.Fatalf("Initialize returned error: %v", err)
 	}
@@ -70,7 +70,7 @@ func TestShowReturnsSpecContent(t *testing.T) {
 func TestCreateGeneratesSpecAndTasksFromTemplates(t *testing.T) {
 	root := t.TempDir()
 
-	_, err := project.Initialize(root, project.InitOptions{InitGit: false, DefaultLang: "en"})
+	_, err := project.Initialize(root, project.InitOptions{InitGit: false, DefaultLang: "en", Shell: "sh"})
 	if err != nil {
 		t.Fatalf("Initialize returned error: %v", err)
 	}
@@ -106,7 +106,7 @@ func TestCreateGeneratesSpecAndTasksFromTemplates(t *testing.T) {
 func TestCreateFailsOnEmptySlug(t *testing.T) {
 	root := t.TempDir()
 
-	_, err := project.Initialize(root, project.InitOptions{InitGit: false, DefaultLang: "en"})
+	_, err := project.Initialize(root, project.InitOptions{InitGit: false, DefaultLang: "en", Shell: "sh"})
 	if err != nil {
 		t.Fatalf("Initialize returned error: %v", err)
 	}
@@ -199,7 +199,7 @@ func TestResolveInputRejectsURLInput(t *testing.T) {
 func TestCreateCreatesAndSwitchesFeatureBranch(t *testing.T) {
 	root := t.TempDir()
 
-	_, err := project.Initialize(root, project.InitOptions{InitGit: true, DefaultLang: "en"})
+	_, err := project.Initialize(root, project.InitOptions{InitGit: true, DefaultLang: "en", Shell: "sh"})
 	if err != nil {
 		t.Fatalf("Initialize returned error: %v", err)
 	}

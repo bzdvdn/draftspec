@@ -6,13 +6,14 @@ import (
 	"strings"
 	"testing"
 
+	"draftspec/src/internal/config"
 	"draftspec/src/internal/project"
 )
 
 func TestCheckHealthyWorkspace(t *testing.T) {
 	root := t.TempDir()
 
-	_, err := project.Initialize(root, project.InitOptions{InitGit: false, DefaultLang: "en", AgentTargets: []string{"claude"}})
+	_, err := project.Initialize(root, project.InitOptions{InitGit: false, DefaultLang: "en", Shell: "sh", AgentTargets: []string{"claude"}})
 	if err != nil {
 		t.Fatalf("Initialize returned error: %v", err)
 	}
@@ -33,7 +34,7 @@ func TestCheckHealthyWorkspace(t *testing.T) {
 func TestCheckWarnsAboutOrphanedAgentArtifact(t *testing.T) {
 	root := t.TempDir()
 
-	_, err := project.Initialize(root, project.InitOptions{InitGit: false, DefaultLang: "en", AgentTargets: []string{"claude", "cursor"}})
+	_, err := project.Initialize(root, project.InitOptions{InitGit: false, DefaultLang: "en", Shell: "sh", AgentTargets: []string{"claude", "cursor"}})
 	if err != nil {
 		t.Fatalf("Initialize returned error: %v", err)
 	}
@@ -70,7 +71,7 @@ func TestCheckWarnsAboutOrphanedAgentArtifact(t *testing.T) {
 func TestCheckErrorsWhenRequiredFileIsMissing(t *testing.T) {
 	root := t.TempDir()
 
-	_, err := project.Initialize(root, project.InitOptions{InitGit: false, DefaultLang: "en", AgentTargets: []string{"claude"}})
+	_, err := project.Initialize(root, project.InitOptions{InitGit: false, DefaultLang: "en", Shell: "sh", AgentTargets: []string{"claude"}})
 	if err != nil {
 		t.Fatalf("Initialize returned error: %v", err)
 	}
@@ -98,5 +99,56 @@ func TestCheckErrorsWhenRequiredFileIsMissing(t *testing.T) {
 	}
 	if !foundMissing {
 		t.Fatalf("expected missing constitution error, got %+v", result.Findings)
+	}
+}
+
+func TestCheckHealthyPowerShellWorkspace(t *testing.T) {
+	root := t.TempDir()
+
+	_, err := project.Initialize(root, project.InitOptions{InitGit: false, DefaultLang: "en", Shell: "powershell"})
+	if err != nil {
+		t.Fatalf("Initialize returned error: %v", err)
+	}
+
+	result, err := Check(root)
+	if err != nil {
+		t.Fatalf("Check returned error: %v", err)
+	}
+	if result.Findings[len(result.Findings)-1].Level != "ok" {
+		t.Fatalf("last finding level = %q, want ok", result.Findings[len(result.Findings)-1].Level)
+	}
+}
+
+func TestCheckErrorsOnUnsupportedShell(t *testing.T) {
+	root := t.TempDir()
+
+	_, err := project.Initialize(root, project.InitOptions{InitGit: false, DefaultLang: "en", Shell: "sh"})
+	if err != nil {
+		t.Fatalf("Initialize returned error: %v", err)
+	}
+
+	cfg, err := config.Load(root)
+	if err != nil {
+		t.Fatalf("config.Load returned error: %v", err)
+	}
+	cfg.Runtime.Shell = "fish"
+	if err := config.Save(root, cfg); err != nil {
+		t.Fatalf("config.Save returned error: %v", err)
+	}
+
+	result, err := Check(root)
+	if err != nil {
+		t.Fatalf("Check returned error: %v", err)
+	}
+
+	var found bool
+	for _, finding := range result.Findings {
+		if finding.Level == "error" && strings.Contains(finding.Message, "unsupported shell") {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Fatalf("expected unsupported shell error, got %+v", result.Findings)
 	}
 }

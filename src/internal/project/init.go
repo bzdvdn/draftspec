@@ -20,6 +20,7 @@ type InitOptions struct {
 	DocsLang     string
 	AgentLang    string
 	CommentsLang string
+	Shell        string
 	AgentTargets []string
 }
 
@@ -57,12 +58,19 @@ func Initialize(root string, options InitOptions) (InitResult, error) {
 	if err != nil {
 		return InitResult{}, err
 	}
+	shell, err := config.NormalizeShell(options.Shell)
+	if err != nil {
+		return InitResult{}, err
+	}
 	languages.AgentTargets = normalizedAgentTargets
+	languages.Shell = shell
 	cfg := config.Default()
 	cfg.Language.Default = languages.Default
 	cfg.Language.Docs = languages.Docs
 	cfg.Language.Agent = languages.Agent
 	cfg.Language.Comments = languages.Comments
+	cfg.Runtime.Shell = shell
+	cfg.Scripts = config.ScriptDefaultsForShell(shell)
 	cfg.Agents.Targets = normalizedAgentTargets
 	var messages []string
 	if options.InitGit {
@@ -126,6 +134,7 @@ func Initialize(root string, options InitOptions) (InitResult, error) {
 		}
 	}
 	messages = append(messages, fmt.Sprintf("configured languages: docs=%s agent=%s comments=%s", cfg.Language.Docs, cfg.Language.Agent, cfg.Language.Comments))
+	messages = append(messages, fmt.Sprintf("configured shell: %s", cfg.Runtime.Shell))
 	agentsPath := filepath.Join(root, "AGENTS.md")
 	snippetPath := filepath.Join(templatesDir, "agents-snippet.md")
 	changed, err := ensureAgentsSnippet(agentsPath, snippetPath)
@@ -137,7 +146,7 @@ func Initialize(root string, options InitOptions) (InitResult, error) {
 	} else {
 		messages = append(messages, "kept existing AGENTS.md Draftspec guidance")
 	}
-	for _, message := range ensureAgentFiles(root, normalizedAgentTargets, languages.Agent) {
+	for _, message := range ensureAgentFiles(root, normalizedAgentTargets, languages.Agent, cfg.Runtime.Shell) {
 		messages = append(messages, message)
 	}
 	if len(normalizedAgentTargets) > 0 {
@@ -174,7 +183,7 @@ func AddAgents(root string, options AddAgentsOptions) (AddAgentsResult, error) {
 	}
 
 	messages := []string{"updated .draftspec/draftspec.yaml with agent targets"}
-	messages = append(messages, ensureAgentFiles(root, requested, agentLanguage)...)
+	messages = append(messages, ensureAgentFiles(root, requested, agentLanguage, cfg.Runtime.Shell)...)
 	messages = append(messages, fmt.Sprintf("enabled agent targets: %s", strings.Join(combined, ", ")))
 	return AddAgentsResult{Messages: messages}, nil
 }
@@ -308,8 +317,8 @@ func ensureAgentsSnippet(path, snippetPath string) (bool, error) {
 	return true, os.WriteFile(path, []byte(builder.String()), 0o644)
 }
 
-func ensureAgentFiles(root string, targets []string, language string) []string {
-	agentFiles, err := agents.Files(targets, language)
+func ensureAgentFiles(root string, targets []string, language string, shell string) []string {
+	agentFiles, err := agents.Files(targets, language, shell)
 	if err != nil {
 		return []string{fmt.Sprintf("skipped agent files: %v", err)}
 	}

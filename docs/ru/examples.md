@@ -11,7 +11,7 @@
 Пример:
 
 ```bash
-draftspec init my-project --lang ru --agents codex
+draftspec init my-project --lang ru --shell sh --agents codex
 cd my-project
 draftspec doctor .
 ```
@@ -37,7 +37,7 @@ draftspec doctor .
 
 ```bash
 cd existing-project
-draftspec init . --lang ru --agents codex
+draftspec init . --lang ru --shell sh --agents codex
 draftspec doctor .
 ```
 
