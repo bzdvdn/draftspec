@@ -11,7 +11,6 @@ Produce a focused inspection report for one feature without expanding scope.
 Always read these first:
 
 - `.draftspec/constitution.md`
-- `.draftspec/memory.md`
 - `.draftspec/specs/<slug>.md`
 
 ## Load Only If Needed

@@ -14,7 +14,6 @@ var defaultConfig = Config{
 	Version: 1,
 	Project: Project{
 		Name:             "my-project",
-		MemoryFile:       ".draftspec/memory.md",
 		ConstitutionFile: ".draftspec/constitution.md",
 	},
 	Paths: Paths{
@@ -33,7 +32,6 @@ var defaultConfig = Config{
 	Agents: Agents{
 		UpdateAgentsMD: true,
 		AgentsFile:     "AGENTS.md",
-		MemoryLink:     ".draftspec/memory.md",
 		Targets:        nil,
 	},
 	Templates: Templates{
@@ -55,7 +53,6 @@ var defaultConfig = Config{
 		ImplementPrompt:    "prompts/implement.md",
 		ArchivePrompt:      "prompts/archive.md",
 		VerifyPrompt:       "prompts/verify.md",
-		Memory:             "memory.md",
 	},
 	Scripts: Scripts{
 		InspectSpec:         "inspect-spec.sh",
@@ -68,9 +65,7 @@ var defaultConfig = Config{
 		CheckArchiveReady:   "check-archive-ready.sh",
 		CheckVerifyReady:    "check-verify-ready.sh",
 		VerifyTaskState:     "verify-task-state.sh",
-		VerifyMemorySync:    "verify-memory-sync.sh",
 		ListOpenTasks:       "list-open-tasks.sh",
-		SyncMemory:          "sync-memory.sh",
 		LinkAgents:          "link-agents.sh",
 		ListSpecs:           "list-specs.sh",
 		ShowSpec:            "show-spec.sh",
@@ -89,7 +84,6 @@ type Config struct {
 
 type Project struct {
 	Name             string `yaml:"name"`
-	MemoryFile       string `yaml:"memory_file"`
 	ConstitutionFile string `yaml:"constitution_file"`
 }
 
@@ -111,7 +105,6 @@ type Language struct {
 type Agents struct {
 	UpdateAgentsMD bool     `yaml:"update_agents_md"`
 	AgentsFile     string   `yaml:"agents_file"`
-	MemoryLink     string   `yaml:"memory_link"`
 	Targets        []string `yaml:"targets,omitempty"`
 }
 
@@ -134,7 +127,6 @@ type Templates struct {
 	ImplementPrompt    string `yaml:"implement_prompt"`
 	ArchivePrompt      string `yaml:"archive_prompt"`
 	VerifyPrompt       string `yaml:"verify_prompt"`
-	Memory             string `yaml:"memory"`
 }
 
 type Scripts struct {
@@ -148,9 +140,7 @@ type Scripts struct {
 	CheckArchiveReady   string `yaml:"check_archive_ready"`
 	CheckVerifyReady    string `yaml:"check_verify_ready"`
 	VerifyTaskState     string `yaml:"verify_task_state"`
-	VerifyMemorySync    string `yaml:"verify_memory_sync"`
 	ListOpenTasks       string `yaml:"list_open_tasks"`
-	SyncMemory          string `yaml:"sync_memory"`
 	LinkAgents          string `yaml:"link_agents"`
 	ListSpecs           string `yaml:"list_specs"`
 	ShowSpec            string `yaml:"show_spec"`
@@ -224,9 +214,6 @@ func (c *Config) applyDefaults() {
 	if c.Project.Name == "" {
 		c.Project.Name = defaultConfig.Project.Name
 	}
-	if c.Project.MemoryFile == "" {
-		c.Project.MemoryFile = defaultConfig.Project.MemoryFile
-	}
 	if c.Project.ConstitutionFile == "" {
 		c.Project.ConstitutionFile = defaultConfig.Project.ConstitutionFile
 	}
@@ -259,9 +246,6 @@ func (c *Config) applyDefaults() {
 	}
 	if c.Agents.AgentsFile == "" {
 		c.Agents.AgentsFile = defaultConfig.Agents.AgentsFile
-	}
-	if c.Agents.MemoryLink == "" {
-		c.Agents.MemoryLink = defaultConfig.Agents.MemoryLink
 	}
 	if !c.Agents.UpdateAgentsMD {
 		c.Agents.UpdateAgentsMD = defaultConfig.Agents.UpdateAgentsMD
@@ -320,9 +304,6 @@ func (c *Config) applyDefaults() {
 	if c.Templates.VerifyPrompt == "" {
 		c.Templates.VerifyPrompt = defaultConfig.Templates.VerifyPrompt
 	}
-	if c.Templates.Memory == "" {
-		c.Templates.Memory = defaultConfig.Templates.Memory
-	}
 	if c.Scripts.InspectSpec == "" {
 		c.Scripts.InspectSpec = defaultConfig.Scripts.InspectSpec
 	}
@@ -353,14 +334,8 @@ func (c *Config) applyDefaults() {
 	if c.Scripts.VerifyTaskState == "" {
 		c.Scripts.VerifyTaskState = defaultConfig.Scripts.VerifyTaskState
 	}
-	if c.Scripts.VerifyMemorySync == "" {
-		c.Scripts.VerifyMemorySync = defaultConfig.Scripts.VerifyMemorySync
-	}
 	if c.Scripts.ListOpenTasks == "" {
 		c.Scripts.ListOpenTasks = defaultConfig.Scripts.ListOpenTasks
-	}
-	if c.Scripts.SyncMemory == "" {
-		c.Scripts.SyncMemory = defaultConfig.Scripts.SyncMemory
 	}
 	if c.Scripts.LinkAgents == "" {
 		c.Scripts.LinkAgents = defaultConfig.Scripts.LinkAgents

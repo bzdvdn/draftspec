@@ -51,7 +51,6 @@ draftspec doctor .
 Чего не стоит делать:
 
 - не пытаться сразу документировать весь проект
-- не превращать `memory.md` в свалку всех исторических знаний
 - не тянуть широкий repository context, если текущая фича этого не требует
 
 Практический смысл такого входа:
@@ -73,8 +72,7 @@ draftspec doctor .
 - прочитать prompt `.draftspec/templates/prompts/constitution.md`
 - собрать только минимально нужные evidence из репозитория
 - создать или обновить `.draftspec/constitution.md`
-- обновить `.draftspec/memory.md`
-- при необходимости запустить `check-constitution.sh` и `sync-memory.sh`
+- при необходимости запустить `check-constitution.sh`
 
 Ожидаемый результат:
 
@@ -92,7 +90,7 @@ draftspec doctor .
 
 Ожидаемое поведение агента:
 
-- сначала прочитать constitution и memory
+- сначала прочитать constitution
 - создать `.draftspec/specs/partner-scheduling.md`
 - записать acceptance criteria в каноническом формате `Given / When / Then`
 - остальной текст держать на configured documentation language
@@ -118,7 +116,7 @@ draftspec doctor .
 
 Ожидаемое поведение агента:
 
-- прочитать constitution, memory и `.draftspec/specs/partner-scheduling.md`
+- прочитать constitution и `.draftspec/specs/partner-scheduling.md`
 - проверить полноту, соответствие конституции и качество сценариев
 - выпустить focused inspection report
 - если отчет нужно сохранять на диск, до планирования предпочитать `.draftspec/specs/partner-scheduling.inspect.md`, а после появления plan package — `.draftspec/plans/partner-scheduling/inspect.md`
@@ -140,7 +138,7 @@ draftspec doctor .
 
 Ожидаемое поведение агента:
 
-- прочитать constitution, memory и spec
+- прочитать constitution и spec
 - создать `.draftspec/plans/partner-scheduling/plan.md`
 - создать `.draftspec/plans/partner-scheduling/data-model.md`
 - создать `.draftspec/plans/partner-scheduling/contracts/`
@@ -194,7 +192,6 @@ draftspec doctor .
 - читать spec, plan, data model или contracts только для активной задачи
 - выполнять незавершенные задачи по порядку
 - обновлять `tasks.md`
-- обновлять `.draftspec/memory.md`
 
 Эта фаза не должна читать широкий контекст репозитория без реальной необходимости.
 
@@ -208,12 +205,10 @@ draftspec doctor .
 
 Ожидаемое поведение агента:
 
-- сначала прочитать constitution, memory и tasks
+- сначала прочитать constitution и tasks
 - подтвердить, что завершенные задачи достаточно соответствуют текущему состоянию реализации
-- проверить согласованность memory, когда это уместно
 - выпустить легкий verification report
 - начинать с `.draftspec/scripts/verify-task-state.sh partner-scheduling`, если сначала нужно только подтвердить состояние задач
-- добавлять `.draftspec/scripts/verify-memory-sync.sh partner-scheduling`, если нужна дешевая грубая проверка sync между tasks и memory
 - использовать `.draftspec/templates/verify-report.md`, если отчет нужно сохранить в файл
 - по умолчанию использовать `.draftspec/plans/partner-scheduling/verify.md`, если путь явно не указан
 
@@ -230,7 +225,6 @@ draftspec doctor .
 - для статуса `completed` сначала запустить `.draftspec/scripts/verify-task-state.sh partner-scheduling` и остановиться, если открытые задачи еще остались
 - скопировать feature package в `.draftspec/archive/partner-scheduling/<YYYY-MM-DD>/`
 - записать `summary.md`
-- добавить короткую archived-запись в `memory.md`
 
 Ожидаемый результат архива:
 
@@ -243,7 +237,6 @@ draftspec doctor .
       plan.md
       tasks.md
       data-model.md
-      memory-snapshot.md
       contracts/
 ```
 

@@ -85,14 +85,14 @@ Release filter: `verify` should remain a lightweight optional safety layer, not 
 - introduce a small `verify` or review-oriented workflow after `implement`
 - check whether completed tasks match implementation state
 - check whether implementation still matches spec and plan intent
-- ensure memory and task state remain synchronized
+- ensure archived feature state and task state remain consistent where verification depends on them
 
 ### Anti-Bloat Notes
 
 Safe direction:
 
 - task-state verification helpers
-- memory/task synchronization checks
+- archive/task consistency checks
   Status: coarse helper-based sync checks are now in place for `verify`.
 - optional persisted verify reports
 
@@ -116,7 +116,7 @@ Release filter: add automation outputs only where they reuse existing checks and
 
 ### Planned work
 
-- improve archive summaries and archive linkage in `memory.md`
+- improve archive summaries and archive linkage
 - keep completed-archive checks cheap by reusing task-state verification
 - add machine-readable outputs such as `doctor --json`
   Status: implemented for `doctor`; extend this pattern only when outputs stay cheap and reuse existing checks.

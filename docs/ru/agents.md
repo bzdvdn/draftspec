@@ -47,7 +47,6 @@ Agent-facing workflow в Draftspec:
 
 - он стартует от `tasks.md`
 - он может использовать `.draftspec/scripts/verify-task-state.sh <slug>` как дешевый helper первого прохода
-- он может использовать `.draftspec/scripts/verify-memory-sync.sh <slug>` для грубых сигналов sync между memory и tasks до чтения кода
 - более глубокие артефакты читаются только когда нужно подтвердить конкретный вывод
 - его задача — подтвердить готовность к архивированию или следующему refine-циклу, а не превращаться в тяжелый review engine
 

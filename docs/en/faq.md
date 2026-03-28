@@ -26,7 +26,7 @@ Archive a feature when it is no longer active in the main workflow, for example 
 - abandoned
 - deferred
 
-The archive keeps historical context without bloating active project memory.
+The archive keeps historical context without bloating the active workspace.
 
 ## What is the difference between `remove-agent` and `cleanup-agents`?
 
@@ -49,7 +49,6 @@ No. `implement` should start from `tasks.md` and load deeper artifacts only when
 Typical minimal read order:
 
 - `constitution.md`
-- `memory.md`
 - `tasks.md`
 - then `spec.md`, `plan.md`, `data-model.md`, `contracts/`, or `research.md` only if needed
 
@@ -63,19 +62,10 @@ constitution -> spec -> inspect -> plan -> tasks -> implement -> verify -> archi
 
 `plan` depends on an existing spec.
 
-## Why is `memory.md` still needed if there is an archive?
-
-They solve different problems.
-
-- `memory.md` stores the current working state of the project
-- `archive/` stores historical snapshots of completed or inactive feature packages
-
-`memory.md` may keep a short archived index, but the full history belongs in `archive/`.
-
 ## Why use stable acceptance IDs?
 
 Identifiers such as `AC-001` make traceability cheaper and clearer across specs, tasks, inspect reports, and later verification work.
 
 ## What is `verify` for?
 
-`verify` is a lightweight confirmation phase after `implement`. It helps answer whether the feature is aligned enough with tasks, memory, and project rules to move toward archive or completion claims.
+`verify` is a lightweight confirmation phase after `implement`. It helps answer whether the feature is aligned enough with tasks, specs, plan artifacts, and project rules to move toward archive or completion claims.

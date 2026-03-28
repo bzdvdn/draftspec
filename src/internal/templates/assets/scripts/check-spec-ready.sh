@@ -12,6 +12,5 @@ check_file() {
 }
 
 check_file ".draftspec/constitution.md"
-check_file ".draftspec/memory.md"
 check_file ".draftspec/templates/spec.md"
 check_file ".draftspec/templates/prompts/spec.md"

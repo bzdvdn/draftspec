@@ -2,9 +2,9 @@
 
 `draftspec` is a lightweight project context kit for development agents and humans.
 
-It keeps project intent, specifications, plan artifacts, task breakdowns, and working memory in simple files without introducing a rigid process engine.
+It keeps project intent, specifications, plan artifacts, and task breakdowns in simple files without introducing a rigid process engine.
 
-The first release is intentionally optimized for low overhead and real-world usage: narrow default context, minimal required artifacts, and strict workflow discipline without heavyweight orchestration.
+The first release is intentionally optimized for low overhead and real-world usage: narrow default context, minimal required artifacts, strict workflow discipline without heavyweight orchestration, and branch-based collaboration that works cleanly for both solo and team development.
 
 ## Positioning
 

@@ -9,7 +9,6 @@ Produce a clear feature specification at `.draftspec/specs/<slug>.md` that is co
 ## Load Only
 
 - `.draftspec/constitution.md`
-- `.draftspec/memory.md`
 - the current user request and conversation
 - the smallest amount of repository context needed to remove ambiguity
 

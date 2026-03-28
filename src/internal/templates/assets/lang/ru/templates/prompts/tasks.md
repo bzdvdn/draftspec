@@ -11,7 +11,6 @@
 Всегда сначала прочитайте:
 
 - `.draftspec/constitution.md`
-- `.draftspec/memory.md`
 - `.draftspec/plans/<slug>/plan.md`
 
 ## Load Only If Needed

@@ -11,7 +11,6 @@ Break an approved plan into executable implementation tasks.
 Always read these before decomposing the work:
 
 - `.draftspec/constitution.md`
-- `.draftspec/memory.md`
 - `.draftspec/plans/<slug>/plan.md`
 
 ## Load Only If Needed

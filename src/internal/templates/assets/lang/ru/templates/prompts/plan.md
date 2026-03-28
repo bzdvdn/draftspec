@@ -9,7 +9,6 @@
 ## Load Only
 
 - `.draftspec/constitution.md`
-- `.draftspec/memory.md`
 - `.draftspec/specs/<slug>.md`
 - только те файлы кода и документации репозитория, которые нужны для планирования этой одной фичи
 

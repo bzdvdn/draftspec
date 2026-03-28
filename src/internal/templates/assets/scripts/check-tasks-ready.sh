@@ -20,7 +20,6 @@ check_file() {
 }
 
 check_file ".draftspec/constitution.md"
-check_file ".draftspec/memory.md"
 check_file ".draftspec/specs/$SPEC_SLUG.md"
 check_file "$PLAN_DIR/plan.md"
 check_file "$PLAN_DIR/data-model.md"

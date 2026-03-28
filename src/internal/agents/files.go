@@ -128,7 +128,7 @@ type commandSpec struct {
 
 func commandSpecs() []commandSpec {
 	return []commandSpec{
-		{Name: "constitution", Description: "Create or update the project constitution", PromptPath: ".draftspec/templates/prompts/constitution.md", Extras: []string{".draftspec/scripts/check-constitution.sh", ".draftspec/scripts/sync-memory.sh"}},
+		{Name: "constitution", Description: "Create or update the project constitution", PromptPath: ".draftspec/templates/prompts/constitution.md", Extras: []string{".draftspec/scripts/check-constitution.sh"}},
 		{Name: "spec", Description: "Create or update one feature spec", PromptPath: ".draftspec/templates/prompts/spec.md", Extras: []string{".draftspec/scripts/check-spec-ready.sh"}},
 		{Name: "inspect", Description: "Inspect one feature for consistency and quality", PromptPath: ".draftspec/templates/prompts/inspect.md", Extras: []string{".draftspec/scripts/check-inspect-ready.sh", ".draftspec/scripts/inspect-spec.sh"}},
 		{Name: "plan", Description: "Create or update one feature plan package", PromptPath: ".draftspec/templates/prompts/plan.md", Extras: []string{".draftspec/scripts/check-plan-ready.sh"}},
@@ -178,7 +178,7 @@ argument-hint: [request]
 $ARGUMENTS
 
 Требования:
-- сначала прочитайте .draftspec/constitution.md и .draftspec/memory.md, если это требуется prompt-файлом
+- сначала прочитайте .draftspec/constitution.md, если это требуется prompt-файлом
 - используйте только минимально нужный контекст репозитория
 - если доступны, учитывайте связанные scripts:
 %s
@@ -197,7 +197,7 @@ User arguments:
 $ARGUMENTS
 
 Requirements:
-- read .draftspec/constitution.md and .draftspec/memory.md first when the prompt requires it
+- read .draftspec/constitution.md first when the prompt requires it
 - use only the minimum repository context needed
 - when available, account for related scripts:
 %s

@@ -36,7 +36,6 @@ func TestInitializeCreatesWorkspaceAndAgentTargets(t *testing.T) {
 	required := []string{
 		filepath.Join(root, ".draftspec", "draftspec.yaml"),
 		filepath.Join(root, ".draftspec", "constitution.md"),
-		filepath.Join(root, ".draftspec", "memory.md"),
 		filepath.Join(root, "AGENTS.md"),
 		filepath.Join(root, ".claude", "commands", "draftspec.inspect.md"),
 		filepath.Join(root, ".cursor", "rules", "draftspec-inspect.mdc"),

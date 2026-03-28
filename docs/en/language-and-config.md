@@ -28,7 +28,6 @@ Base language used when the more specific values are not overridden.
 Controls generated project documentation such as:
 
 - `constitution.md`
-- `memory.md`
 - spec templates
 - plan templates
 - tasks templates

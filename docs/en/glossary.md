@@ -26,19 +26,15 @@ The executable breakdown of a feature plan. In Draftspec, `tasks.md` lives insid
 
 ## Implement
 
-The execution phase that works from unfinished tasks and updates project memory and task state.
+The execution phase that works from unfinished tasks and updates task state.
 
 ## Verify
 
-A lightweight post-implementation check that confirms whether a feature is aligned enough with tasks, memory, and project rules to proceed safely toward archive or further completion claims.
+A lightweight post-implementation check that confirms whether a feature is aligned enough with tasks, specs, plan artifacts, and project rules to proceed safely toward archive or further completion claims.
 
 ## Archive
 
 The phase and storage area used to preserve a historical snapshot of a finished or inactive feature package.
-
-## Memory
-
-The current working memory of the project, stored in `.draftspec/memory.md`. It summarizes active state, important decisions, and archived feature status.
 
 ## Data Model
 
@@ -62,7 +58,7 @@ A generated agent file that still exists on disk even though its target is no lo
 
 ## Docs Language
 
-The configured language used for generated project documentation such as `constitution.md`, `memory.md`, specs, plans, and tasks.
+The configured language used for generated project documentation such as `constitution.md`, specs, plans, and tasks.
 
 ## Agent Language
 

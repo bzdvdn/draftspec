@@ -11,7 +11,6 @@ Implement the feature by following the existing task list without expanding scop
 Always read these before doing any implementation work:
 
 - `.draftspec/constitution.md`
-- `.draftspec/memory.md`
 - `.draftspec/plans/<slug>/tasks.md`
 
 ## Load Only If Needed
@@ -54,17 +53,15 @@ Do not broaden scope to solve these problems.
 - Use `tasks.md` as the execution entrypoint.
 - Load deeper artifacts only when the current task requires them.
 - Do not violate the constitution.
-- Follow the project's preferred code comment language as recorded in `.draftspec/draftspec.yaml`, `.draftspec/constitution.md`, and `.draftspec/memory.md`.
+- Follow the project's preferred code comment language as recorded in `.draftspec/draftspec.yaml` and `.draftspec/constitution.md`.
 - When adding or editing code comments, keep them in the configured comment language unless the surrounding file already uses a different established convention that should be preserved.
 - Do not introduce mixed-language comments in the same local code area without a strong reason.
 - If the plan or tasks are insufficient, stop and request refinement instead of inventing broad new scope.
 - Mark completed tasks in `tasks.md`.
-- Update `.draftspec/memory.md` when: a full phase is complete, a new public entry point is added, a data schema or contract changes, or all tasks are done.
 
 ## Output expectations
 
 - Implement the work
 - Update `tasks.md` checkboxes for completed items
-- Update `.draftspec/memory.md`
 - Summarize completed tasks, remaining tasks, and any blockers
 - Explicitly state which acceptance criteria from the spec are now covered by the implementation

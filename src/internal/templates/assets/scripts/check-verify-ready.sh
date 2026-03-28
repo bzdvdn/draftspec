@@ -20,7 +20,6 @@ check_file() {
 }
 
 check_file ".draftspec/constitution.md"
-check_file ".draftspec/memory.md"
 check_file "$PLAN_DIR/tasks.md"
 check_file ".draftspec/templates/verify-report.md"
 check_file ".draftspec/templates/prompts/verify.md"

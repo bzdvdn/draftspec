@@ -7,7 +7,6 @@
 - docs_language: <en|ru>
 - artifacts:
   - .draftspec/constitution.md
-  - .draftspec/memory.md
   - .draftspec/specs/<slug>.md
 
 ## Verdict

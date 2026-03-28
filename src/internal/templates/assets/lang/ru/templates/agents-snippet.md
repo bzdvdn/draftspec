@@ -8,13 +8,13 @@
 - Комментарии в коде: [COMMENTS_LANGUAGE]
 
 Workflow-команды:
-- `/draftspec.constitution`: patch-обновить `.draftspec/constitution.md` и синхронизировать `.draftspec/memory.md`
+- `/draftspec.constitution`: patch-обновить `.draftspec/constitution.md`
 - `/draftspec.spec`: создать или уточнить один файл `.draftspec/specs/<slug>.md`
 - `/draftspec.inspect`: проанализировать одну фичу на согласованность и качество до или после планирования
 - `/draftspec.plan`: создать или обновить `.draftspec/plans/<slug>/plan.md`, `data-model.md` и `contracts/`
 - `/draftspec.tasks`: создать или обновить `.draftspec/plans/<slug>/tasks.md`
-- `/draftspec.implement`: выполнить незавершенные задачи и обновить память проекта
-- `/draftspec.archive`: архивировать один feature package в `.draftspec/archive/` и добавить короткую запись в память
+- `/draftspec.implement`: выполнить незавершенные задачи
+- `/draftspec.archive`: архивировать один feature package в `.draftspec/archive/`
 
 Дисциплина чтения:
 - Следуйте цепочке `constitution -> spec -> inspect -> plan -> tasks -> implement -> archive`
@@ -29,11 +29,9 @@ Workflow-команды:
 - Не смешивайте языки комментариев в одной локальной области кода без сильной причины
 
 Перед значимыми изменениями:
-- Прочитать `.draftspec/memory.md`
 - Просмотреть `.draftspec/constitution.md`
 - Изучить релевантный `.draftspec/specs/<slug>.md`
 - Изучить релевантный feature package в `.draftspec/plans/<slug>/`, если он есть
 
 После значимых решений или изменений:
-- Обновить `.draftspec/memory.md`
 - Поддерживать согласованность спецификаций, планов, задач, archive state и реализации

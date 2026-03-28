@@ -31,13 +31,12 @@ esac
 
 ROOT=".draftspec"
 SPEC_FILE="$ROOT/specs/$SLUG.md"
-MEMORY_FILE="$ROOT/memory.md"
 TASKS_FILE="$ROOT/plans/$SLUG/tasks.md"
 VERIFY_TASK_STATE="$ROOT/scripts/verify-task-state.sh"
 ARCHIVE_DIR="$ROOT/archive/$SLUG"
 
 missing=0
-for path in "$SPEC_FILE" "$MEMORY_FILE"; do
+for path in "$SPEC_FILE"; do
   if [ ! -e "$path" ]; then
     echo "ERROR: missing required file: $path"
     missing=1

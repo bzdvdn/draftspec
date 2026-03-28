@@ -4,18 +4,17 @@ You are archiving one feature package.
 
 ## Goal
 
-Create a durable archive snapshot for one feature and update project memory with a short archive entry.
+Create a durable archive snapshot for one feature.
 
 ## Load First
 
 Always read these first:
 
-- `.draftspec/memory.md`
 - `.draftspec/specs/<slug>.md`
 
 ## Load Only If Needed
 
-Read plan artifacts only to inform `summary.md`. If the summary can be written from the spec and memory alone, do not read them:
+Read plan artifacts only to inform `summary.md`. If the summary can be written from the spec alone, do not read them:
 
 - `.draftspec/plans/<slug>/plan.md`
 - `.draftspec/plans/<slug>/tasks.md`
@@ -45,7 +44,6 @@ Stop and ask a minimal follow-up question if:
 - If plan artifacts exist, archive them together with the spec.
 - If `research.md` does not exist, do not invent it.
 - If status is `completed` and `tasks.md` exists, use `.draftspec/scripts/verify-task-state.sh <slug>` before archiving. Do not claim a completed archive when required tasks are still open.
-- Update `memory.md` by adding a short entry under `Archived Specs` using slug, status, date, and reason.
 - Use one of these statuses:
   - `completed`
   - `superseded`
@@ -57,5 +55,4 @@ Stop and ask a minimal follow-up question if:
 
 - Create the archive snapshot
 - Write or patch `summary.md`
-- Update `memory.md`
 - Summarize archived files, status, and reason

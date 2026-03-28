@@ -4,14 +4,13 @@ You are verifying one implemented feature package after task execution.
 
 ## Goal
 
-Confirm whether the implemented work is aligned enough with tasks, memory, and project rules to proceed safely.
+Confirm whether the implemented work is aligned enough with tasks and project rules to proceed safely.
 
 ## Load First
 
 Always read these first:
 
 - `.draftspec/constitution.md`
-- `.draftspec/memory.md`
 - `.draftspec/plans/<slug>/tasks.md`
 
 ## Load Only If Needed
@@ -46,15 +45,13 @@ Stop and ask for clarification only if:
 - Prefer confirming concrete implementation claims over broad subjective review.
 - Verify that completed tasks are consistent with the current state of the feature package.
 - Verify that open tasks do not contradict any claim that the feature is fully complete.
-- Verify that `.draftspec/memory.md` reflects important implementation changes when relevant.
 - Verify acceptance-to-task coverage consistency when `tasks.md` includes an `Acceptance Coverage` section.
 - Use a simple verdict: `pass`, `concerns`, or `blocked`.
 - Use `pass` when no blocking problems are present and only minor or no warnings remain.
 - Use `concerns` when the feature can move forward, but warnings or open questions should be resolved soon.
-- Use `blocked` when missing task completion, contradictory implementation state, or unsynchronized memory would make archive or completion claims unsafe.
+- Use `blocked` when missing task completion or contradictory implementation state would make archive or completion claims unsafe.
 - Keep the verification output in the project's configured documentation language when writing it to disk.
 - Use `.draftspec/scripts/verify-task-state.sh <slug>` as a cheap first pass before reading deeper artifacts.
-- Use `.draftspec/scripts/verify-memory-sync.sh <slug>` to catch coarse contradictions between `tasks.md` and `memory.md` before doing deeper verification.
 - Use `.draftspec/templates/verify-report.md` as the canonical template when writing the report to disk.
 - Use this report structure:
   - `# Verify Report: <slug>`
@@ -71,4 +68,4 @@ Stop and ask for clarification only if:
 - Output the report to the conversation unless the user asks to persist it
 - If persisted without an explicit path, use `.draftspec/plans/<slug>/verify.md`
 - Summarize the verdict, completed checks, remaining concerns, and whether the feature is safe to archive
-- In `## Checks`, explicitly cover task completion, coarse memory sync, memory alignment, and implementation alignment where inspected
+- In `## Checks`, explicitly cover task completion and implementation alignment where inspected

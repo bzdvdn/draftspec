@@ -9,7 +9,6 @@ Produce the technical planning artifacts for a spec under `.draftspec/plans/<slu
 ## Load Only
 
 - `.draftspec/constitution.md`
-- `.draftspec/memory.md`
 - `.draftspec/specs/<slug>.md`
 - only the repository code and docs needed to plan this one feature
 

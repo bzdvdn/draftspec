@@ -85,14 +85,14 @@ Release filter: `verify` должен оставаться легкой опци
 - ввести небольшой `verify` или review-oriented workflow после `implement`
 - проверять, что завершенные tasks соответствуют реальному состоянию implementation
 - проверять, что implementation по-прежнему соответствует intent из spec и plan
-- следить, чтобы memory и task state оставались синхронизированными
+- следить, чтобы archived feature state и task state оставались согласованными там, где от этого зависит verification
 
 ### Anti-Bloat Notes
 
 Безопасное направление:
 
 - helper-скрипты для проверки состояния задач
-- проверки синхронизации memory/tasks
+- проверки consistency между archive и tasks
   Статус: для `verify` уже добавлены грубые helper-based проверки sync.
 - optional persisted verify reports
 
@@ -116,7 +116,7 @@ Release filter: добавлять automation output только там, где
 
 ### Планируемая работа
 
-- улучшить archive summaries и связи архива с `memory.md`
+- улучшить archive summaries и связи архива
 - удерживать проверки completed-архива дешевыми за счет переиспользования task-state verification
 - добавить machine-readable outputs вроде `doctor --json`
   Статус: уже реализовано для `doctor`; дальше расширять этот подход только там, где output остается дешевым и переиспользует существующие проверки.

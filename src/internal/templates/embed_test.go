@@ -83,7 +83,6 @@ func TestFilesBuildForSupportedLanguages(t *testing.T) {
 			for _, required := range []string{
 				"draftspec.yaml",
 				"constitution.md",
-				"memory.md",
 				"templates/spec.md",
 				"templates/plan.md",
 				"templates/tasks.md",
@@ -101,7 +100,6 @@ func TestFilesBuildForSupportedLanguages(t *testing.T) {
 				"scripts/check-archive-ready.sh",
 				"scripts/check-verify-ready.sh",
 				"scripts/verify-task-state.sh",
-				"scripts/verify-memory-sync.sh",
 			} {
 				if _, ok := targets[required]; !ok {
 					t.Fatalf("expected generated file set to include %s", required)

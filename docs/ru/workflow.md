@@ -6,6 +6,8 @@
 constitution -> spec -> inspect -> plan -> tasks -> implement -> verify -> archive
 ```
 
+Draftspec предполагает branch-based delivery: каждая активная фича должна разрабатываться в своей git-ветке, а общим источником истины служат feature spec и plan package, а не общий mutable memory-файл.
+
 ## Роли фаз
 
 ### `constitution`
@@ -92,11 +94,11 @@ constitution -> spec -> inspect -> plan -> tasks -> implement -> verify -> archi
 
 ### `implement`
 
-Выполняет незавершенные задачи, обновляет `tasks.md` и синхронизирует `memory.md`.
+Выполняет незавершенные задачи и обновляет `tasks.md`.
 
 ### `verify`
 
-Запускает легкую post-implementation проверку, чтобы подтвердить, что завершенная работа достаточно согласована с tasks, memory и правилами проекта для безопасного следующего шага.
+Запускает легкую post-implementation проверку, чтобы подтвердить, что завершенная работа достаточно согласована с tasks и правилами проекта для безопасного следующего шага.
 
 Полный verification report должен использовать стабильную структуру:
 
@@ -119,15 +121,13 @@ constitution -> spec -> inspect -> plan -> tasks -> implement -> verify -> archi
 
 - `pass`: блокирующих проблем нет; остаются только незначительные предупреждения или их нет совсем
 - `concerns`: по workflow можно двигаться дальше, но warnings или открытые вопросы желательно закрыть в ближайшее время
-- `blocked`: архивирование или заявление о завершенности иначе опирались бы на противоречивое состояние реализации, незавершенную обязательную работу или несинхронизированную memory
+- `blocked`: архивирование или заявление о завершенности иначе опирались бы на противоречивое состояние реализации или незавершенную обязательную работу
 
 Если verification report нужно сохранить на диск, Draftspec должен по умолчанию использовать `.draftspec/plans/<slug>/verify.md`.
 
 Используйте `.draftspec/templates/verify-report.md` как канонический шаблон, если отчет записывается в файл.
 
 Используйте `.draftspec/scripts/verify-task-state.sh <slug>` как самый дешевый helper первого прохода, когда нужно только подтвердить состояние задач.
-
-Используйте `.draftspec/scripts/verify-memory-sync.sh <slug>` для дешевой грубой проверки между `tasks.md` и `memory.md` до чтения implementation files.
 
 ### `archive`
 
@@ -145,4 +145,4 @@ constitution -> spec -> inspect -> plan -> tasks -> implement -> verify -> archi
 - только после этого строятся tasks
 - implementation идет по tasks, а не по широкой импровизации
 - легкий verify закрывает разрыв между implementation и archive
-- завершенные feature packages уходят в archive, не раздувая active memory
+- завершенные feature packages уходят в archive, не раздувая активное рабочее пространство

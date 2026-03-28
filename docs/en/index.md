@@ -26,6 +26,6 @@ This creates:
 
 - `.draftspec/` workspace files
 - project-local agent command files when `--agents` is used
-- `AGENTS.md` guidance linked to Draftspec memory and templates
+- `AGENTS.md` guidance linked to Draftspec structure, workflow, and templates
 
 For a concise product summary, see the root [README](../README.md) and [MVP](../MVP.md).

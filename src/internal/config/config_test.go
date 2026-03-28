@@ -26,9 +26,6 @@ func TestDefaultAppliesExpectedDefaults(t *testing.T) {
 	if cfg.Scripts.VerifyTaskState != "verify-task-state.sh" {
 		t.Fatalf("VerifyTaskState = %q, want %q", cfg.Scripts.VerifyTaskState, "verify-task-state.sh")
 	}
-	if cfg.Scripts.VerifyMemorySync != "verify-memory-sync.sh" {
-		t.Fatalf("VerifyMemorySync = %q, want %q", cfg.Scripts.VerifyMemorySync, "verify-memory-sync.sh")
-	}
 }
 
 func TestLoadReturnsDefaultsWhenConfigDoesNotExist(t *testing.T) {

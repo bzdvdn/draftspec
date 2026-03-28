@@ -4,7 +4,7 @@
 
 `draftspec` provides a minimal, file-based context system for software projects.
 
-It helps development agents and humans work from the same project memory:
+It helps development agents and humans work from the same project context:
 
 - what the project is trying to do
 - what a feature should do
@@ -33,7 +33,6 @@ The product should feel lightweight, editable, and resilient.
 ```text
 .draftspec/
   draftspec.yaml
-  memory.md
   constitution.md
   specs/
     <slug>.md
@@ -49,21 +48,19 @@ The product should feel lightweight, editable, and resilient.
   archive/
     <slug>/
       <YYYY-MM-DD>/
-        summary.md
-        spec.md
-        plan.md
-        tasks.md
-        data-model.md
-        research.md
-        memory-snapshot.md
-        contracts/
+      summary.md
+      spec.md
+      plan.md
+      tasks.md
+      data-model.md
+      research.md
+      contracts/
   templates/
     constitution.md
     spec.md
     plan.md
     tasks.md
     data-model.md
-    memory.md
     contracts/
       api.md
       events.md
@@ -82,7 +79,6 @@ The product should feel lightweight, editable, and resilient.
     check-tasks-ready.sh
     check-implement-ready.sh
     list-open-tasks.sh
-    sync-memory.sh
     link-agents.sh
     list-specs.sh
     show-spec.sh
@@ -129,7 +125,6 @@ Controls:
 The language settings are stored in `.draftspec/draftspec.yaml` and reflected in:
 
 - `.draftspec/constitution.md`
-- `.draftspec/memory.md`
 - `.draftspec/templates/agents-snippet.md`
 
 For specification and planning work, the configured `docs language` acts as the default language for generated specs, plans, contracts, and task lists unless an existing artifact has a stronger local convention that should be preserved.
@@ -139,6 +134,12 @@ For implementation work, the configured `comments language` acts as the default 
 ## Token efficiency goals
 
 Draftspec should stay meaningfully lighter than Speckit by default.
+
+Draftspec should also stay team-safe by default:
+
+- each feature should be worked in a dedicated git branch
+- active feature state should live in the feature spec and plan package, not in a shared mutable memory file
+- archive should preserve historical context without creating frequent merge conflicts across parallel work
 
 Design constraints for low token usage:
 
@@ -191,7 +192,6 @@ The constitution is authoritative over specs, plans, tasks, and implementation.
 Inputs:
 
 - `.draftspec/constitution.md`
-- `.draftspec/memory.md`
 - `.draftspec/specs/<slug>.md`
 - optional plan artifacts when they exist
 
@@ -206,7 +206,6 @@ Outputs:
 
 Inputs:
 
-- `.draftspec/memory.md`
 - `.draftspec/specs/<slug>.md`
 - optional plan artifacts when they exist
 
@@ -214,7 +213,6 @@ Outputs:
 
 - `.draftspec/archive/<slug>/<YYYY-MM-DD>/summary.md`
 - archived copies of the feature spec and plan artifacts
-- a short archive entry under `Archived Specs` in `memory.md`
 
 ## Spec workflow
 
@@ -223,7 +221,6 @@ Outputs:
 Inputs:
 
 - `.draftspec/constitution.md`
-- `.draftspec/memory.md`
 - user request
 - minimal repository context when needed
 
@@ -238,7 +235,6 @@ Output:
 Inputs:
 
 - `.draftspec/constitution.md`
-- `.draftspec/memory.md`
 - `.draftspec/specs/<slug>.md`
 - repository code and docs when relevant
 
@@ -255,7 +251,6 @@ Outputs:
 `tasks` always reads:
 
 - `.draftspec/constitution.md`
-- `.draftspec/memory.md`
 - `.draftspec/plans/<slug>/plan.md`
 
 It then reads only as needed:
@@ -276,7 +271,6 @@ It must:
 `implement` always reads:
 
 - `.draftspec/constitution.md`
-- `.draftspec/memory.md`
 - `.draftspec/plans/<slug>/tasks.md`
 
 It then reads only as needed:
@@ -292,7 +286,6 @@ It must:
 - execute only unfinished tasks
 - respect task order and phase structure
 - update `tasks.md`
-- update `memory.md`
 - stop when the plan is insufficient or conflicts with the constitution
 
 ## Configuration file
@@ -302,7 +295,6 @@ version: 1
 
 project:
   name: my-project
-  memory_file: .draftspec/memory.md
   constitution_file: .draftspec/constitution.md
 
 paths:
@@ -320,7 +312,6 @@ language:
 agents:
   update_agents_md: true
   agents_file: AGENTS.md
-  memory_link: .draftspec/memory.md
   targets: []
 
 templates:
@@ -336,7 +327,6 @@ templates:
   plan_prompt: prompts/plan.md
   tasks_prompt: prompts/tasks.md
   implement_prompt: prompts/implement.md
-  memory: memory.md
 
 scripts:
   inspect_spec: inspect-spec.sh
@@ -346,7 +336,6 @@ scripts:
   check_tasks_ready: check-tasks-ready.sh
   check_implement_ready: check-implement-ready.sh
   list_open_tasks: list-open-tasks.sh
-  sync_memory: sync-memory.sh
   link_agents: link-agents.sh
   list_specs: list-specs.sh
   show_spec: show-spec.sh

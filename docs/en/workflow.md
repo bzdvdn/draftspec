@@ -6,6 +6,8 @@
 constitution -> spec -> inspect -> plan -> tasks -> implement -> verify -> archive
 ```
 
+Draftspec assumes branch-based delivery: each active feature should be developed in its own git branch, with the feature spec and plan package acting as the shared source of truth instead of a mutable global memory file.
+
 ## Phase Responsibilities
 
 ### `constitution`
@@ -92,11 +94,11 @@ Turns the plan package into executable tasks. `tasks.md` lives next to other pla
 
 ### `implement`
 
-Executes unfinished tasks, updates `tasks.md`, and refreshes `memory.md`.
+Executes unfinished tasks and updates `tasks.md`.
 
 ### `verify`
 
-Runs a lightweight post-implementation check to confirm that completed work is aligned enough with tasks, memory, and project rules to move forward safely.
+Runs a lightweight post-implementation check to confirm that completed work is aligned enough with tasks and project rules to move forward safely.
 
 A full verification report should use a stable structure:
 
@@ -119,15 +121,13 @@ Suggested semantics:
 
 - `pass`: no blocking problems are present; only minor or no warnings remain
 - `concerns`: the feature can move forward, but warnings or open questions should be resolved soon
-- `blocked`: archive or completion claims would otherwise proceed on contradictory implementation state, unfinished required work, or unsynchronized memory
+- `blocked`: archive or completion claims would otherwise proceed on contradictory implementation state or unfinished required work
 
 When a verification report should be persisted to disk, Draftspec should prefer `.draftspec/plans/<slug>/verify.md`.
 
 Use `.draftspec/templates/verify-report.md` as the canonical template when the report is written to disk.
 
 Use `.draftspec/scripts/verify-task-state.sh <slug>` as the cheapest first-pass helper when you only need task-state confirmation.
-
-Use `.draftspec/scripts/verify-memory-sync.sh <slug>` for cheap coarse checks between `tasks.md` and `memory.md` before reading any implementation files.
 
 ### `archive`
 
@@ -144,4 +144,4 @@ The chain keeps the product strict without becoming bureaucratic:
 - technical planning happens before task breakdown
 - implementation follows tasks instead of improvisation
 - lightweight verification closes the gap between implementation and archive
-- completed feature packages can be archived without bloating active memory
+- completed feature packages can be archived without bloating the active workspace

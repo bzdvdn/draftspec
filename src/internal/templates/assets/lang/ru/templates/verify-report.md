@@ -7,7 +7,6 @@
 - docs_language: <en|ru>
 - artifacts:
   - .draftspec/constitution.md
-  - .draftspec/memory.md
   - .draftspec/plans/<slug>/tasks.md
 
 ## Verdict
@@ -17,7 +16,6 @@
 ## Checks
 
 - completed tasks reviewed
-- memory alignment reviewed
 - implementation alignment reviewed where needed
 
 ## Errors

@@ -67,7 +67,6 @@ func Check(root string) (Result, error) {
 	for _, path := range []string{
 		configPath,
 		filepath.Join(root, cfg.Project.ConstitutionFile),
-		filepath.Join(root, cfg.Project.MemoryFile),
 		filepath.Join(templatesDir, cfg.Templates.Spec),
 		filepath.Join(templatesDir, cfg.Templates.Plan),
 		filepath.Join(templatesDir, cfg.Templates.Tasks),
@@ -90,7 +89,6 @@ func Check(root string) (Result, error) {
 		filepath.Join(scriptsDir, cfg.Scripts.CheckArchiveReady),
 		filepath.Join(scriptsDir, cfg.Scripts.CheckVerifyReady),
 		filepath.Join(scriptsDir, cfg.Scripts.VerifyTaskState),
-		filepath.Join(scriptsDir, cfg.Scripts.VerifyMemorySync),
 	} {
 		checkPath(&findings, path, false)
 	}

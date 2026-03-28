@@ -51,7 +51,6 @@ Recommended starting point:
 What not to do:
 
 - do not try to spec the whole project at once
-- do not turn `memory.md` into a dump of all historical knowledge
 - do not pull broad repository context unless the active feature really needs it
 
 Why this helps:
@@ -73,8 +72,7 @@ Expected agent behavior:
 - read the constitution prompt in `.draftspec/templates/prompts/constitution.md`
 - inspect only the minimum repository evidence needed
 - create or patch `.draftspec/constitution.md`
-- update `.draftspec/memory.md`
-- run `check-constitution.sh` and `sync-memory.sh` when appropriate
+- run `check-constitution.sh` when appropriate
 
 Expected outcome:
 
@@ -92,7 +90,7 @@ User request:
 
 Expected agent behavior:
 
-- read constitution and memory first
+- read constitution first
 - create `.draftspec/specs/partner-scheduling.md`
 - write acceptance criteria using canonical `Given / When / Then`
 - keep surrounding text in the configured documentation language
@@ -118,7 +116,7 @@ User request:
 
 Expected agent behavior:
 
-- read constitution, memory, and `.draftspec/specs/partner-scheduling.md`
+- read constitution and `.draftspec/specs/partner-scheduling.md`
 - check completeness, constitutional consistency, and scenario quality
 - create a focused inspection report
 - if the report should be persisted, prefer `.draftspec/specs/partner-scheduling.inspect.md` before planning and `.draftspec/plans/partner-scheduling/inspect.md` after the plan package exists
@@ -140,7 +138,7 @@ User request:
 
 Expected agent behavior:
 
-- read constitution, memory, and the spec
+- read constitution and the spec
 - create `.draftspec/plans/partner-scheduling/plan.md`
 - create `.draftspec/plans/partner-scheduling/data-model.md`
 - create `.draftspec/plans/partner-scheduling/contracts/`
@@ -194,7 +192,6 @@ Expected agent behavior:
 - load spec, plan, data model, or contracts only for the active task
 - implement unfinished tasks in order
 - update `tasks.md`
-- update `.draftspec/memory.md`
 
 This phase should avoid broad repository reads unless the active task actually requires them.
 
@@ -208,12 +205,10 @@ User request:
 
 Expected agent behavior:
 
-- read constitution, memory, and tasks first
+- read constitution and tasks first
 - confirm that completed tasks match the current implementation state closely enough
-- confirm that memory is aligned when relevant
 - produce a lightweight verification report
 - start with `.draftspec/scripts/verify-task-state.sh partner-scheduling` when task-state confirmation is enough
-- add `.draftspec/scripts/verify-memory-sync.sh partner-scheduling` when you need a cheap coarse sync check between tasks and memory
 - use `.draftspec/templates/verify-report.md` when the report should be persisted
 - default to `.draftspec/plans/partner-scheduling/verify.md` when no explicit path is provided
 
@@ -230,7 +225,6 @@ Expected agent behavior:
 - for `completed` status, start with `.draftspec/scripts/verify-task-state.sh partner-scheduling` and stop if open tasks remain
 - copy the feature package into `.draftspec/archive/partner-scheduling/<YYYY-MM-DD>/`
 - write `summary.md`
-- add a short archived entry to `memory.md`
 
 Expected archive result:
 
@@ -243,7 +237,6 @@ Expected archive result:
       plan.md
       tasks.md
       data-model.md
-      memory-snapshot.md
       contracts/
 ```
 

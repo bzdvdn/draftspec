@@ -2,12 +2,13 @@
 
 ## What Draftspec Is
 
-`draftspec` keeps project intent, specifications, plan artifacts, tasks, and working memory in plain files. It is designed to help humans and development agents share the same project context without introducing a rigid process engine.
+`draftspec` keeps project intent, specifications, plan artifacts, and tasks in plain files. It is designed to help humans and development agents share the same project context without introducing a rigid process engine.
 
 ## Core Ideas
 
 - The constitution is the highest-priority project document.
 - Every feature starts as a spec and evolves through a strict workflow.
+- Each feature should be developed in its own git branch so teams can collaborate without shared-memory merge churn.
 - Generated docs and prompts can use English or Russian.
 - Agent workflows should load only the minimum context needed.
 - Readiness checks belong in scripts whenever possible.
@@ -17,7 +18,6 @@
 ```text
 .draftspec/
   draftspec.yaml
-  memory.md
   constitution.md
   specs/
     <slug>.md
@@ -39,7 +39,6 @@
         tasks.md
         data-model.md
         research.md
-        memory-snapshot.md
         contracts/
   templates/
   scripts/

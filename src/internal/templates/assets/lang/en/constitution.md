@@ -54,7 +54,6 @@
 - This constitution is authoritative for project decisions.
 - Changes to architecture, specs, plans, and tasks MUST comply with these principles.
 - If implementation conflicts with this constitution, the constitution wins unless it is explicitly amended first.
-- Agents and humans MUST update `.draftspec/memory.md` after material constitutional changes.
 - Amend by patching this file, preserving mandatory sections and keeping guidance concrete and testable.
 
 ## Last Updated

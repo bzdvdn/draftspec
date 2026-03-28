@@ -23,7 +23,6 @@ Do not redesign an existing project into an idealized architecture. Describe cur
 
 - current user request and conversation
 - `.draftspec/constitution.md`
-- `.draftspec/memory.md`
 - `README.md`, if present
 - `AGENTS.md`, if present
 - project manifests and configuration files when they quickly explain language, runtime, architectural boundaries, or integrations
@@ -98,17 +97,10 @@ If the constitution is already current and does not conflict with the request, s
 - If a rule is inferred from the repository, phrase it as an observed stable norm of the project rather than an abstract best practice.
 - If a rule is introduced by user intent, phrase it as law for downstream phases.
 - Update `## Last Updated` with today's date in `YYYY-MM-DD` format whenever the constitution changes.
-- After updating the constitution, also update `.draftspec/memory.md` so it reflects:
-  - constitution last updated date
-  - current project purpose
-  - principle names
-  - key constraints
-  - current language policy
 
 ## Output expectations
 
 - Write the updated `.draftspec/constitution.md`
-- Update `.draftspec/memory.md`
 - Briefly summarize what changed and what remains unresolved
 - Separately note what was inferred from the codebase and what was added as new mandatory law
 - If there are unresolved constitutional questions, explicitly mark them as **BLOCKER** for downstream phases (spec, inspect, plan)

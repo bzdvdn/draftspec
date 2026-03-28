@@ -65,7 +65,6 @@ func Files(settings LanguageSettings) ([]File, error) {
 		Language     string
 	}{
 		{RelativePath: "constitution.md", TargetPath: "constitution.md", Mode: 0o644, Language: settings.Docs},
-		{RelativePath: "memory.md", TargetPath: "memory.md", Mode: 0o644, Language: settings.Docs},
 		{RelativePath: "templates/constitution.md", TargetPath: "templates/constitution.md", Mode: 0o644, Language: settings.Docs},
 		{RelativePath: "templates/spec.md", TargetPath: "templates/spec.md", Mode: 0o644, Language: settings.Docs},
 		{RelativePath: "templates/plan.md", TargetPath: "templates/plan.md", Mode: 0o644, Language: settings.Docs},
@@ -76,7 +75,6 @@ func Files(settings LanguageSettings) ([]File, error) {
 		{RelativePath: "templates/archive/summary.md", TargetPath: "templates/archive/summary.md", Mode: 0o644, Language: settings.Docs},
 		{RelativePath: "templates/inspect-report.md", TargetPath: "templates/inspect-report.md", Mode: 0o644, Language: settings.Docs},
 		{RelativePath: "templates/verify-report.md", TargetPath: "templates/verify-report.md", Mode: 0o644, Language: settings.Docs},
-		{RelativePath: "templates/memory.md", TargetPath: "templates/memory.md", Mode: 0o644, Language: settings.Docs},
 		{RelativePath: "templates/agents-snippet.md", TargetPath: "templates/agents-snippet.md", Mode: 0o644, Language: settings.Agent},
 		{RelativePath: "templates/prompts/constitution.md", TargetPath: "templates/prompts/constitution.md", Mode: 0o644, Language: settings.Agent},
 		{RelativePath: "templates/prompts/spec.md", TargetPath: "templates/prompts/spec.md", Mode: 0o644, Language: settings.Agent},
@@ -87,7 +85,7 @@ func Files(settings LanguageSettings) ([]File, error) {
 		{RelativePath: "templates/prompts/archive.md", TargetPath: "templates/prompts/archive.md", Mode: 0o644, Language: settings.Agent},
 		{RelativePath: "templates/prompts/verify.md", TargetPath: "templates/prompts/verify.md", Mode: 0o644, Language: settings.Agent},
 	}
-	files := make([]File, 0, len(definitions)+11)
+	files := make([]File, 0, len(definitions)+9)
 	files = append(files, File{TargetPath: "draftspec.yaml", Content: generateConfig(settings), Mode: 0o644})
 	for _, definition := range definitions {
 		content, err := localizedFileContent(definition.Language, definition.RelativePath)
@@ -111,9 +109,7 @@ func Files(settings LanguageSettings) ([]File, error) {
 		{"assets/scripts/check-archive-ready.sh", "scripts/check-archive-ready.sh", 0o755},
 		{"assets/scripts/check-verify-ready.sh", "scripts/check-verify-ready.sh", 0o755},
 		{"assets/scripts/verify-task-state.sh", "scripts/verify-task-state.sh", 0o755},
-		{"assets/scripts/verify-memory-sync.sh", "scripts/verify-memory-sync.sh", 0o755},
 		{"assets/scripts/list-open-tasks.sh", "scripts/list-open-tasks.sh", 0o755},
-		{"assets/scripts/sync-memory.sh", "scripts/sync-memory.sh", 0o755},
 		{"assets/scripts/link-agents.sh", "scripts/link-agents.sh", 0o755},
 		{"assets/scripts/list-specs.sh", "scripts/list-specs.sh", 0o755},
 		{"assets/scripts/show-spec.sh", "scripts/show-spec.sh", 0o755},
