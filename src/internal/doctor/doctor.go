@@ -90,6 +90,7 @@ func Check(root string) (Result, error) {
 		filepath.Join(scriptsDir, cfg.Scripts.CheckArchiveReady),
 		filepath.Join(scriptsDir, cfg.Scripts.CheckVerifyReady),
 		filepath.Join(scriptsDir, cfg.Scripts.VerifyTaskState),
+		filepath.Join(scriptsDir, cfg.Scripts.VerifyMemorySync),
 	} {
 		checkPath(&findings, path, false)
 	}

@@ -63,6 +63,20 @@ constitution -> spec -> inspect -> plan -> tasks -> implement -> verify -> archi
 
 Стабильные идентификаторы критериев вроде `AC-001` делают traceability легче и проще для валидации.
 
+Для дешевой проверки `spec <-> plan` consistency Draftspec должен предпочитать такую область анализа:
+
+- обязательно: `spec.md`, `plan.md`
+- условно: `data-model.md`, `contracts/`
+- implementation code по умолчанию не читать
+
+Цель этой проверки — поймать явный drift, а не запускать полный архитектурный review. Полезные типы проверок:
+
+- goal alignment
+- необоснованное расширение scope
+- отражение acceptance-critical behavior на уровне плана
+- соответствие конституции
+- оправданность более богатых plan artifacts вроде `data-model.md` и `contracts/`
+
 ### `plan`
 
 Создает технические артефакты для одного feature package:
@@ -112,6 +126,8 @@ constitution -> spec -> inspect -> plan -> tasks -> implement -> verify -> archi
 Используйте `.draftspec/templates/verify-report.md` как канонический шаблон, если отчет записывается в файл.
 
 Используйте `.draftspec/scripts/verify-task-state.sh <slug>` как самый дешевый helper первого прохода, когда нужно только подтвердить состояние задач.
+
+Используйте `.draftspec/scripts/verify-memory-sync.sh <slug>` для дешевой грубой проверки между `tasks.md` и `memory.md` до чтения implementation files.
 
 ### `archive`
 

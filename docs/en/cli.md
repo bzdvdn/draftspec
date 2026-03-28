@@ -53,6 +53,8 @@ Checks workspace health.
 - `warning` for orphaned agent artifacts still present on disk
 - `ok` when the workspace is healthy
 
+Use `--json` for machine-readable output in automation and CI.
+
 ### `draftspec list-specs [path]`
 
 Lists spec slugs from `.draftspec/specs/`.

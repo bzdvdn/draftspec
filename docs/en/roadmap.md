@@ -10,11 +10,37 @@ Draftspec should continue to position itself between heavier spec-driven systems
 - lighter than spec-kit
 - optimized for agent-first workflows on real codebases
 
+## First Release Focus
+
+The immediate goal for Draftspec is not to match heavier SDD systems in phase count, artifact count, or automation depth.
+
+The immediate goal is to:
+
+- ship a lightweight first release
+- test the workflow in real codebases and real agent sessions
+- validate that a strict-by-structure approach works without large default context
+
+Before those field tests, Draftspec should prefer:
+
+- narrow default context over broad repository reads
+- cheap checks and readiness scripts over heavy orchestration
+- a minimal required artifact set over growing every feature package
+- stronger traceability and consistency without increasing prompt mass
+
+Before those field tests, Draftspec should avoid rushing into:
+
+- new mandatory phases
+- mandatory persisted reports for every feature
+- wider default inspect/verify context
+- automation that makes the workflow heavier before its value is proven
+
 ## Iteration 1
 
 ### Primary goal
 
 Strengthen `inspect` as the central quality layer.
+
+Release filter: strengthen `inspect` only in ways that keep it cheap in context terms and prevent it from becoming a mandatory heavy review engine.
 
 ### Planned work
 
@@ -31,12 +57,14 @@ Safe direction:
 - stronger structural checks
 - clearer verdict semantics
 - better traceability through stable acceptance IDs
+- cheap `spec <-> plan` consistency checks based on `spec.md` and `plan.md` only
 
 Use caution with:
 
 - making persisted inspect reports mandatory for every feature
 - reading implementation code by default during inspect
 - turning inspect into a broad review engine
+- pulling `data-model`, `contracts`, and code into every inspect run by default
 
 ### Why this matters
 
@@ -49,6 +77,8 @@ If `inspect` is strong, every downstream phase gets better with less wasted impl
 Add a lightweight post-implementation verification layer.
 
 Status: lightweight contract, prompt, readiness script, and report template are now in place. The remaining work is to deepen checks without expanding default context.
+
+Release filter: `verify` should remain a lightweight optional safety layer, not a new heavy mandatory phase for every feature.
 
 ### Planned work
 
@@ -63,6 +93,7 @@ Safe direction:
 
 - task-state verification helpers
 - memory/task synchronization checks
+  Status: coarse helper-based sync checks are now in place for `verify`.
 - optional persisted verify reports
 
 Use caution with:
@@ -81,11 +112,14 @@ This closes the gap between "tasks were executed" and "the feature is actually a
 
 Strengthen brownfield ergonomics and automation outputs.
 
+Release filter: add automation outputs only where they reuse existing checks and do not pull in new mandatory context.
+
 ### Planned work
 
 - improve archive summaries and archive linkage in `memory.md`
 - keep completed-archive checks cheap by reusing task-state verification
 - add machine-readable outputs such as `doctor --json`
+  Status: implemented for `doctor`; extend this pattern only when outputs stay cheap and reuse existing checks.
 - improve config-aware helper behavior for scripts and future tooling
 - continue polishing multilingual consistency in docs and prompts
 
@@ -126,3 +160,4 @@ Draftspec should avoid these unless there is a very strong reason:
 - approval-gate bureaucracy
 - large default prompt contexts
 - required artifact sprawl for every feature
+- trying to become a full process operating system before the lightweight core is proven in practice

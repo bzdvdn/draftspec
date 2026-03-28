@@ -46,6 +46,17 @@ Stop and ask a minimal follow-up question only if:
 - Every acceptance criterion in the spec MUST have an explicit Given/When/Then format. The `Given`, `When`, and `Then` markers remain canonical regardless of the documentation language. Missing G/W/T is an `Error`, not a `Suggestion`.
 - If `tasks.md` exists, verify that every acceptance criterion from the spec is covered by at least one task. An uncovered criterion is an `Error`.
 - If plan artifacts exist, check alignment between spec, plan, data model, contracts, and tasks.
+- When `plan.md` exists, check `spec <-> plan` consistency before reading deeper plan artifacts.
+- Treat `spec.md` and `plan.md` as the required inputs for cheap plan consistency checks.
+- Only read `data-model.md` or `contracts/` when `plan.md` explicitly depends on them or when they are required to confirm a concrete consistency claim.
+- Check `Goal Alignment`: the plan must not change the core feature goal expressed in the spec.
+- Check `Scope Expansion`: the plan must not introduce major new workstreams, components, or integration surfaces that are outside the spec.
+- Check `Acceptance Coverage at Plan Level`: major acceptance-critical behavior from the spec should be reflected in the plan intent, even before tasks exist.
+- Check `Constitution Consistency`: the plan must not violate constitutional rules or architectural constraints.
+- Check `Artifact Justification`: if the plan introduces `data-model.md` or `contracts/`, the need for those artifacts should be justified by the spec.
+- Use `blocked` when the plan changes the feature goal, violates the constitution, ignores major acceptance-critical behavior, or introduces major unjustified scope expansion.
+- Use `warning` when the plan is still broadly aligned but appears under-justified, weakly scoped, or only partially connected to acceptance intent.
+- Do not turn this into a broad design review. Prefer catching obvious drift over scoring architecture quality.
 - Keep the inspection report in the project's configured documentation language when writing it to disk.
 - Prefer concrete findings over generic advice.
 - Use this report structure:

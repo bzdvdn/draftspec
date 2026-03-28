@@ -47,6 +47,7 @@ Each prompt is designed to:
 
 - it starts from `tasks.md`
 - it can use `.draftspec/scripts/verify-task-state.sh <slug>` as a cheap first-pass helper
+- it can use `.draftspec/scripts/verify-memory-sync.sh <slug>` for coarse memory/task sync signals before touching code
 - it reads deeper artifacts only when needed to confirm a concrete claim
 - it is meant to confirm readiness for archive or follow-up refinement, not to become a heavy review engine
 

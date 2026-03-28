@@ -2,6 +2,7 @@ package cli
 
 import (
 	"bytes"
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"strings"
@@ -98,6 +99,35 @@ func TestAddAgentAndDoctorCommands(t *testing.T) {
 	}
 	if !strings.Contains(stdout, "ok: draftspec workspace looks healthy") {
 		t.Fatalf("unexpected doctor output: %s", stdout)
+	}
+}
+
+func TestDoctorCommandJSONOutput(t *testing.T) {
+	root := t.TempDir()
+
+	if _, _, err := executeRoot(t, "init", root, "--git=false", "--lang", "en"); err != nil {
+		t.Fatalf("init command returned error: %v", err)
+	}
+
+	stdout, _, err := executeRoot(t, "doctor", root, "--json")
+	if err != nil {
+		t.Fatalf("doctor --json returned error: %v", err)
+	}
+
+	var payload struct {
+		Findings []struct {
+			Level   string `json:"Level"`
+			Message string `json:"Message"`
+		} `json:"Findings"`
+	}
+	if err := json.Unmarshal([]byte(stdout), &payload); err != nil {
+		t.Fatalf("failed to parse doctor json output %q: %v", stdout, err)
+	}
+	if len(payload.Findings) == 0 {
+		t.Fatalf("expected findings in doctor json output, got %q", stdout)
+	}
+	if payload.Findings[len(payload.Findings)-1].Level != "ok" {
+		t.Fatalf("expected trailing ok finding in json output, got %+v", payload.Findings)
 	}
 }
 

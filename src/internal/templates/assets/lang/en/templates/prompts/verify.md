@@ -54,6 +54,7 @@ Stop and ask for clarification only if:
 - Use `blocked` when missing task completion, contradictory implementation state, or unsynchronized memory would make archive or completion claims unsafe.
 - Keep the verification output in the project's configured documentation language when writing it to disk.
 - Use `.draftspec/scripts/verify-task-state.sh <slug>` as a cheap first pass before reading deeper artifacts.
+- Use `.draftspec/scripts/verify-memory-sync.sh <slug>` to catch coarse contradictions between `tasks.md` and `memory.md` before doing deeper verification.
 - Use `.draftspec/templates/verify-report.md` as the canonical template when writing the report to disk.
 - Use this report structure:
   - `# Verify Report: <slug>`
@@ -70,4 +71,4 @@ Stop and ask for clarification only if:
 - Output the report to the conversation unless the user asks to persist it
 - If persisted without an explicit path, use `.draftspec/plans/<slug>/verify.md`
 - Summarize the verdict, completed checks, remaining concerns, and whether the feature is safe to archive
-- In `## Checks`, explicitly cover task completion, memory alignment, and implementation alignment where inspected
+- In `## Checks`, explicitly cover task completion, coarse memory sync, memory alignment, and implementation alignment where inspected

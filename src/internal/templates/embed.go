@@ -111,6 +111,7 @@ func Files(settings LanguageSettings) ([]File, error) {
 		{"assets/scripts/check-archive-ready.sh", "scripts/check-archive-ready.sh", 0o755},
 		{"assets/scripts/check-verify-ready.sh", "scripts/check-verify-ready.sh", 0o755},
 		{"assets/scripts/verify-task-state.sh", "scripts/verify-task-state.sh", 0o755},
+		{"assets/scripts/verify-memory-sync.sh", "scripts/verify-memory-sync.sh", 0o755},
 		{"assets/scripts/list-open-tasks.sh", "scripts/list-open-tasks.sh", 0o755},
 		{"assets/scripts/sync-memory.sh", "scripts/sync-memory.sh", 0o755},
 		{"assets/scripts/link-agents.sh", "scripts/link-agents.sh", 0o755},

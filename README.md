@@ -4,6 +4,19 @@
 
 It keeps project intent, specifications, plan artifacts, task breakdowns, and working memory in simple files without introducing a rigid process engine.
 
+The first release is intentionally optimized for low overhead and real-world usage: narrow default context, minimal required artifacts, and strict workflow discipline without heavyweight orchestration.
+
+## Positioning
+
+Draftspec is a lean SDD kit for real codebases.
+
+- stricter than OpenSpec in phase discipline and artifact alignment
+- lighter than Spec Kit in default context, workflow surface, and artifact overhead
+- optimized for agent-first workflows with narrow context loading
+- designed to keep strictness in templates, entrypoints, and readiness checks rather than heavyweight orchestration
+
+In short: Draftspec aims to be as strict as practical while staying lightweight enough for everyday use.
+
 ## Documentation
 
 Extended documentation lives in [`docs/`](docs/README.md):
@@ -20,6 +33,7 @@ draftspec list-agents [path]
 draftspec remove-agent [path]
 draftspec cleanup-agents [path]
 draftspec doctor [path]
+draftspec doctor [path] --json
 draftspec list-specs [path]
 draftspec show-spec <name> [path]
 ```
@@ -36,6 +50,7 @@ constitution -> spec -> inspect -> plan -> tasks -> implement -> verify -> archi
 - Plan packages keep `plan.md`, `tasks.md`, `data-model.md`, `contracts/`, and optional `research.md` together.
 - Specs use canonical `Given / When / Then` markers across documentation languages.
 - Agent workflows are designed to load only the minimum context required.
+- Strictness comes from phase entrypoints, templates, and readiness checks rather than large default prompts.
 - Generated docs and prompts support English and Russian.
 
 ## Quick Example
@@ -43,6 +58,7 @@ constitution -> spec -> inspect -> plan -> tasks -> implement -> verify -> archi
 ```bash
 draftspec init my-project --lang en --agents claude --agents codex
 draftspec doctor my-project
+draftspec doctor my-project --json
 ```
 
 For deeper guidance, use:
@@ -66,4 +82,3 @@ The repository includes unit tests for config, project lifecycle, doctor checks,
 ## License
 
 Released under the [MIT License](LICENSE).
-

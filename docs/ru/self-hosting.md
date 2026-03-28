@@ -11,6 +11,7 @@ go test ./...
 go build -o bin/draftspec ./src/cmd/draftspec
 ./bin/draftspec init TESTS/demo --git=false --lang en --agents claude --agents cursor
 ./bin/draftspec doctor TESTS/demo
+./bin/draftspec doctor TESTS/demo --json
 ```
 
 ## Текущее Покрытие Тестами

@@ -68,6 +68,7 @@ var defaultConfig = Config{
 		CheckArchiveReady:   "check-archive-ready.sh",
 		CheckVerifyReady:    "check-verify-ready.sh",
 		VerifyTaskState:     "verify-task-state.sh",
+		VerifyMemorySync:    "verify-memory-sync.sh",
 		ListOpenTasks:       "list-open-tasks.sh",
 		SyncMemory:          "sync-memory.sh",
 		LinkAgents:          "link-agents.sh",
@@ -147,6 +148,7 @@ type Scripts struct {
 	CheckArchiveReady   string `yaml:"check_archive_ready"`
 	CheckVerifyReady    string `yaml:"check_verify_ready"`
 	VerifyTaskState     string `yaml:"verify_task_state"`
+	VerifyMemorySync    string `yaml:"verify_memory_sync"`
 	ListOpenTasks       string `yaml:"list_open_tasks"`
 	SyncMemory          string `yaml:"sync_memory"`
 	LinkAgents          string `yaml:"link_agents"`
@@ -350,6 +352,9 @@ func (c *Config) applyDefaults() {
 	}
 	if c.Scripts.VerifyTaskState == "" {
 		c.Scripts.VerifyTaskState = defaultConfig.Scripts.VerifyTaskState
+	}
+	if c.Scripts.VerifyMemorySync == "" {
+		c.Scripts.VerifyMemorySync = defaultConfig.Scripts.VerifyMemorySync
 	}
 	if c.Scripts.ListOpenTasks == "" {
 		c.Scripts.ListOpenTasks = defaultConfig.Scripts.ListOpenTasks

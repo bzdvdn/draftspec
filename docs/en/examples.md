@@ -2,6 +2,64 @@
 
 This page shows realistic end-to-end Draftspec scenarios for one feature package.
 
+## Quick Usage Patterns
+
+### New Project
+
+When starting a greenfield project, Draftspec works best as a minimal project-context layer from day one.
+
+Example:
+
+```bash
+draftspec init my-project --lang en --agents codex
+cd my-project
+draftspec doctor .
+```
+
+What to do next:
+
+- establish the `constitution` for project rules
+- describe the first feature through `spec`
+- prepare `plan` and `tasks`
+- use `implement` only from the current task list
+
+Why this helps:
+
+- humans and agents start from the same rules
+- project context stays explicit and editable from the beginning
+- the workflow stays lightweight because Draftspec does not require a heavy process engine
+
+### Existing Project
+
+For a brownfield codebase, Draftspec should be adopted incrementally instead of trying to document the whole repository at once.
+
+Example:
+
+```bash
+cd existing-project
+draftspec init . --lang en --agents codex
+draftspec doctor .
+```
+
+Recommended starting point:
+
+- establish the `constitution` around the project's current reality
+- pick one active feature or change request
+- create a spec only for that scope
+- move to plan, tasks, and implement only within that feature package
+
+What not to do:
+
+- do not try to spec the whole project at once
+- do not turn `memory.md` into a dump of all historical knowledge
+- do not pull broad repository context unless the active feature really needs it
+
+Why this helps:
+
+- Draftspec adds a lightweight layer of discipline on top of an existing codebase
+- adoption happens one feature at a time
+- this keeps token usage down and avoids process bloat
+
 ## 1. Create a Constitution for a Brownfield Project
 
 User request:
@@ -155,6 +213,7 @@ Expected agent behavior:
 - confirm that memory is aligned when relevant
 - produce a lightweight verification report
 - start with `.draftspec/scripts/verify-task-state.sh partner-scheduling` when task-state confirmation is enough
+- add `.draftspec/scripts/verify-memory-sync.sh partner-scheduling` when you need a cheap coarse sync check between tasks and memory
 - use `.draftspec/templates/verify-report.md` when the report should be persisted
 - default to `.draftspec/plans/partner-scheduling/verify.md` when no explicit path is provided
 

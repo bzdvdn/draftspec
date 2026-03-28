@@ -53,6 +53,8 @@ draftspec add-agent my-project --agents claude --agents codex
 - `warning` для orphaned agent artifacts, которые все еще лежат на диске
 - `ok`, когда workspace выглядит здоровым
 
+Используй `--json`, если нужен machine-readable output для automation и CI.
+
 ### `draftspec list-specs [path]`
 
 Показывает список spec slug'ов из `.draftspec/specs/`.

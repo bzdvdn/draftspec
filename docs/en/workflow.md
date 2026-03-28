@@ -63,6 +63,20 @@ Use `.draftspec/templates/inspect-report.md` as the canonical template when the 
 
 Stable acceptance IDs such as `AC-001` make traceability lighter and easier to validate.
 
+For cheap `spec <-> plan` consistency checks, Draftspec should prefer this scope:
+
+- required: `spec.md`, `plan.md`
+- conditional: `data-model.md`, `contracts/`
+- do not read implementation code by default
+
+The goal is to catch obvious drift, not to run a full architectural review. Useful checks include:
+
+- goal alignment
+- unjustified scope expansion
+- acceptance-critical behavior reflected at the plan level
+- constitutional consistency
+- justification for richer plan artifacts such as `data-model.md` and `contracts/`
+
 ### `plan`
 
 Produces technical design artifacts for one feature package:
@@ -112,6 +126,8 @@ When a verification report should be persisted to disk, Draftspec should prefer 
 Use `.draftspec/templates/verify-report.md` as the canonical template when the report is written to disk.
 
 Use `.draftspec/scripts/verify-task-state.sh <slug>` as the cheapest first-pass helper when you only need task-state confirmation.
+
+Use `.draftspec/scripts/verify-memory-sync.sh <slug>` for cheap coarse checks between `tasks.md` and `memory.md` before reading any implementation files.
 
 ### `archive`
 
