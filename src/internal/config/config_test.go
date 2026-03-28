@@ -23,6 +23,9 @@ func TestDefaultAppliesExpectedDefaults(t *testing.T) {
 	if cfg.Scripts.CheckInspectReady != "check-inspect-ready.sh" {
 		t.Fatalf("CheckInspectReady = %q, want %q", cfg.Scripts.CheckInspectReady, "check-inspect-ready.sh")
 	}
+	if cfg.Scripts.VerifyTaskState != "verify-task-state.sh" {
+		t.Fatalf("VerifyTaskState = %q, want %q", cfg.Scripts.VerifyTaskState, "verify-task-state.sh")
+	}
 }
 
 func TestLoadReturnsDefaultsWhenConfigDoesNotExist(t *testing.T) {

@@ -14,6 +14,7 @@ This documentation is organized into a few practical guides:
 - [Examples](examples.md)
 - [FAQ](faq.md)
 - [Glossary](glossary.md)
+- [Roadmap](roadmap.md)
 
 ## Quick Start
 

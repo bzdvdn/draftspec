@@ -44,6 +44,7 @@
 - Записывайте `summary.md` внутри директории архива.
 - Если plan artifacts существуют, архивируйте их вместе со spec.
 - Если `research.md` не существует, не выдумывайте его.
+- Если status равен `completed` и `tasks.md` существует, используйте `.draftspec/scripts/verify-task-state.sh <slug>` перед архивацией. Не заявляйте completed-архив, если обязательные задачи еще открыты.
 - Обновляйте `memory.md`, добавляя короткую запись в `Archived Specs` со slug, status, date и reason.
 - Используйте один из этих статусов:
   - `completed`

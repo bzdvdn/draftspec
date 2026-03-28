@@ -44,6 +44,8 @@ var defaultConfig = Config{
 		ContractsAPI:       "contracts/api.md",
 		ContractsEvents:    "contracts/events.md",
 		ArchiveSummary:     "archive/summary.md",
+		InspectReport:      "inspect-report.md",
+		VerifyReport:       "verify-report.md",
 		Constitution:       "constitution.md",
 		ConstitutionPrompt: "prompts/constitution.md",
 		SpecPrompt:         "prompts/spec.md",
@@ -52,6 +54,7 @@ var defaultConfig = Config{
 		TasksPrompt:        "prompts/tasks.md",
 		ImplementPrompt:    "prompts/implement.md",
 		ArchivePrompt:      "prompts/archive.md",
+		VerifyPrompt:       "prompts/verify.md",
 		Memory:             "memory.md",
 	},
 	Scripts: Scripts{
@@ -63,6 +66,8 @@ var defaultConfig = Config{
 		CheckTasksReady:     "check-tasks-ready.sh",
 		CheckImplementReady: "check-implement-ready.sh",
 		CheckArchiveReady:   "check-archive-ready.sh",
+		CheckVerifyReady:    "check-verify-ready.sh",
+		VerifyTaskState:     "verify-task-state.sh",
 		ListOpenTasks:       "list-open-tasks.sh",
 		SyncMemory:          "sync-memory.sh",
 		LinkAgents:          "link-agents.sh",
@@ -117,6 +122,8 @@ type Templates struct {
 	ContractsAPI       string `yaml:"contracts_api"`
 	ContractsEvents    string `yaml:"contracts_events"`
 	ArchiveSummary     string `yaml:"archive_summary"`
+	InspectReport      string `yaml:"inspect_report"`
+	VerifyReport       string `yaml:"verify_report"`
 	Constitution       string `yaml:"constitution"`
 	ConstitutionPrompt string `yaml:"constitution_prompt"`
 	SpecPrompt         string `yaml:"spec_prompt"`
@@ -125,6 +132,7 @@ type Templates struct {
 	TasksPrompt        string `yaml:"tasks_prompt"`
 	ImplementPrompt    string `yaml:"implement_prompt"`
 	ArchivePrompt      string `yaml:"archive_prompt"`
+	VerifyPrompt       string `yaml:"verify_prompt"`
 	Memory             string `yaml:"memory"`
 }
 
@@ -137,6 +145,8 @@ type Scripts struct {
 	CheckTasksReady     string `yaml:"check_tasks_ready"`
 	CheckImplementReady string `yaml:"check_implement_ready"`
 	CheckArchiveReady   string `yaml:"check_archive_ready"`
+	CheckVerifyReady    string `yaml:"check_verify_ready"`
+	VerifyTaskState     string `yaml:"verify_task_state"`
 	ListOpenTasks       string `yaml:"list_open_tasks"`
 	SyncMemory          string `yaml:"sync_memory"`
 	LinkAgents          string `yaml:"link_agents"`
@@ -275,6 +285,12 @@ func (c *Config) applyDefaults() {
 	if c.Templates.ArchiveSummary == "" {
 		c.Templates.ArchiveSummary = defaultConfig.Templates.ArchiveSummary
 	}
+	if c.Templates.InspectReport == "" {
+		c.Templates.InspectReport = defaultConfig.Templates.InspectReport
+	}
+	if c.Templates.VerifyReport == "" {
+		c.Templates.VerifyReport = defaultConfig.Templates.VerifyReport
+	}
 	if c.Templates.Constitution == "" {
 		c.Templates.Constitution = defaultConfig.Templates.Constitution
 	}
@@ -298,6 +314,9 @@ func (c *Config) applyDefaults() {
 	}
 	if c.Templates.ArchivePrompt == "" {
 		c.Templates.ArchivePrompt = defaultConfig.Templates.ArchivePrompt
+	}
+	if c.Templates.VerifyPrompt == "" {
+		c.Templates.VerifyPrompt = defaultConfig.Templates.VerifyPrompt
 	}
 	if c.Templates.Memory == "" {
 		c.Templates.Memory = defaultConfig.Templates.Memory
@@ -325,6 +344,12 @@ func (c *Config) applyDefaults() {
 	}
 	if c.Scripts.CheckArchiveReady == "" {
 		c.Scripts.CheckArchiveReady = defaultConfig.Scripts.CheckArchiveReady
+	}
+	if c.Scripts.CheckVerifyReady == "" {
+		c.Scripts.CheckVerifyReady = defaultConfig.Scripts.CheckVerifyReady
+	}
+	if c.Scripts.VerifyTaskState == "" {
+		c.Scripts.VerifyTaskState = defaultConfig.Scripts.VerifyTaskState
 	}
 	if c.Scripts.ListOpenTasks == "" {
 		c.Scripts.ListOpenTasks = defaultConfig.Scripts.ListOpenTasks

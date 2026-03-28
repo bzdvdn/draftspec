@@ -44,6 +44,7 @@ Stop and ask a minimal follow-up question if:
 - Write `summary.md` inside the archive directory.
 - If plan artifacts exist, archive them together with the spec.
 - If `research.md` does not exist, do not invent it.
+- If status is `completed` and `tasks.md` exists, use `.draftspec/scripts/verify-task-state.sh <slug>` before archiving. Do not claim a completed archive when required tasks are still open.
 - Update `memory.md` by adding a short entry under `Archived Specs` using slug, status, date, and reason.
 - Use one of these statuses:
   - `completed`

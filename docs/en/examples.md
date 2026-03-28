@@ -44,6 +44,7 @@ Example acceptance criterion:
 ```md
 ### Acceptance Criterion 1
 
+- ID: AC-001
 - **Given** a partner with a custom retry policy
 - **When** the ingestion schedule is evaluated
 - **Then** the worker uses the partner-specific retry window instead of the default policy
@@ -62,6 +63,8 @@ Expected agent behavior:
 - read constitution, memory, and `.draftspec/specs/partner-scheduling.md`
 - check completeness, constitutional consistency, and scenario quality
 - create a focused inspection report
+- if the report should be persisted, prefer `.draftspec/specs/partner-scheduling.inspect.md` before planning and `.draftspec/plans/partner-scheduling/inspect.md` after the plan package exists
+- use `.draftspec/templates/inspect-report.md` as the canonical report template
 
 Typical findings:
 
@@ -116,7 +119,7 @@ Example task structure:
 
 ## Acceptance Coverage
 
-- Acceptance Criterion 1 -> Task 1, Task 2
+- AC-001 -> Task 1, Task 2
 ```
 
 ## 6. Implement the Feature
@@ -137,7 +140,25 @@ Expected agent behavior:
 
 This phase should avoid broad repository reads unless the active task actually requires them.
 
-## 7. Archive the Feature
+## 7. Verify the Feature
+
+User request:
+
+```text
+/draftspec.verify partner-scheduling
+```
+
+Expected agent behavior:
+
+- read constitution, memory, and tasks first
+- confirm that completed tasks match the current implementation state closely enough
+- confirm that memory is aligned when relevant
+- produce a lightweight verification report
+- start with `.draftspec/scripts/verify-task-state.sh partner-scheduling` when task-state confirmation is enough
+- use `.draftspec/templates/verify-report.md` when the report should be persisted
+- default to `.draftspec/plans/partner-scheduling/verify.md` when no explicit path is provided
+
+## 8. Archive the Feature
 
 User request:
 
@@ -147,6 +168,7 @@ User request:
 
 Expected agent behavior:
 
+- for `completed` status, start with `.draftspec/scripts/verify-task-state.sh partner-scheduling` and stop if open tasks remain
 - copy the feature package into `.draftspec/archive/partner-scheduling/<YYYY-MM-DD>/`
 - write `summary.md`
 - add a short archived entry to `memory.md`
@@ -166,7 +188,7 @@ Expected archive result:
       contracts/
 ```
 
-## 8. Agent Maintenance Scenario
+## 9. Agent Maintenance Scenario
 
 A practical maintenance flow for agent targets:
 

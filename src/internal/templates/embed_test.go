@@ -87,6 +87,8 @@ func TestFilesBuildForSupportedLanguages(t *testing.T) {
 				"templates/spec.md",
 				"templates/plan.md",
 				"templates/tasks.md",
+				"templates/inspect-report.md",
+				"templates/verify-report.md",
 				"templates/archive/summary.md",
 				"templates/prompts/spec.md",
 				"templates/prompts/inspect.md",
@@ -94,8 +96,11 @@ func TestFilesBuildForSupportedLanguages(t *testing.T) {
 				"templates/prompts/tasks.md",
 				"templates/prompts/implement.md",
 				"templates/prompts/archive.md",
+				"templates/prompts/verify.md",
 				"scripts/check-inspect-ready.sh",
 				"scripts/check-archive-ready.sh",
+				"scripts/check-verify-ready.sh",
+				"scripts/verify-task-state.sh",
 			} {
 				if _, ok := targets[required]; !ok {
 					t.Fatalf("expected generated file set to include %s", required)

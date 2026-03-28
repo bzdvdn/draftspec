@@ -74,6 +74,8 @@ func Files(settings LanguageSettings) ([]File, error) {
 		{RelativePath: "templates/contracts/api.md", TargetPath: "templates/contracts/api.md", Mode: 0o644, Language: settings.Docs},
 		{RelativePath: "templates/contracts/events.md", TargetPath: "templates/contracts/events.md", Mode: 0o644, Language: settings.Docs},
 		{RelativePath: "templates/archive/summary.md", TargetPath: "templates/archive/summary.md", Mode: 0o644, Language: settings.Docs},
+		{RelativePath: "templates/inspect-report.md", TargetPath: "templates/inspect-report.md", Mode: 0o644, Language: settings.Docs},
+		{RelativePath: "templates/verify-report.md", TargetPath: "templates/verify-report.md", Mode: 0o644, Language: settings.Docs},
 		{RelativePath: "templates/memory.md", TargetPath: "templates/memory.md", Mode: 0o644, Language: settings.Docs},
 		{RelativePath: "templates/agents-snippet.md", TargetPath: "templates/agents-snippet.md", Mode: 0o644, Language: settings.Agent},
 		{RelativePath: "templates/prompts/constitution.md", TargetPath: "templates/prompts/constitution.md", Mode: 0o644, Language: settings.Agent},
@@ -83,6 +85,7 @@ func Files(settings LanguageSettings) ([]File, error) {
 		{RelativePath: "templates/prompts/tasks.md", TargetPath: "templates/prompts/tasks.md", Mode: 0o644, Language: settings.Agent},
 		{RelativePath: "templates/prompts/implement.md", TargetPath: "templates/prompts/implement.md", Mode: 0o644, Language: settings.Agent},
 		{RelativePath: "templates/prompts/archive.md", TargetPath: "templates/prompts/archive.md", Mode: 0o644, Language: settings.Agent},
+		{RelativePath: "templates/prompts/verify.md", TargetPath: "templates/prompts/verify.md", Mode: 0o644, Language: settings.Agent},
 	}
 	files := make([]File, 0, len(definitions)+11)
 	files = append(files, File{TargetPath: "draftspec.yaml", Content: generateConfig(settings), Mode: 0o644})
@@ -106,6 +109,8 @@ func Files(settings LanguageSettings) ([]File, error) {
 		{"assets/scripts/check-tasks-ready.sh", "scripts/check-tasks-ready.sh", 0o755},
 		{"assets/scripts/check-implement-ready.sh", "scripts/check-implement-ready.sh", 0o755},
 		{"assets/scripts/check-archive-ready.sh", "scripts/check-archive-ready.sh", 0o755},
+		{"assets/scripts/check-verify-ready.sh", "scripts/check-verify-ready.sh", 0o755},
+		{"assets/scripts/verify-task-state.sh", "scripts/verify-task-state.sh", 0o755},
 		{"assets/scripts/list-open-tasks.sh", "scripts/list-open-tasks.sh", 0o755},
 		{"assets/scripts/sync-memory.sh", "scripts/sync-memory.sh", 0o755},
 		{"assets/scripts/link-agents.sh", "scripts/link-agents.sh", 0o755},

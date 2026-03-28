@@ -14,7 +14,8 @@
 
 ## Acceptance Coverage
 
-- Criterion 1 -> Task 1, Task 2
+- AC-001 -> Task 1, Task 2
+- AC-002 -> Task 3
 
 ## Notes
 

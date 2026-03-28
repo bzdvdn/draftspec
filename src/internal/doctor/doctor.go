@@ -71,6 +71,8 @@ func Check(root string) (Result, error) {
 		filepath.Join(templatesDir, cfg.Templates.Spec),
 		filepath.Join(templatesDir, cfg.Templates.Plan),
 		filepath.Join(templatesDir, cfg.Templates.Tasks),
+		filepath.Join(templatesDir, cfg.Templates.InspectReport),
+		filepath.Join(templatesDir, cfg.Templates.VerifyReport),
 		filepath.Join(templatesDir, cfg.Templates.ConstitutionPrompt),
 		filepath.Join(templatesDir, cfg.Templates.SpecPrompt),
 		filepath.Join(templatesDir, cfg.Templates.InspectPrompt),
@@ -78,6 +80,7 @@ func Check(root string) (Result, error) {
 		filepath.Join(templatesDir, cfg.Templates.TasksPrompt),
 		filepath.Join(templatesDir, cfg.Templates.ImplementPrompt),
 		filepath.Join(templatesDir, cfg.Templates.ArchivePrompt),
+		filepath.Join(templatesDir, cfg.Templates.VerifyPrompt),
 		filepath.Join(scriptsDir, cfg.Scripts.CheckConstitution),
 		filepath.Join(scriptsDir, cfg.Scripts.CheckSpecReady),
 		filepath.Join(scriptsDir, cfg.Scripts.CheckInspectReady),
@@ -85,6 +88,8 @@ func Check(root string) (Result, error) {
 		filepath.Join(scriptsDir, cfg.Scripts.CheckTasksReady),
 		filepath.Join(scriptsDir, cfg.Scripts.CheckImplementReady),
 		filepath.Join(scriptsDir, cfg.Scripts.CheckArchiveReady),
+		filepath.Join(scriptsDir, cfg.Scripts.CheckVerifyReady),
+		filepath.Join(scriptsDir, cfg.Scripts.VerifyTaskState),
 	} {
 		checkPath(&findings, path, false)
 	}

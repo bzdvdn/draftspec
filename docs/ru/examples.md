@@ -44,6 +44,7 @@
 ```md
 ### Acceptance Criterion 1
 
+- ID: AC-001
 - **Given** у партнера задана собственная retry policy
 - **When** рассчитывается расписание ingestion
 - **Then** worker использует partner-specific retry window вместо default policy
@@ -62,6 +63,8 @@
 - прочитать constitution, memory и `.draftspec/specs/partner-scheduling.md`
 - проверить полноту, соответствие конституции и качество сценариев
 - выпустить focused inspection report
+- если отчет нужно сохранять на диск, до планирования предпочитать `.draftspec/specs/partner-scheduling.inspect.md`, а после появления plan package — `.draftspec/plans/partner-scheduling/inspect.md`
+- использовать `.draftspec/templates/inspect-report.md` как канонический шаблон отчета
 
 Типовые находки:
 
@@ -116,7 +119,7 @@
 
 ## Acceptance Coverage
 
-- Acceptance Criterion 1 -> Task 1, Task 2
+- AC-001 -> Task 1, Task 2
 ```
 
 ## 6. Реализация Фичи
@@ -137,7 +140,25 @@
 
 Эта фаза не должна читать широкий контекст репозитория без реальной необходимости.
 
-## 7. Архивация Фичи
+## 7. Verify Фичи
+
+Пример запроса:
+
+```text
+/draftspec.verify partner-scheduling
+```
+
+Ожидаемое поведение агента:
+
+- сначала прочитать constitution, memory и tasks
+- подтвердить, что завершенные задачи достаточно соответствуют текущему состоянию реализации
+- проверить согласованность memory, когда это уместно
+- выпустить легкий verification report
+- начинать с `.draftspec/scripts/verify-task-state.sh partner-scheduling`, если сначала нужно только подтвердить состояние задач
+- использовать `.draftspec/templates/verify-report.md`, если отчет нужно сохранить в файл
+- по умолчанию использовать `.draftspec/plans/partner-scheduling/verify.md`, если путь явно не указан
+
+## 8. Архивация Фичи
 
 Пример запроса:
 
@@ -147,6 +168,7 @@
 
 Ожидаемое поведение агента:
 
+- для статуса `completed` сначала запустить `.draftspec/scripts/verify-task-state.sh partner-scheduling` и остановиться, если открытые задачи еще остались
 - скопировать feature package в `.draftspec/archive/partner-scheduling/<YYYY-MM-DD>/`
 - записать `summary.md`
 - добавить короткую archived-запись в `memory.md`
@@ -166,7 +188,7 @@
       contracts/
 ```
 
-## 8. Сценарий Обслуживания Агентов
+## 9. Сценарий Обслуживания Агентов
 
 Практический maintenance flow для agent targets:
 

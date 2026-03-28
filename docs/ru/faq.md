@@ -58,7 +58,7 @@
 Нет. Предполагаемая цепочка строгая:
 
 ```text
-constitution -> spec -> inspect -> plan -> tasks -> implement -> archive
+constitution -> spec -> inspect -> plan -> tasks -> implement -> verify -> archive
 ```
 
 `plan` зависит от уже существующей spec.
@@ -71,3 +71,11 @@ constitution -> spec -> inspect -> plan -> tasks -> implement -> archive
 - `archive/` хранит исторические снимки завершенных или неактивных feature packages
 
 В `memory.md` может быть короткий индекс архивов, но полная история должна жить в `archive/`.
+
+## Зачем нужны стабильные идентификаторы критериев?
+
+Идентификаторы вроде `AC-001` делают traceability дешевле и понятнее между spec, tasks, inspect-отчетами и будущей фазой verification.
+
+## Для чего нужен `verify`?
+
+`verify` — это легкая подтверждающая фаза после `implement`. Она помогает ответить, достаточно ли фича согласована с tasks, memory и правилами проекта, чтобы двигаться к архивированию или заявлению о завершенности.

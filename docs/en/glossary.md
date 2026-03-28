@@ -28,6 +28,10 @@ The executable breakdown of a feature plan. In Draftspec, `tasks.md` lives insid
 
 The execution phase that works from unfinished tasks and updates project memory and task state.
 
+## Verify
+
+A lightweight post-implementation check that confirms whether a feature is aligned enough with tasks, memory, and project rules to proceed safely toward archive or further completion claims.
+
 ## Archive
 
 The phase and storage area used to preserve a historical snapshot of a finished or inactive feature package.
@@ -71,3 +75,7 @@ The configured preferred language for new or edited code comments during impleme
 ## Given / When / Then
 
 The canonical BDD markers used for acceptance criteria regardless of documentation language. The surrounding text may still follow the configured docs language.
+
+## Acceptance ID
+
+A stable identifier for an acceptance criterion, such as `AC-001`. It helps keep traceability explicit across specs, tasks, and inspection reports.

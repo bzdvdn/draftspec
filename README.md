@@ -27,7 +27,7 @@ draftspec show-spec <name> [path]
 ## Workflow
 
 ```text
-constitution -> spec -> inspect -> plan -> tasks -> implement -> archive
+constitution -> spec -> inspect -> plan -> tasks -> implement -> verify -> archive
 ```
 
 ## Key Points
@@ -51,6 +51,7 @@ For deeper guidance, use:
 - [CLI Reference](docs/en/cli.md)
 - [Workflow Model](docs/en/workflow.md)
 - [Examples](docs/en/examples.md)
+- [Roadmap](docs/en/roadmap.md)
 
 
 ## Development

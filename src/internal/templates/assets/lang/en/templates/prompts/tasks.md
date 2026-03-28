@@ -52,6 +52,8 @@ Do not jump ahead into implementation.
 - Follow the structure of `.draftspec/templates/tasks.md`: group tasks into ordered phases (`## Phase N: Name`).
 - Each task MUST follow the format: `- [ ] <action verb> — <concrete measurable outcome>`
 - The tasks taken together MUST cover all acceptance criteria from the spec. Any uncovered criterion is a blocker.
+- The `## Acceptance Coverage` section MUST include at least one explicit coverage line for each acceptance criterion.
+- Coverage lines SHOULD reference stable acceptance IDs such as `AC-001 -> Task 1, Task 2`.
 - Prefer tasks that are concrete, testable, and implementation-oriented.
 - Include validation and documentation alignment work where needed.
 - Do not generate vague umbrella tasks.

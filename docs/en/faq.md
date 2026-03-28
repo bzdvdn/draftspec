@@ -58,7 +58,7 @@ Typical minimal read order:
 No. The intended chain is strict:
 
 ```text
-constitution -> spec -> inspect -> plan -> tasks -> implement -> archive
+constitution -> spec -> inspect -> plan -> tasks -> implement -> verify -> archive
 ```
 
 `plan` depends on an existing spec.
@@ -71,3 +71,11 @@ They solve different problems.
 - `archive/` stores historical snapshots of completed or inactive feature packages
 
 `memory.md` may keep a short archived index, but the full history belongs in `archive/`.
+
+## Why use stable acceptance IDs?
+
+Identifiers such as `AC-001` make traceability cheaper and clearer across specs, tasks, inspect reports, and later verification work.
+
+## What is `verify` for?
+
+`verify` is a lightweight confirmation phase after `implement`. It helps answer whether the feature is aligned enough with tasks, memory, and project rules to move toward archive or completion claims.

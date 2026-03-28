@@ -16,6 +16,7 @@
 
 ### Criterion 1
 
+- ID: AC-001
 - **Given** the initial state or precondition
 - **When** the action or event
 - **Then** the expected observable outcome

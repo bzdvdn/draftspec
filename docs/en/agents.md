@@ -33,6 +33,7 @@ The agent-facing workflows are:
 - `plan`
 - `tasks`
 - `implement`
+- `verify`
 - `archive`
 
 Each prompt is designed to:
@@ -41,6 +42,15 @@ Each prompt is designed to:
 - stop when prerequisites are missing
 - respect the configured documentation and agent languages
 - preserve constitutional authority over specs, plans, tasks, and implementation
+
+`verify` is intentionally lightweight:
+
+- it starts from `tasks.md`
+- it can use `.draftspec/scripts/verify-task-state.sh <slug>` as a cheap first-pass helper
+- it reads deeper artifacts only when needed to confirm a concrete claim
+- it is meant to confirm readiness for archive or follow-up refinement, not to become a heavy review engine
+
+For `archive`, a `completed` status should reuse `verify-task-state.sh` before creating the snapshot.
 
 ## Maintenance Commands
 

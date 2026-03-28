@@ -33,6 +33,7 @@ Agent-facing workflow в Draftspec:
 - `plan`
 - `tasks`
 - `implement`
+- `verify`
 - `archive`
 
 Каждый prompt должен:
@@ -41,6 +42,15 @@ Agent-facing workflow в Draftspec:
 - останавливаться при отсутствии prerequisites
 - уважать configured documentation language и agent language
 - считать конституцию документом с наивысшим приоритетом
+
+`verify` специально сделан легким:
+
+- он стартует от `tasks.md`
+- он может использовать `.draftspec/scripts/verify-task-state.sh <slug>` как дешевый helper первого прохода
+- более глубокие артефакты читаются только когда нужно подтвердить конкретный вывод
+- его задача — подтвердить готовность к архивированию или следующему refine-циклу, а не превращаться в тяжелый review engine
+
+Для `archive` статус `completed` должен переиспользовать `verify-task-state.sh` перед созданием снимка.
 
 ## Команды обслуживания
 

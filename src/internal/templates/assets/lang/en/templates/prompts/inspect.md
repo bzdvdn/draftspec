@@ -48,14 +48,27 @@ Stop and ask a minimal follow-up question only if:
 - If plan artifacts exist, check alignment between spec, plan, data model, contracts, and tasks.
 - Keep the inspection report in the project's configured documentation language when writing it to disk.
 - Prefer concrete findings over generic advice.
-- Use these sections in the report:
-  - `Errors`
-  - `Warnings`
-  - `Questions`
-  - `Suggestions`
+- Use this report structure:
+  - `# Inspect Report: <slug>`
+  - `## Scope`
+  - `## Verdict`
+  - `## Errors`
+  - `## Warnings`
+  - `## Questions`
+  - `## Suggestions`
+  - `## Traceability`
+  - `## Next Step`
+- The `## Verdict` section MUST use one of: `pass`, `concerns`, `blocked`.
+- Use `pass` when no errors are present and only minor or no warnings remain.
+- Use `concerns` when the feature can still move forward, but warnings or open questions should be resolved soon.
+- Use `blocked` when constitutional conflicts, missing spec intent, missing Given/When/Then acceptance criteria, or uncovered acceptance criteria prevent the next workflow step from proceeding safely.
+- `## Traceability` should summarize how acceptance criteria map to tasks when `tasks.md` exists.
+- Prefer traceability statements that reference stable acceptance IDs such as `AC-001`.
+- `## Next Step` should say whether it is safe to continue to `plan`, `tasks`, or whether refinement is required first.
 
 ## Output expectations
 
-- Output the report to the conversation unless the user specifies an explicit file path
-- If writing to a file, use the path provided by the user
-- Summarize errors, warnings, open questions, and suggestions
+- Output the report to the conversation unless the user asks to persist it.
+- If the user asks to persist the report without specifying a file path, use `.draftspec/plans/<slug>/inspect.md` when the plan package exists. Otherwise use `.draftspec/specs/<slug>.inspect.md`.
+- If the user provides an explicit file path, use that path.
+- Summarize errors, warnings, open questions, suggestions, and the final verdict.

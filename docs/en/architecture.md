@@ -56,7 +56,7 @@ These include:
 - `constitution.md`
 - `memory.md`
 - spec, plan, tasks, and archive templates
-- prompts for `constitution`, `spec`, `inspect`, `plan`, `tasks`, `implement`, and `archive`
+- prompts for `constitution`, `spec`, `inspect`, `plan`, `tasks`, `implement`, `verify`, and `archive`
 - localized `agents-snippet.md`
 
 Shared shell scripts live in:
@@ -124,3 +124,23 @@ The internal architecture follows a few important principles:
 - prefer one canonical prompt source over duplicated prompt logic
 - keep workflow phases strict without embedding a heavy orchestration engine
 - optimize for low token usage by controlling read sets and artifact scope
+
+## Anti-Bloat Checklist
+
+Use this checklist before adding a new feature, prompt rule, script, or artifact:
+
+- Does it increase the default read set? If yes, treat it as risky by default.
+- Can it be solved with a cheap deterministic helper instead of more reasoning?
+- Does it make a new artifact mandatory for every feature? If yes, reconsider.
+- Does it require reading implementation code by default? If yes, it is probably too heavy.
+- Can the workflow still begin from constitution, memory, spec, plan, or tasks before touching code?
+- Does it expand the public CLI without clear value for everyday users?
+- Does it add a brand-new gate, or can it strengthen an existing phase instead?
+- Can its value be explained in one short sentence? If not, it may be process complexity without enough return.
+- Does it push Draftspec closer to spec-kit-style bureaucracy without matching value?
+- Does it improve brownfield ergonomics in a real way?
+
+A change is usually a good fit when it does at least one of these:
+
+- improves quality without expanding the default context
+- replaces expensive reasoning with a cheap structural check
