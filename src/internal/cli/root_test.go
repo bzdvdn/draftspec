@@ -169,3 +169,56 @@ func TestInitCommandRequiresShell(t *testing.T) {
 		t.Fatal("expected init without --shell to fail")
 	}
 }
+
+func TestRefreshCommandUpdatesManagedArtifacts(t *testing.T) {
+	root := t.TempDir()
+
+	if _, _, err := executeRoot(t, "init", root, "--git=false", "--lang", "en", "--shell", "sh", "--agents", "claude"); err != nil {
+		t.Fatalf("init command returned error: %v", err)
+	}
+
+	promptPath := filepath.Join(root, ".draftspec", "templates", "prompts", "inspect.md")
+	if err := os.WriteFile(promptPath, []byte("stale prompt"), 0o644); err != nil {
+		t.Fatalf("WriteFile returned error: %v", err)
+	}
+
+	stdout, _, err := executeRoot(t, "refresh", root, "--shell", "powershell")
+	if err != nil {
+		t.Fatalf("refresh command returned error: %v", err)
+	}
+	if !strings.Contains(stdout, "update .draftspec/templates/prompts/inspect.md") {
+		t.Fatalf("unexpected refresh output: %s", stdout)
+	}
+
+	if _, err := os.Stat(filepath.Join(root, ".draftspec", "scripts", "check-spec-ready.ps1")); err != nil {
+		t.Fatalf("expected refreshed powershell script to exist: %v", err)
+	}
+}
+
+func TestRefreshCommandJSONDryRunOutput(t *testing.T) {
+	root := t.TempDir()
+
+	if _, _, err := executeRoot(t, "init", root, "--git=false", "--lang", "en", "--shell", "sh"); err != nil {
+		t.Fatalf("init command returned error: %v", err)
+	}
+
+	stdout, _, err := executeRoot(t, "refresh", root, "--shell", "powershell", "--dry-run", "--json")
+	if err != nil {
+		t.Fatalf("refresh command returned error: %v", err)
+	}
+
+	var payload struct {
+		DryRun  bool     `json:"dry_run"`
+		Updated []string `json:"updated"`
+		Created []string `json:"created"`
+	}
+	if err := json.Unmarshal([]byte(stdout), &payload); err != nil {
+		t.Fatalf("failed to parse refresh json output %q: %v", stdout, err)
+	}
+	if !payload.DryRun {
+		t.Fatalf("expected dry_run true in refresh json output, got %q", stdout)
+	}
+	if len(payload.Updated) == 0 && len(payload.Created) == 0 {
+		t.Fatalf("expected refresh json to report pending changes, got %q", stdout)
+	}
+}

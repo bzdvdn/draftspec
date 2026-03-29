@@ -28,6 +28,8 @@ The product should feel lightweight, editable, and resilient.
 - no public CLI command for implementation in the first version
 - no AI orchestration embedded into the CLI in the first version
 
+Managed generated artifacts should remain refreshable without touching authored feature state. `refresh` should update templates, scripts, config-derived values, project-local agent files, and the managed Draftspec block in `AGENTS.md` while leaving `constitution`, `specs`, `plans`, and `archive` untouched.
+
 ## Workspace layout
 
 ```text
@@ -204,12 +206,16 @@ Inputs:
 
 - `.draftspec/constitution.md`
 - `.draftspec/specs/<slug>.md`
-- optional plan artifacts when they exist
+- optional plan artifacts when they exist, with the cheapest scope preferred first:
+  - `plan.md` before `tasks.md`
+  - `tasks.md` before `data-model.md`, `contracts/`, or `research.md`
+  - do not read implementation code by default
 
 Outputs:
 
 - a focused inspection report for one feature
 - explicit Given/When/Then acceptance criteria, with `Given`, `When`, and `Then` kept canonical across documentation languages and inspect treating missing G/W/T as an error
+- explicit cheap checks for `constitution <-> spec`, `spec <-> plan`, and `plan <-> tasks` when those downstream artifacts exist
 
 ## Archive workflow
 
@@ -309,6 +315,9 @@ It must:
 
 - execute only unfinished tasks
 - respect task order and phase structure
+- keep full-run execution as the default when no scope restriction is provided
+- allow explicit scope restriction by one phase or specific task IDs
+- reject ambiguous scope such as mixing phase and task selection in the same run
 - update `tasks.md`
 - emit short phase progress updates during runtime, using the configured agent language
 - stop when the plan is insufficient or conflicts with the constitution

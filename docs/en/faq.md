@@ -36,6 +36,14 @@ The archive keeps historical context without bloating the active workspace.
 
 Use `doctor` after either one if you want to verify workspace health.
 
+## How do I update prompts, scripts, and agent files in an existing project?
+
+Use `draftspec refresh [path]`.
+
+`refresh` updates only Draftspec-managed generated artifacts such as `.draftspec/templates/`, `.draftspec/scripts/`, `.draftspec/draftspec.yaml`, project-local agent files, and the managed Draftspec block in `AGENTS.md`.
+
+It does not modify authored feature state such as `constitution.md`, `specs/`, `plans/`, or `archive/`.
+
 ## Why does Draftspec keep `Given / When / Then` in English even in Russian docs?
 
 Those markers are intentionally canonical. They are easier for agents to recognize consistently and easier for validation rules to enforce.

@@ -144,8 +144,10 @@ Add a user-selectable dark theme for the dashboard and settings pages.
 Ожидаемое поведение агента:
 
 - прочитать constitution и `.draftspec/specs/partner-scheduling.md`
+- держать default inspect scope дешевым: сначала `constitution.md` и `spec.md`, а `plan.md` или `tasks.md` подтягивать только если они существуют и реально влияют на вывод
 - проверить полноту, соответствие конституции и качество сценариев
 - выпустить focused inspection report
+- использовать `.draftspec/scripts/inspect-spec.sh` или `.draftspec/scripts/inspect-spec.ps1` как дешевый helper первого прохода, когда нужно быстро подтвердить структурные проблемы spec или coverage
 - если отчет нужно сохранять на диск, до планирования предпочитать `.draftspec/specs/partner-scheduling.inspect.md`, а после появления plan package — `.draftspec/plans/partner-scheduling/inspect.md`
 - использовать `.draftspec/templates/inspect-report.md` как канонический шаблон отчета
 
@@ -222,6 +224,20 @@ Add a user-selectable dark theme for the dashboard and settings pages.
 - обновлять `tasks.md`
 
 Эта фаза не должна читать широкий контекст репозитория без реальной необходимости.
+
+Примеры выборочных запросов:
+
+```text
+/draftspec.implement partner-scheduling --phase 2
+/draftspec.implement partner-scheduling --tasks T1.1,T2.1
+```
+
+Ожидаемое поведение в scoped mode:
+
+- сохранять full-run behavior только когда scope-флагов нет
+- выполнять только выбранную фазу или выбранные task IDs, если scope явно сужен
+- сохранять порядок задач из `tasks.md`
+- предупреждать, если выбранная работа перескакивает через незавершенные более ранние фазы или задачи
 
 Типичные runtime updates:
 

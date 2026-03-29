@@ -24,6 +24,41 @@ draftspec init my-project --docs-lang ru --agent-lang en --comments-lang en --sh
 - `--comments-lang` фиксирует предпочитаемый язык комментариев в коде
 - `--agents` генерирует project-local agent files
 
+### `draftspec refresh [path]`
+
+Обновляет только Draftspec-managed generated artifacts в уже существующем проекте.
+
+Эта команда обновляет:
+
+- `.draftspec/draftspec.yaml`
+- `.draftspec/templates/**`
+- `.draftspec/scripts/**`
+- project-local agent command files
+- managed Draftspec block внутри `AGENTS.md`
+
+Эта команда не обновляет:
+
+- `.draftspec/constitution.md`
+- `.draftspec/specs/**`
+- `.draftspec/plans/**`
+- `.draftspec/archive/**`
+
+Примеры:
+
+```bash
+draftspec refresh my-project
+draftspec refresh my-project --shell powershell --agents claude --dry-run
+draftspec refresh my-project --agent-lang ru --json
+```
+
+Важные флаги:
+
+- `--lang`, `--docs-lang`, `--agent-lang`, `--comments-lang` переопределяют существующие language settings из config
+- `--shell` переопределяет семейство генерируемых workflow scripts
+- `--agents` переопределяет набор включенных project-local agent targets
+- `--dry-run` показывает pending changes без записи на диск
+- `--json` выводит результат refresh в JSON
+
 ### `draftspec add-agent [path]`
 
 Добавляет один или несколько agent targets в уже инициализированный проект.

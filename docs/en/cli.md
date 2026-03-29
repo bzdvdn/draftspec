@@ -24,6 +24,41 @@ Important flags:
 - `--comments-lang` records the preferred code comment language
 - `--agents` generates project-local agent command files
 
+### `draftspec refresh [path]`
+
+Refreshes only Draftspec-managed generated artifacts in an existing project.
+
+This command updates:
+
+- `.draftspec/draftspec.yaml`
+- `.draftspec/templates/**`
+- `.draftspec/scripts/**`
+- project-local agent command files
+- the managed Draftspec guidance block inside `AGENTS.md`
+
+This command does not update:
+
+- `.draftspec/constitution.md`
+- `.draftspec/specs/**`
+- `.draftspec/plans/**`
+- `.draftspec/archive/**`
+
+Examples:
+
+```bash
+draftspec refresh my-project
+draftspec refresh my-project --shell powershell --agents claude --dry-run
+draftspec refresh my-project --agent-lang ru --json
+```
+
+Important flags:
+
+- `--lang`, `--docs-lang`, `--agent-lang`, `--comments-lang` override the existing configured languages
+- `--shell` overrides the generated workflow script family
+- `--agents` overrides enabled project-local agent targets
+- `--dry-run` reports pending managed changes without writing them
+- `--json` outputs the refresh result as JSON
+
 ### `draftspec add-agent [path]`
 
 Adds one or more agent targets to an existing Draftspec project.

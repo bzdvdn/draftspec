@@ -45,6 +45,7 @@ Draftspec — это lean SDD kit для реальных кодовых баз.
 
 ```text
 draftspec init [path]
+draftspec refresh [path]
 draftspec add-agent [path]
 draftspec list-agents [path]
 draftspec remove-agent [path]
@@ -76,6 +77,7 @@ constitution -> spec -> inspect -> plan -> tasks -> implement -> verify -> archi
 
 ```bash
 draftspec init my-project --lang ru --shell sh --agents claude --agents codex
+draftspec refresh my-project --shell powershell --dry-run
 draftspec doctor my-project
 draftspec doctor my-project --json
 ```

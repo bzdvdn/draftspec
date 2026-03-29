@@ -48,6 +48,13 @@ Do not broaden scope to solve these problems.
 
 ## Rules
 
+- Default behavior: if the user does not restrict scope, execute all unfinished tasks in order.
+- Scoped behavior: if the user explicitly provides `--phase <number>`, execute only that phase.
+- Scoped behavior: if the user explicitly provides `--tasks <task-id-list>`, execute only those task IDs.
+- Do not accept `--phase` and `--tasks` together in the same run.
+- In scoped mode, keep the execution order from `tasks.md` rather than inventing a new order from the request text.
+- If the selected phase or task IDs do not exist in `tasks.md`, stop and request refinement.
+- If scoped execution skips unfinished earlier work, warn about the ordering risk but do not silently broaden scope.
 - Implement only unfinished tasks from `tasks.md`.
 - Respect the order and phase structure in `tasks.md`.
 - Use `tasks.md` as the execution entrypoint.

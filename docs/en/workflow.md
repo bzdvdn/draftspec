@@ -82,15 +82,18 @@ Stable acceptance IDs such as `AC-001` make traceability lighter and easier to v
 
 For cheap `spec <-> plan` consistency checks, Draftspec should prefer this scope:
 
-- required: `spec.md`, `plan.md`
-- conditional: `data-model.md`, `contracts/`
+- always load: `constitution.md`, `spec.md`
+- load if needed: `plan.md`, `tasks.md`
+- conditional deeper reads only when a concrete claim requires them: `data-model.md`, `contracts/`, `research.md`
 - do not read implementation code by default
 
 The goal is to catch obvious drift, not to run a full architectural review. Useful checks include:
 
+- constitution-to-spec alignment
 - goal alignment
 - unjustified scope expansion
 - acceptance-critical behavior reflected at the plan level
+- plan-to-task alignment when `tasks.md` exists
 - constitutional consistency
 - justification for richer plan artifacts such as `data-model.md` and `contracts/`
 
@@ -118,6 +121,17 @@ AC-001 -> T1.1, T2.1
 ### `implement`
 
 Executes unfinished tasks and updates `tasks.md`.
+
+Default behavior should remain full-run: without explicit scope flags, Draftspec continues through all unfinished tasks in task-list order.
+
+Selective execution is allowed when the user explicitly narrows scope:
+
+- `--phase <number>` for one implementation phase
+- `--tasks <task-id-list>` for one or more specific task IDs such as `T1.1,T2.1`
+
+`--phase` and `--tasks` should not be combined in the same run.
+
+When selective execution skips unfinished earlier work, Draftspec should warn about the sequencing risk without silently broadening scope.
 
 During implementation, Draftspec should emit short runtime progress updates whenever it starts or completes a phase in the active execution scope.
 

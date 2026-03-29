@@ -121,16 +121,34 @@ else
   warn "no explicit acceptance criterion headings found"
 fi
 
+acceptance_id_count=$(printf '%s
+' "$acceptance_body" | grep -c 'AC-[0-9][0-9][0-9]' || true)
+if [ "$acceptance_id_count" -gt 0 ]; then
+  ok "acceptance IDs found: $acceptance_id_count"
+else
+  warn "no stable acceptance IDs found in acceptance criteria"
+fi
+
 if [ -n "$TASKS_FILE" ] && [ -f "$TASKS_FILE" ]; then
   if grep -q "^## $COVERAGE$" "$TASKS_FILE"; then
     ok "$COVERAGE"
     coverage_body="$(extract_section "$TASKS_FILE" "$COVERAGE")"
     coverage_lines=$(printf '%s
 ' "$coverage_body" | grep -c -- '->' || true)
+    malformed_lines=$(printf '%s
+' "$coverage_body" | grep -- '->' | grep -vc 'AC-[0-9][0-9][0-9].*->.*T[0-9]\+\.[0-9]\+' || true)
     if [ "$criteria_count" -gt 0 ] && [ "$coverage_lines" -lt "$criteria_count" ]; then
       error "acceptance coverage entries ($coverage_lines) are fewer than acceptance criteria ($criteria_count)"
     else
       ok "acceptance coverage entries: $coverage_lines"
+    fi
+    if [ "$acceptance_id_count" -gt 0 ] && [ "$coverage_lines" -lt "$acceptance_id_count" ]; then
+      error "acceptance coverage entries ($coverage_lines) are fewer than acceptance IDs ($acceptance_id_count)"
+    fi
+    if [ "$malformed_lines" -gt 0 ]; then
+      error "acceptance coverage contains malformed entries; expected lines like AC-001 -> T1.1"
+    elif [ "$coverage_lines" -gt 0 ]; then
+      ok "acceptance coverage format uses AC and task IDs"
     fi
   else
     error "tasks file is missing required section: $COVERAGE"

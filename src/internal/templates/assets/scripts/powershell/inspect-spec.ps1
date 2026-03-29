@@ -125,16 +125,32 @@ if ($criteriaCount -gt 0) {
   Add-Warn "no explicit acceptance criterion headings found"
 }
 
+$acceptanceIDCount = ($acceptanceBody | Where-Object { $_ -match 'AC-[0-9][0-9][0-9]' }).Count
+if ($acceptanceIDCount -gt 0) {
+  Add-OK "acceptance IDs found: $acceptanceIDCount"
+} else {
+  Add-Warn "no stable acceptance IDs found in acceptance criteria"
+}
+
 if (-not [string]::IsNullOrWhiteSpace($TasksFile) -and (Test-Path -LiteralPath $TasksFile)) {
   $tasksContent = Get-Content -LiteralPath $TasksFile
   if ($tasksContent -contains "## $Coverage") {
     Add-OK $Coverage
     $coverageBody = Extract-Section $TasksFile $Coverage
     $coverageLines = ($coverageBody | Where-Object { $_ -match '->' }).Count
+    $malformedLines = ($coverageBody | Where-Object { $_ -match '->' -and $_ -notmatch 'AC-[0-9][0-9][0-9].*->.*T[0-9]+\.[0-9]+' }).Count
     if ($criteriaCount -gt 0 -and $coverageLines -lt $criteriaCount) {
       Add-Error "acceptance coverage entries ($coverageLines) are fewer than acceptance criteria ($criteriaCount)"
     } else {
       Add-OK "acceptance coverage entries: $coverageLines"
+    }
+    if ($acceptanceIDCount -gt 0 -and $coverageLines -lt $acceptanceIDCount) {
+      Add-Error "acceptance coverage entries ($coverageLines) are fewer than acceptance IDs ($acceptanceIDCount)"
+    }
+    if ($malformedLines -gt 0) {
+      Add-Error "acceptance coverage contains malformed entries; expected lines like AC-001 -> T1.1"
+    } elseif ($coverageLines -gt 0) {
+      Add-OK "acceptance coverage format uses AC and task IDs"
     }
   } else {
     Add-Error "tasks file is missing required section: $Coverage"

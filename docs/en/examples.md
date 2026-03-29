@@ -144,8 +144,10 @@ User request:
 Expected agent behavior:
 
 - read constitution and `.draftspec/specs/partner-scheduling.md`
+- keep the default inspect scope cheap: prefer `constitution.md` and `spec.md`, then pull `plan.md` or `tasks.md` only when they exist and materially affect the finding
 - check completeness, constitutional consistency, and scenario quality
 - create a focused inspection report
+- use `.draftspec/scripts/inspect-spec.sh` or `.draftspec/scripts/inspect-spec.ps1` as a cheap first-pass helper when structural spec or coverage issues need quick confirmation
 - if the report should be persisted, prefer `.draftspec/specs/partner-scheduling.inspect.md` before planning and `.draftspec/plans/partner-scheduling/inspect.md` after the plan package exists
 - use `.draftspec/templates/inspect-report.md` as the canonical report template
 
@@ -222,6 +224,20 @@ Expected agent behavior:
 - update `tasks.md`
 
 This phase should avoid broad repository reads unless the active task actually requires them.
+
+Example scoped requests:
+
+```text
+/draftspec.implement partner-scheduling --phase 2
+/draftspec.implement partner-scheduling --tasks T1.1,T2.1
+```
+
+Expected scoped behavior:
+
+- keep the default full-run behavior only when no scope flag is provided
+- execute only the selected phase or task IDs when scope is explicitly narrowed
+- preserve task order from `tasks.md`
+- warn if selected work skips unfinished earlier phases or tasks
 
 Typical runtime updates:
 

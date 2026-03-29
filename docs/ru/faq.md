@@ -36,6 +36,14 @@
 
 После любой из этих команд удобно запускать `doctor`, чтобы проверить здоровье workspace.
 
+## Как обновить промты, скрипты и agent files в уже существующем проекте?
+
+Используй `draftspec refresh [path]`.
+
+`refresh` обновляет только Draftspec-managed generated artifacts, например `.draftspec/templates/`, `.draftspec/scripts/`, `.draftspec/draftspec.yaml`, project-local agent files и managed Draftspec block внутри `AGENTS.md`.
+
+При этом команда не изменяет authored feature state, то есть `constitution.md`, `specs/`, `plans/` и `archive/`.
+
 ## Почему Draftspec оставляет `Given / When / Then` на английском даже в русской документации?
 
 Эти маркеры намеренно сделаны каноническими. Агентам так проще распознавать их стабильно, а правилам валидации проще их проверять.

@@ -9,6 +9,7 @@ func NewRootCmd() *cobra.Command {
 	}
 
 	cmd.AddCommand(newInitCmd())
+	cmd.AddCommand(newRefreshCmd())
 	cmd.AddCommand(newAddAgentCmd())
 	cmd.AddCommand(newListAgentsCmd())
 	cmd.AddCommand(newRemoveAgentCmd())
