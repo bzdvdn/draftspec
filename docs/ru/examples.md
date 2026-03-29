@@ -78,6 +78,40 @@ Add a user-selectable dark theme for the dashboard and settings pages.
 - создать или переключить `feature/add-dark-mode`
 - избежать неоднозначных slug из generic filename
 
+### Поэтапный Ввод Через `--name`
+
+Когда имя фичи уже понятно, а подробное описание удобнее прислать следующим сообщением, `/draftspec.spec` может стартовать в staged mode.
+
+Пример:
+
+```text
+/draftspec.spec --name "Dependency Dashboard"
+```
+
+Следующее сообщение:
+
+```text
+Нужен dashboard для мониторинга зависимостей микросервисов с тёмной темой, фильтрами, dependency graph, summary cards и auto-refresh.
+```
+
+Это позволяет Draftspec:
+
+- зафиксировать каноническое имя фичи заранее
+- безопасно вывести slug вроде `dependency-dashboard`
+- не терять контекст spec-запроса между сообщениями
+
+Если нужен явный slug:
+
+```text
+/draftspec.spec --name "Dependency Dashboard" --slug frontend-layout-rework
+```
+
+Если нужен repository-specific branch override:
+
+```text
+/draftspec.spec --name "Dependency Dashboard" --slug frontend-layout-rework --branch FEAT-142
+```
+
 ## 1. Создание Конституции для Brownfield-проекта
 
 Пример запроса:

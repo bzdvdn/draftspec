@@ -69,7 +69,7 @@ constitution -> spec -> inspect -> plan -> tasks -> implement -> verify -> archi
 - Specs используют канонические маркеры `Given / When / Then` независимо от языка документации.
 - Agent workflows должны читать только минимально нужный контекст.
 - Strictness обеспечивается phase entrypoints, templates и readiness checks, а не большими prompt contexts.
-- Agent-facing `/draftspec.spec` работает branch-first: от `feature/<slug>` и с приоритетом явных `name:` / `slug:` в prompt-файлах.
+- Agent-facing `/draftspec.spec` работает branch-first: от `feature/<slug>`, поддерживает `--name` с optional `--slug` / `--branch` и сохраняет приоритет явных `name:` / `slug:` в prompt-файлах.
 - `draftspec init` требует явный `--shell` и генерирует только одно семейство scripts: `sh` или `powershell`.
 - Генерируемые docs и prompts поддерживают английский и русский.
 

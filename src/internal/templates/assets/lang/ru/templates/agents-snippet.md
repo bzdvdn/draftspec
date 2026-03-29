@@ -20,6 +20,7 @@ Workflow-команды:
 - Следуйте цепочке `constitution -> spec -> inspect -> plan -> tasks -> implement -> archive`
 - Не пропускайте prerequisites
 - По умолчанию загружайте только текущий feature slug
+- `/draftspec.spec` поддерживает `--name`, optional `--slug` и optional `--branch`; для chat-based ввода описание фичи может прийти следующим сообщением
 - Для file-based входа в `/draftspec.spec` предпочитайте `name:` и опциональный `slug:` в начале файла, а не fallback на filename
 - Разрешайте явный `--branch <name>` override для repository-specific branch naming conventions, например Jira keys
 - В `tasks` начинайте с `plan.md` и грузите более глубокие артефакты только при необходимости

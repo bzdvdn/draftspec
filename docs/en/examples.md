@@ -78,6 +78,40 @@ This lets Draftspec:
 - create or switch to `feature/add-dark-mode`
 - avoid ambiguous slugs from generic filenames
 
+### Staged Input Via `--name`
+
+When the feature name is already clear but the detailed description is easier to send in the next message, `/draftspec.spec` can start in staged mode.
+
+Example:
+
+```text
+/draftspec.spec --name "Dependency Dashboard"
+```
+
+Next message:
+
+```text
+Build a dashboard for monitoring microservice dependencies with a dark theme, filters, a dependency graph, summary cards, and auto-refresh.
+```
+
+This allows Draftspec to:
+
+- lock in the canonical feature name up front
+- derive a safe slug such as `dependency-dashboard`
+- preserve the spec request context across messages
+
+If you need an explicit slug:
+
+```text
+/draftspec.spec --name "Dependency Dashboard" --slug frontend-layout-rework
+```
+
+If you need a repository-specific branch override:
+
+```text
+/draftspec.spec --name "Dependency Dashboard" --slug frontend-layout-rework --branch FEAT-142
+```
+
 ## 1. Create a Constitution for a Brownfield Project
 
 User request:

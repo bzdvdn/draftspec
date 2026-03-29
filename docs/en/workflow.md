@@ -28,6 +28,23 @@ Mandatory sections:
 
 Captures one feature request as a concrete spec. Acceptance criteria should use canonical `Given / When / Then` markers even when the surrounding document language is Russian.
 
+For agent-facing `/draftspec.spec`, Draftspec should support optional arguments:
+
+- `--name <feature name>`
+- `--slug <feature-slug>`
+- `--branch <branch-name>`
+
+Argument semantics:
+
+- `--name` sets the canonical feature name for the current spec request
+- `--slug` overrides the spec slug
+- `--branch` overrides only the working branch and does not change the spec slug
+
+`/draftspec.spec` should support two input modes:
+
+- inline mode: the feature name and description are provided in the same message
+- staged mode: the user first sends `/draftspec.spec --name ...` and then sends the feature description in the next message
+
 When `/draftspec.spec` starts from a prompt file, Draftspec should prefer top-of-file metadata such as:
 
 ```text
@@ -35,7 +52,21 @@ name: Add dark mode
 slug: add-dark-mode
 ```
 
-`slug:` is optional. If it is missing, Draftspec should derive the slug from `name:`. If neither field is present, falling back to the filename is only safe when the filename is already specific enough.
+Priority rules for the slug:
+
+1. `--slug`
+2. `slug:`
+3. a slug derived from `--name`
+4. a slug derived from `name:`
+5. a safe fallback from the filename or short request text only when sufficiently specific
+
+Priority rules for the feature name:
+
+1. `--name`
+2. `name:`
+3. a concise feature name safely derived from the user request
+
+If `/draftspec.spec` is invoked with `--name` but the feature description is still not detailed enough for a valid spec, Draftspec should not lose the request context: it should ask for the missing description or treat the next user message as the continuation of the same spec request.
 
 By default, the feature branch should be `feature/<slug>`. If the user explicitly provides `--branch <name>`, Draftspec should use that branch name instead without changing the spec slug.
 

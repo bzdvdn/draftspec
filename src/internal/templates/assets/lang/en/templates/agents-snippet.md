@@ -20,6 +20,7 @@ Read discipline:
 - Follow `constitution -> spec -> inspect -> plan -> tasks -> implement -> archive`
 - Do not skip prerequisites
 - Load only the current feature slug by default
+- `/draftspec.spec` supports `--name`, optional `--slug`, and optional `--branch`; for chat-based input, the feature description may arrive in the next message
 - For file-based `/draftspec.spec` input, prefer a top-of-file `name:` and optional `slug:` before falling back to the filename
 - Allow an explicit `--branch <name>` override for repository-specific branch naming conventions such as Jira keys
 - During `tasks`, start with `plan.md` and read deeper artifacts only if required

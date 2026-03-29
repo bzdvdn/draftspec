@@ -241,12 +241,43 @@ Inputs:
 - user request
 - minimal repository context when needed
 
-If the request is file-based, Draftspec should prefer explicit top-of-file metadata:
+For agent-facing `/draftspec.spec`, Draftspec should support three optional command-style inputs:
+
+- `--name <feature name>`
+- `--slug <feature-slug>`
+- `--branch <branch-name>`
+
+Semantics:
+
+- `--name` sets the canonical feature name for the current spec request
+- `--slug` overrides the derived spec slug
+- `--branch` overrides the execution branch name without changing the spec slug
+
+Draftspec should support two input modes for `/draftspec.spec`:
+
+- inline mode: the user provides the feature name and description in the same request
+- staged mode: the user first provides `/draftspec.spec --name ...` and then provides the feature description in the next message
+
+Priority rules for spec identity:
+
+1. `--slug`
+2. top-of-file `slug:`
+3. slug derived from `--name`
+4. slug derived from top-of-file `name:`
+5. safe fallback from filename or short request text only when sufficiently specific
+
+Priority rules for feature name:
+
+1. `--name`
+2. top-of-file `name:`
+3. a concise feature name derived from the user request when unambiguous
+
+If the request is file-based, Draftspec should still prefer explicit top-of-file metadata:
 
 - `name: <feature name>`
 - optional `slug: <feature-slug>`
 
-If `slug:` is missing, derive the slug from `name:`. Fall back to the filename only when it is specific enough to produce a safe slug and feature branch.
+If `/draftspec.spec` is invoked with `--name` but without enough feature detail to write a valid specification, Draftspec should ask for the missing description or treat the next user message as the continuation of the same spec request.
 
 Output:
 

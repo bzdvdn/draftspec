@@ -46,6 +46,8 @@ Each prompt is designed to:
 `spec` should stay branch-first:
 
 - it should create or switch to `feature/<slug>` before writing `.draftspec/specs/<slug>.md` when the environment allows it
+- it should support `--name`, optional `--slug`, and optional `--branch` for chat-oriented input
+- if `/draftspec.spec` is invoked with `--name` but without enough description, it should preserve context and ask for or accept the next message as the continuation of the spec request
 - when the input comes from a local prompt file, it should prefer top-of-file `name:` and optional `slug:` metadata over a generic filename
 - if the request is ambiguous, multi-feature, URL-like, or tries to derive one spec from multiple constitutional changes, it should stop and ask for one concrete feature
 
