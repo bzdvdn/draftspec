@@ -34,6 +34,20 @@ In short: Draftspec aims to be as strict as practical while staying lightweight 
 
 In short, Draftspec aims to sit between OpenSpec and Spec Kit: stricter than OpenSpec, lighter than Spec Kit, and optimized for branch-based collaboration with minimal default context.
 
+## Where Draftspec Stands Out
+
+- Narrow context by default. Each phase is designed to load the smallest useful scope.
+- Strict workflow chain. Constitution, spec, inspect, plan, tasks, and implementation stay aligned.
+- Lightweight traceability. Stable IDs and cheap readiness checks reduce prompt bloat.
+- Brownfield-friendly workflow. Draftspec works well in existing repositories without forcing a heavyweight process layer.
+- Branch-first collaboration. Active feature state stays local to the feature instead of spreading through shared mutable memory.
+
+OpenSpec is more flexible by design and works well when teams want a looser artifact-guided workflow.
+
+Spec Kit provides a broader and more thorough workflow surface, but usually at the cost of more artifacts, more context, and more process overhead.
+
+Draftspec is optimized for discipline per token: strong workflow boundaries, minimal default context, and enough structure to keep agents aligned without making the workflow heavy.
+
 ## Documentation
 
 Extended documentation lives in [`docs/`](docs/README.md):

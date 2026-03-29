@@ -34,6 +34,20 @@ Draftspec — это lean SDD kit для реальных кодовых баз.
 
 Коротко: Draftspec занимает место между OpenSpec и Spec Kit: строже OpenSpec, легче Spec Kit и лучше приспособлен для branch-based collaboration с минимальным default context.
 
+## Где Draftspec Сильнее Всего
+
+- Узкий контекст по умолчанию. Каждая фаза должна загружать только минимально полезный scope.
+- Строгая цепочка workflow. Конституция, spec, inspect, plan, tasks и implement остаются согласованными.
+- Легкая трассировка. Стабильные ID и дешевые readiness checks уменьшают prompt overhead.
+- Удобство для brownfield-репозиториев. Draftspec хорошо работает в существующих кодовых базах без навязывания тяжелого process layer.
+- Branch-first collaboration. Активное состояние фичи остается локальным для feature, а не размазывается по shared mutable memory.
+
+OpenSpec по дизайну более гибкий и хорошо подходит командам, которым нужен более свободный artifact-guided workflow.
+
+Spec Kit дает более широкую и подробную workflow surface, но обычно ценой большего числа артефактов, более широкого контекста и более тяжелого процесса.
+
+Draftspec оптимизируется под discipline per token: сильные границы workflow, минимальный default context и достаточную структуру для согласованной работы агентов без превращения процесса в тяжеловесную систему.
+
 ## Документация
 
 Расширенная документация находится в [`docs/`](docs/README.md):
