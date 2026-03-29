@@ -189,12 +189,12 @@ Add a user-selectable dark theme for the dashboard and settings pages.
 ```md
 ## Phase 1: Data Model
 
-- [ ] Add partner scheduling override model
-- [ ] Persist retry window fields
+- [ ] T1.1 Add partner scheduling override model — override fields are persisted
+- [ ] T1.2 Persist retry window fields — retry windows are available to scheduling logic
 
 ## Acceptance Coverage
 
-- AC-001 -> Task 1, Task 2
+- AC-001 -> T1.1, T1.2
 ```
 
 ## 6. Реализация Фичи

@@ -49,13 +49,16 @@ Do not jump ahead into implementation.
 - Do not mix task languages inside the same task list without a strong project reason.
 - Load deeper artifacts only when the current decomposition needs them.
 - Follow the structure of `.draftspec/templates/tasks.md`: group tasks into ordered phases (`## Phase N: Name`).
-- Each task MUST follow the format: `- [ ] <action verb> — <concrete measurable outcome>`
+- Each task MUST include a phase-scoped task ID in the form `T<phase>.<index>`.
+- Each task MUST follow the format: `- [ ] T<phase>.<index> <action verb> — <concrete measurable outcome>`
 - The tasks taken together MUST cover all acceptance criteria from the spec. Any uncovered criterion is a blocker.
 - The `## Acceptance Coverage` section MUST include at least one explicit coverage line for each acceptance criterion.
-- Coverage lines SHOULD reference stable acceptance IDs such as `AC-001 -> Task 1, Task 2`.
+- Coverage lines SHOULD reference stable acceptance IDs and task IDs such as `AC-001 -> T1.1, T2.1`.
 - Prefer tasks that are concrete, testable, and implementation-oriented.
 - Include validation and documentation alignment work where needed.
 - Do not generate vague umbrella tasks.
+- For newly created task lists, task IDs are required.
+- When meaningfully updating an existing task list without task IDs, normalize it to the ID-based format.
 
 ## Output expectations
 

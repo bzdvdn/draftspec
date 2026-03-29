@@ -46,6 +46,7 @@ Stop and ask for clarification only if:
 - Verify that completed tasks are consistent with the current state of the feature package.
 - Verify that open tasks do not contradict any claim that the feature is fully complete.
 - Verify acceptance-to-task coverage consistency when `tasks.md` includes an `Acceptance Coverage` section.
+- When `tasks.md` uses task IDs such as `T1.1`, reference those IDs directly in checks, findings, and conclusions.
 - Use a simple verdict: `pass`, `concerns`, or `blocked`.
 - Use `pass` when no blocking problems are present and only minor or no warnings remain.
 - Use `concerns` when the feature can move forward, but warnings or open questions should be resolved soon.

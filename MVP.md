@@ -274,6 +274,7 @@ It must:
 
 - produce concrete executable tasks
 - group them by implementation phase
+- assign phase-scoped task IDs such as `T1.1`
 - stop when the plan is underspecified or blocked by the constitution
 
 ## Implement workflow

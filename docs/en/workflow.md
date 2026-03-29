@@ -103,6 +103,14 @@ Produces technical design artifacts for one feature package:
 
 Turns the plan package into executable tasks. `tasks.md` lives next to other plan artifacts inside `.draftspec/plans/<slug>/`.
 
+Tasks should be grouped by phase and use phase-scoped task IDs such as `T1.1`, `T1.2`, and `T2.1`.
+
+Acceptance coverage should reference those task IDs directly:
+
+```text
+AC-001 -> T1.1, T2.1
+```
+
 ### `implement`
 
 Executes unfinished tasks and updates `tasks.md`.

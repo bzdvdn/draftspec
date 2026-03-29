@@ -44,6 +44,7 @@ Stop and ask a minimal follow-up question only if:
 - Inspect spec completeness and clarity.
 - Every acceptance criterion in the spec MUST have an explicit Given/When/Then format. The `Given`, `When`, and `Then` markers remain canonical regardless of the documentation language. Missing G/W/T is an `Error`, not a `Suggestion`.
 - If `tasks.md` exists, verify that every acceptance criterion from the spec is covered by at least one task. An uncovered criterion is an `Error`.
+- If `tasks.md` uses task IDs such as `T1.1`, prefer traceability statements that reference those task IDs directly.
 - If plan artifacts exist, check alignment between spec, plan, data model, contracts, and tasks.
 - When `plan.md` exists, check `spec <-> plan` consistency before reading deeper plan artifacts.
 - Treat `spec.md` and `plan.md` as the required inputs for cheap plan consistency checks.
@@ -73,7 +74,7 @@ Stop and ask a minimal follow-up question only if:
 - Use `concerns` when the feature can still move forward, but warnings or open questions should be resolved soon.
 - Use `blocked` when constitutional conflicts, missing spec intent, missing Given/When/Then acceptance criteria, or uncovered acceptance criteria prevent the next workflow step from proceeding safely.
 - `## Traceability` should summarize how acceptance criteria map to tasks when `tasks.md` exists.
-- Prefer traceability statements that reference stable acceptance IDs such as `AC-001`.
+- Prefer traceability statements that reference stable acceptance IDs and task IDs such as `AC-001 -> T1.1, T2.1`.
 - `## Next Step` should say whether it is safe to continue to `plan`, `tasks`, or whether refinement is required first.
 
 ## Output expectations
