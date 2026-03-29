@@ -210,9 +210,16 @@ Expected agent behavior:
 - start from `tasks.md`
 - load spec, plan, data model, or contracts only for the active task
 - implement unfinished tasks in order
+- report phase progress as it moves through the selected work
 - update `tasks.md`
 
 This phase should avoid broad repository reads unless the active task actually requires them.
+
+Typical runtime updates:
+
+- `Starting Phase 1: Data Model`
+- `Phase 1 complete: T1.1, T1.2`
+- `Next: Phase 2: Scheduler Logic`
 
 ## 7. Verify the Feature
 

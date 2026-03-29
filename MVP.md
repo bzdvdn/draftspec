@@ -297,6 +297,7 @@ It must:
 - execute only unfinished tasks
 - respect task order and phase structure
 - update `tasks.md`
+- emit short phase progress updates during runtime, using the configured agent language
 - stop when the plan is insufficient or conflicts with the constitution
 
 ## Configuration file

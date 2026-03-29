@@ -115,6 +115,10 @@ AC-001 -> T1.1, T2.1
 
 Executes unfinished tasks and updates `tasks.md`.
 
+During implementation, Draftspec should emit short runtime progress updates whenever it starts or completes a phase in the active execution scope.
+
+Those phase-status updates should follow the project's configured agent language rather than defaulting to English.
+
 ### `verify`
 
 Runs a lightweight post-implementation check to confirm that completed work is aligned enough with tasks and project rules to move forward safely.

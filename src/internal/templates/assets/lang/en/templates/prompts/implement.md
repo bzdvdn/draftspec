@@ -51,6 +51,9 @@ Do not broaden scope to solve these problems.
 - Implement only unfinished tasks from `tasks.md`.
 - Respect the order and phase structure in `tasks.md`.
 - Use `tasks.md` as the execution entrypoint.
+- Always make it clear which phase is currently in progress when the active work crosses a phase boundary.
+- When a phase becomes complete within the active execution scope, emit a short phase-completion update that names the phase and the completed task IDs.
+- Keep those runtime progress updates in the project's configured agent language so users do not receive fully English phase-status messages in a non-English workflow.
 - Load deeper artifacts only when the current task requires them.
 - Do not violate the constitution.
 - Follow the project's preferred code comment language as recorded in `.draftspec/draftspec.yaml` and `.draftspec/constitution.md`.
@@ -63,5 +66,6 @@ Do not broaden scope to solve these problems.
 
 - Implement the work
 - Update `tasks.md` checkboxes for completed items
+- Report phase progress in runtime: when a phase starts, when it completes, and what remains next inside the current scope
 - Summarize completed tasks, remaining tasks, and any blockers
 - Explicitly state which acceptance criteria from the spec are now covered by the implementation
