@@ -1,5 +1,7 @@
 # draftspec
 
+Русская версия: [README.ru.md](README.ru.md)
+
 `draftspec` is a lightweight project context kit for development agents and humans.
 
 It keeps project intent, specifications, plan artifacts, and task breakdowns in simple files without introducing a rigid process engine.
