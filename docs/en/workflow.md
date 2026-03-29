@@ -37,6 +37,10 @@ slug: add-dark-mode
 
 `slug:` is optional. If it is missing, Draftspec should derive the slug from `name:`. If neither field is present, falling back to the filename is only safe when the filename is already specific enough.
 
+By default, the feature branch should be `feature/<slug>`. If the user explicitly provides `--branch <name>`, Draftspec should use that branch name instead without changing the spec slug.
+
+The spec itself should remain branch-agnostic: the working branch belongs to execution context, not to the spec document.
+
 If the request is ambiguous, combines multiple features, or asks to derive one spec from multiple constitutional changes, Draftspec should stop and ask for one concrete feature before creating the branch or spec.
 
 ### `inspect`

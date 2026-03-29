@@ -238,6 +238,10 @@ Output:
 - `.draftspec/specs/<slug>.md`
 - work should happen from `feature/<slug>` when the environment can create or switch branches
 
+If the user explicitly provides `--branch <name>`, Draftspec should use that branch name instead of the default `feature/<slug>` without changing the spec slug.
+
+The spec document itself should stay branch-agnostic. The working branch belongs to execution context, not to the persisted feature specification.
+
 ## Plan workflow
 
 `plan` is responsible for translating one spec into technical design artifacts.

@@ -21,6 +21,7 @@ Workflow-команды:
 - Не пропускайте prerequisites
 - По умолчанию загружайте только текущий feature slug
 - Для file-based входа в `/draftspec.spec` предпочитайте `name:` и опциональный `slug:` в начале файла, а не fallback на filename
+- Разрешайте явный `--branch <name>` override для repository-specific branch naming conventions, например Jira keys
 - В `tasks` начинайте с `plan.md` и грузите более глубокие артефакты только при необходимости
 - В `implement` начинайте с `tasks.md` и грузите более глубокие артефакты только при необходимости
 

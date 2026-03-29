@@ -125,6 +125,14 @@ Example acceptance criterion:
 - **Then** the worker uses the partner-specific retry window instead of the default policy
 ```
 
+Example with an explicit branch override:
+
+```text
+/draftspec.spec Add partner-specific ingestion scheduling with retry policy overrides --branch NRD-11
+```
+
+In that case, the spec slug can still stay `partner-scheduling` while the working branch follows the repository's branch convention, for example `NRD-11`.
+
 ## 3. Inspect the Spec
 
 User request:

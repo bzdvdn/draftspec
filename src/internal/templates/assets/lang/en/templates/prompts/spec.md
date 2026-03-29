@@ -47,6 +47,8 @@ If the spec already exists and is current, say so and do not modify the file.
 - If `slug:` is present, use it for the spec path and feature branch.
 - If only `name:` is present, derive `<slug>` from it.
 - Fall back to the file basename only when it is specific enough to produce a safe slug.
+- If the user explicitly provides `--branch <name>`, use that branch name as-is instead of the default `feature/<slug>`.
+- An explicit `--branch` override does not change the spec slug unless the user also requests a different slug.
 - Use the project's configured documentation language for new or updated spec content.
 - Respect an established local document convention only when preserving an existing file would otherwise become inconsistent.
 - Do not introduce mixed-language headings or sections in the same spec without a strong project reason.
@@ -61,6 +63,6 @@ If the spec already exists and is current, say so and do not modify the file.
 
 ## Output expectations
 
-- Create or switch to `feature/<slug>` before editing the spec when branch creation is available in the current environment.
+- Create or switch to `feature/<slug>` before editing the spec when branch creation is available in the current environment, unless the user explicitly provides `--branch`.
 - Write or patch `.draftspec/specs/<slug>.md`, where `<slug>` is the lowercase kebab-case of the feature name
 - Summarize goal, scope, acceptance criteria, and open questions

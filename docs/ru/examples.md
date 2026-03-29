@@ -125,6 +125,14 @@ Add a user-selectable dark theme for the dashboard and settings pages.
 - **Then** worker использует partner-specific retry window вместо default policy
 ```
 
+Пример с явным branch override:
+
+```text
+/draftspec.spec Добавить partner-specific расписание ingestion с override для retry policy --branch NRD-11
+```
+
+В этом случае slug спецификации может по-прежнему оставаться `partner-scheduling`, а рабочая ветка будет следовать branch convention репозитория, например `NRD-11`.
+
 ## 3. Проверка Spec через Inspect
 
 Пример запроса:

@@ -21,6 +21,7 @@ Read discipline:
 - Do not skip prerequisites
 - Load only the current feature slug by default
 - For file-based `/draftspec.spec` input, prefer a top-of-file `name:` and optional `slug:` before falling back to the filename
+- Allow an explicit `--branch <name>` override for repository-specific branch naming conventions such as Jira keys
 - During `tasks`, start with `plan.md` and read deeper artifacts only if required
 - During `implement`, start with `tasks.md` and read deeper artifacts only if required
 
