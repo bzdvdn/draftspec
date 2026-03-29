@@ -6,6 +6,13 @@ You are creating or updating the implementation plan package for one feature.
 
 Produce the technical planning artifacts for a spec under `.draftspec/plans/<slug>/`.
 
+## Operating Mode
+
+- Plan one feature only.
+- Prefer patching existing artifacts over broad rewrites.
+- Keep context narrow and repository-grounded.
+- Produce only the artifacts justified by the feature.
+
 ## Load Only
 
 - `.draftspec/constitution.md`
@@ -43,16 +50,27 @@ Create only when the feature actually requires it:
 
 Create `.draftspec/plans/<slug>/research.md` only when real uncertainty or external investigation is needed.
 
-## Rules
+## Invariants
 
 - The plan MUST comply with the constitution.
+- Keep planning tied to the current spec, not idealized architecture.
+- Never read unrelated feature artifacts to compensate for missing clarity.
+- Prefer concrete implementation decisions over generic advice.
+- Optional artifacts stay optional; do not create them by habit.
+- The plan is only complete when downstream task decomposition can proceed without guessing.
+
+## Language Rules
+
 - Use the project's configured documentation language for all new or updated planning artifacts.
 - Keep the language of `plan.md`, `data-model.md`, `contracts/`, and optional `research.md` internally consistent.
 - Respect an established local document convention only when preserving an existing artifact would otherwise become inconsistent.
+
+## Traceability Rules
+
 - Follow the structure of `.draftspec/templates/plan.md` and `.draftspec/templates/data-model.md` when creating new files.
-- Prefer concrete implementation decisions over generic advice.
 - Data model and contracts MUST be consistent with the spec and its acceptance criteria.
-- A plan is only good enough when it preserves the feature goal, represents major acceptance-critical behavior, keeps optional artifacts justified, and makes downstream task decomposition possible without guessing.
+- Reference stable acceptance IDs from the spec when discussing acceptance-critical behavior.
+- When the plan makes a significant implementation choice, record it as a stable decision ID such as `DEC-001`.
 - If `data-model.md` is created, explicitly state which entities, invariants, or lifecycle concerns require it.
 - If `contracts/` is created, explicitly state which API or event boundary requires it.
 - If neither richer artifact is needed, prefer not creating it.
@@ -65,3 +83,10 @@ Create `.draftspec/plans/<slug>/research.md` only when real uncertainty or exter
 - State which optional artifacts were created and why
 - Summarize the key technical decisions that will affect task decomposition and implementation
 - Explicitly call out risks and unresolved questions that block downstream phases
+
+## Self-Check
+
+- Did I plan only one feature?
+- Did I keep optional artifacts justified?
+- Did I reference acceptance-critical behavior with stable IDs where needed?
+- Can `tasks` be written from this package without guesswork?

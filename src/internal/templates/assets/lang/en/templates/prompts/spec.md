@@ -8,6 +8,13 @@ Produce a clear feature specification at `.draftspec/specs/<slug>.md` that is co
 
 Before writing or updating the spec, ensure work is happening on the feature branch for `<slug>`. The default branch naming convention is `feature/<slug>`.
 
+## Operating Mode
+
+- Work on exactly one feature.
+- Prefer patching an existing spec over rewriting it.
+- Load only the minimum context needed to remove ambiguity.
+- Do not drift into planning or implementation.
+
 ## Load Only
 
 - `.draftspec/constitution.md`
@@ -39,10 +46,21 @@ Do not continue into planning or implementation thinking when the spec itself is
 
 If the spec already exists and is current, say so and do not modify the file.
 
-## Rules
+## Invariants
 
 - The spec MUST comply with the constitution.
 - Keep the spec focused on one feature or change.
+- Never load unrelated feature artifacts to compensate for unclear requirements.
+- Derive acceptance criteria from the request and repository reality; do not invent them.
+- Use explicit scope boundaries. The out-of-scope section is mandatory.
+- Do not mix languages inside the same spec without a strong project reason.
+- Follow `.draftspec/templates/spec.md` when creating a new file.
+- Every acceptance criterion MUST use Given/When/Then format.
+- Every acceptance criterion MUST have a stable ID such as `AC-001`.
+- Ask follow-up questions only when the missing information is critical.
+
+## Resolution Rules
+
 - `/draftspec.spec` may receive `--name <feature name>`, optional `--slug <feature-slug>`, and optional `--branch <branch-name>`.
 - If `--name` is present, use it as the canonical feature name.
 - If `--slug` is present, use it for the spec path.
@@ -57,20 +75,31 @@ If the spec already exists and is current, say so and do not modify the file.
 - If the user explicitly provides `--branch <name>`, use that branch name as-is instead of the default `feature/<slug>`.
 - An explicit `--branch` override does not change the spec slug unless the user also requests a different slug.
 - If the user provided only `--name` and the detailed description is still missing, ask for the description or accept the next user message as the continuation of the same spec request.
+
+## Language Rules
+
 - Use the project's configured documentation language for new or updated spec content.
 - Respect an established local document convention only when preserving an existing file would otherwise become inconsistent.
 - Do not introduce mixed-language headings or sections in the same spec without a strong project reason.
-- Follow the structure of `.draftspec/templates/spec.md` when creating a new file.
-- Every acceptance criterion MUST use Given/When/Then format. The `Given`, `When`, and `Then` markers remain canonical regardless of the documentation language:
+
+## Acceptance Rules
+
+- The `Given`, `When`, and `Then` markers remain canonical regardless of the documentation language:
   - **Given** — the initial state or precondition
   - **When** — the action or event
   - **Then** — the expected observable outcome
-- Use explicit scope boundaries. The out-of-scope section is mandatory.
-- Ask follow-up questions only when the missing information is critical.
-- Do not jump into implementation planning here.
+- Acceptance criteria should be observable and testable.
+- Prefer a small set of strong criteria over a long redundant list.
 
 ## Output expectations
 
 - Create or switch to `feature/<slug>` before editing the spec when branch creation is available in the current environment, unless the user explicitly provides `--branch`.
 - Write or patch `.draftspec/specs/<slug>.md`, where `<slug>` is the lowercase kebab-case of the feature name
 - Summarize goal, scope, acceptance criteria, and open questions
+
+## Self-Check
+
+- Did I stay within one feature?
+- Did I avoid planning and implementation detail?
+- Did every acceptance criterion get a stable ID and Given/When/Then form?
+- Did I avoid loading unrelated artifacts?

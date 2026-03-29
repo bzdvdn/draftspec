@@ -17,6 +17,8 @@ $lines = Get-Content -LiteralPath $TasksFile
 $total = ($lines | Where-Object { $_ -match '^- \[[ x]\]' }).Count
 $completed = ($lines | Where-Object { $_ -match '^- \[x\]' }).Count
 $open = ($lines | Where-Object { $_ -match '^- \[ \]' }).Count
+$taskIds = ($lines | Select-String -Pattern 'T[0-9]+\.[0-9]+' -AllMatches | ForEach-Object { $_.Matches } | Measure-Object).Count
+$coverageLines = ($lines | Where-Object { $_ -match 'AC-[0-9][0-9][0-9].*->.*T[0-9]+\.[0-9]+' }).Count
 
 if ($total -eq 0) {
   Write-Output "ERROR: no task checkboxes found in $TasksFile"
@@ -26,6 +28,17 @@ if ($total -eq 0) {
 Write-Output "TASKS_TOTAL=$total"
 Write-Output "TASKS_COMPLETED=$completed"
 Write-Output "TASKS_OPEN=$open"
+Write-Output "TASK_IDS=$taskIds"
+Write-Output "AC_COVERAGE_LINES=$coverageLines"
+
+if ($taskIds -eq 0) {
+  Write-Output "ERROR: no stable task IDs found in $TasksFile"
+  exit 1
+}
+
+if ($coverageLines -eq 0) {
+  Write-Output "WARN: no AC-to-task coverage lines found in $TasksFile"
+}
 
 if ($open -gt 0) {
   Write-Output "WARN: open tasks remain in $TasksFile"

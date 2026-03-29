@@ -21,5 +21,6 @@
 
 - Keep task ordering aligned with the plan
 - Use phase-scoped task IDs in the form `T<phase>.<index>`
+- Keep tasks concrete, measurable, and executable in order
 - Mark tasks complete as implementation progresses
 - Do not leave acceptance criteria without task coverage

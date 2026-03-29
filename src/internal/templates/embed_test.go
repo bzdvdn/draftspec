@@ -226,6 +226,94 @@ func TestInspectHelperScriptsSupportAcceptanceIDsAndCoverageFormat(t *testing.T)
 	}
 }
 
+func TestReadinessScriptsEnforceLeanTraceabilityRules(t *testing.T) {
+	testCases := []struct {
+		name   string
+		shell  string
+		target string
+		want   []string
+	}{
+		{
+			name:   "sh spec ready",
+			shell:  "sh",
+			target: "scripts/check-spec-ready.sh",
+			want: []string{
+				"spec template includes requirement IDs",
+				"spec template includes acceptance IDs",
+				"spec template includes Given marker",
+			},
+		},
+		{
+			name:   "sh plan ready",
+			shell:  "sh",
+			target: "scripts/check-plan-ready.sh",
+			want: []string{
+				"spec has stable acceptance IDs",
+				"./.draftspec/scripts/inspect-spec.sh",
+			},
+		},
+		{
+			name:   "sh tasks ready",
+			shell:  "sh",
+			target: "scripts/check-tasks-ready.sh",
+			want: []string{
+				"plan has stable decision IDs",
+				"spec has stable acceptance IDs",
+			},
+		},
+		{
+			name:   "sh implement ready",
+			shell:  "sh",
+			target: "scripts/check-implement-ready.sh",
+			want: []string{
+				"tasks include acceptance coverage section",
+				"tasks include AC-to-task coverage lines",
+			},
+		},
+		{
+			name:   "sh verify ready",
+			shell:  "sh",
+			target: "scripts/check-verify-ready.sh",
+			want: []string{
+				"./.draftspec/scripts/inspect-spec.sh",
+				"./.draftspec/scripts/verify-task-state.sh",
+			},
+		},
+		{
+			name:   "powershell verify task state",
+			shell:  "powershell",
+			target: "scripts/verify-task-state.ps1",
+			want: []string{
+				"TASK_IDS=",
+				"AC_COVERAGE_LINES=",
+				"no AC-to-task coverage lines found",
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			files, err := Files(LanguageSettings{
+				Default:  "en",
+				Docs:     "en",
+				Agent:    "en",
+				Comments: "en",
+				Shell:    tc.shell,
+			})
+			if err != nil {
+				t.Fatalf("Files() returned error: %v", err)
+			}
+
+			content := fileContentByTarget(t, files, tc.target)
+			for _, snippet := range tc.want {
+				if !strings.Contains(content, snippet) {
+					t.Fatalf("expected %s to contain %q", tc.target, snippet)
+				}
+			}
+		})
+	}
+}
+
 func fileContentByTarget(t *testing.T, files []File, target string) string {
 	t.Helper()
 

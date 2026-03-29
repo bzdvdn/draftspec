@@ -67,8 +67,9 @@ constitution -> spec -> inspect -> plan -> tasks -> implement -> verify -> archi
 - The constitution is the highest-priority project document.
 - Plan packages keep `plan.md`, `tasks.md`, `data-model.md`, `contracts/`, and optional `research.md` together.
 - Specs use canonical `Given / When / Then` markers across documentation languages.
+- Draftspec prefers stable IDs and explicit references over repeated narrative summaries: `RQ-*` for requirements, `AC-*` for acceptance criteria, `DEC-*` for plan decisions, and phase-scoped `T*` task IDs.
 - Agent workflows are designed to load only the minimum context required.
-- Strictness comes from phase entrypoints, templates, and readiness checks rather than large default prompts.
+- Strictness comes from phase entrypoints, templates, stable artifact structure, and readiness checks rather than large default prompts.
 - Agent-facing `/draftspec.spec` is branch-first: it should work from `feature/<slug>`, support `--name` with optional `--slug` / `--branch`, and still prefer explicit `name:` / `slug:` metadata for prompt files.
 - `draftspec init` requires an explicit `--shell` and generates one script family: `sh` or `powershell`.
 - Generated docs and prompts support English and Russian.

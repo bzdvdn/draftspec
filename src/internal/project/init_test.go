@@ -150,6 +150,58 @@ func TestInitializeWithPowerShellGeneratesPS1Scripts(t *testing.T) {
 	}
 }
 
+func TestInitializeGeneratesReadinessScriptsWithTraceabilityChecks(t *testing.T) {
+	root := t.TempDir()
+
+	_, err := Initialize(root, InitOptions{
+		InitGit:     false,
+		DefaultLang: "en",
+		Shell:       "sh",
+	})
+	if err != nil {
+		t.Fatalf("Initialize returned error: %v", err)
+	}
+
+	testCases := []struct {
+		path string
+		want []string
+	}{
+		{
+			path: filepath.Join(root, ".draftspec", "scripts", "check-spec-ready.sh"),
+			want: []string{
+				"spec template includes requirement IDs",
+				"spec template includes acceptance IDs",
+			},
+		},
+		{
+			path: filepath.Join(root, ".draftspec", "scripts", "check-implement-ready.sh"),
+			want: []string{
+				"tasks include acceptance coverage section",
+				"tasks include AC-to-task coverage lines",
+			},
+		},
+		{
+			path: filepath.Join(root, ".draftspec", "scripts", "check-verify-ready.sh"),
+			want: []string{
+				"./.draftspec/scripts/inspect-spec.sh",
+				"./.draftspec/scripts/verify-task-state.sh",
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		content, err := os.ReadFile(tc.path)
+		if err != nil {
+			t.Fatalf("ReadFile(%s) returned error: %v", tc.path, err)
+		}
+		for _, want := range tc.want {
+			if !strings.Contains(string(content), want) {
+				t.Fatalf("expected %s to contain %q", tc.path, want)
+			}
+		}
+	}
+}
+
 func TestRefreshUpdatesManagedFilesWithoutTouchingAuthoredArtifacts(t *testing.T) {
 	root := t.TempDir()
 

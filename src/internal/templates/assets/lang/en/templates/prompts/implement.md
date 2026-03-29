@@ -6,6 +6,13 @@ You are executing a planned feature implementation.
 
 Implement the feature by following the existing task list without expanding scope.
 
+## Operating Mode
+
+- Use `tasks.md` as the execution entrypoint.
+- Execute the smallest safe scope allowed by the request.
+- Read only the artifacts and code needed for the active task.
+- Patch existing files where possible instead of broad rewrites.
+
 ## Load First
 
 Always read these before doing any implementation work:
@@ -46,7 +53,7 @@ If all tasks in `tasks.md` are already marked complete, say so and do not contin
 
 Do not broaden scope to solve these problems.
 
-## Rules
+## Scope Rules
 
 - Default behavior: if the user does not restrict scope, execute all unfinished tasks in order.
 - Scoped behavior: if the user explicitly provides `--phase <number>`, execute only that phase.
@@ -55,21 +62,32 @@ Do not broaden scope to solve these problems.
 - In scoped mode, keep the execution order from `tasks.md` rather than inventing a new order from the request text.
 - If the selected phase or task IDs do not exist in `tasks.md`, stop and request refinement.
 - If scoped execution skips unfinished earlier work, warn about the ordering risk but do not silently broaden scope.
+
+## Invariants
+
 - Implement only unfinished tasks from `tasks.md`.
 - Respect the order and phase structure in `tasks.md`.
-- Use `tasks.md` as the execution entrypoint.
+- Never redesign or re-plan the feature silently during implementation.
+- Never read unrelated feature artifacts or repository areas by default.
+- If a task cannot be implemented safely from current artifacts, stop and request refinement.
+- Mark completed tasks in `tasks.md`.
+- Keep runtime updates short and tied to the current phase and task IDs.
+- Do not violate the constitution.
+
+## Progress Rules
+
 - Always make it clear which phase is currently in progress when the active work crosses a phase boundary.
 - When a phase becomes complete within the active execution scope, emit a short phase-completion update that names the phase and the completed task IDs.
 - Keep those runtime progress updates in the project's configured agent language so users do not receive fully English phase-status messages in a non-English workflow.
 - Load deeper artifacts only when the current task requires them.
-- Do not violate the constitution.
-- Do not silently redesign or re-plan the feature during implementation.
+
+## Language Rules
+
 - If a selected task cannot be implemented safely from the current spec, plan, tasks, and supporting artifacts, stop and send the workflow back to spec, plan, or tasks refinement instead of inventing new scope.
 - Follow the project's preferred code comment language as recorded in `.draftspec/draftspec.yaml` and `.draftspec/constitution.md`.
 - When adding or editing code comments, keep them in the configured comment language unless the surrounding file already uses a different established convention that should be preserved.
 - Do not introduce mixed-language comments in the same local code area without a strong reason.
 - If the plan or tasks are insufficient, stop and request refinement instead of inventing broad new scope.
-- Mark completed tasks in `tasks.md`.
 
 ## Output expectations
 
@@ -78,3 +96,10 @@ Do not broaden scope to solve these problems.
 - Report phase progress in runtime: when a phase starts, when it completes, and what remains next inside the current scope
 - Summarize completed tasks, remaining tasks, and any blockers
 - Explicitly state which acceptance criteria from the spec are now covered by the implementation
+
+## Self-Check
+
+- Did I execute only the requested scope from `tasks.md`?
+- Did I avoid silent redesign or scope expansion?
+- Did I read only the artifacts needed for the active task?
+- Did I update completed tasks and report acceptance coverage?

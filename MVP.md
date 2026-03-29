@@ -17,6 +17,8 @@ It helps development agents and humans work from the same project context:
 
 The product should feel lightweight, editable, and resilient.
 
+Draftspec should preserve traceability through compact, stable IDs instead of broader default context or extra summary layers.
+
 ## Non-goals
 
 - no mandatory checkpoint flow
@@ -165,6 +167,16 @@ Lightweight guardrails should preserve strictness without broadening default con
 - traceability should improve through stable IDs and explicit references instead of new shared summary artifacts
 - `archive` should remain a compact historical record, not a new mutable working-memory layer
 
+Recommended stable ID scheme:
+
+- `RQ-*` for spec requirements
+- `AC-*` for acceptance criteria
+- `DEC-*` for plan-level implementation decisions
+- `DM-*` for data-model entities when the model needs explicit identifiers
+- `API-*` for API contract entries
+- `EVT-*` for event contract entries
+- `T<phase>.<index>` for implementation tasks
+
 ## Plan package
 
 Each feature plan lives under `.draftspec/plans/<slug>/`.
@@ -216,6 +228,7 @@ Outputs:
 - a focused inspection report for one feature
 - explicit Given/When/Then acceptance criteria, with `Given`, `When`, and `Then` kept canonical across documentation languages and inspect treating missing G/W/T as an error
 - explicit cheap checks for `constitution <-> spec`, `spec <-> plan`, and `plan <-> tasks` when those downstream artifacts exist
+- explicit references to stable IDs when reporting mismatches or gaps
 
 ## Archive workflow
 
@@ -288,6 +301,13 @@ If the user explicitly provides `--branch <name>`, Draftspec should use that bra
 
 The spec document itself should stay branch-agnostic. The working branch belongs to execution context, not to the persisted feature specification.
 
+The default spec template should stay compact while making downstream traceability cheap:
+
+- requirements should use stable `RQ-*` IDs
+- acceptance criteria should use stable `AC-*` IDs
+- acceptance criteria should remain in canonical Given/When/Then form
+- out-of-scope boundaries should stay explicit
+
 ## Plan workflow
 
 `plan` is responsible for translating one spec into technical design artifacts.
@@ -305,6 +325,13 @@ Outputs:
 - `.draftspec/plans/<slug>/contracts/api.md`
 - `.draftspec/plans/<slug>/contracts/events.md`
 - optional `.draftspec/plans/<slug>/research.md`
+
+The default plan package should support downstream work with minimal rereading:
+
+- `plan.md` should record significant implementation decisions with stable `DEC-*` IDs
+- `plan.md` should reference relevant `AC-*` IDs for acceptance-critical behavior
+- `data-model.md` should use stable `DM-*` IDs only when entity-level traceability is actually helpful
+- contracts should use stable `API-*` and `EVT-*` IDs only when those boundaries exist
 
 ## Tasks workflow
 
@@ -325,6 +352,7 @@ It must:
 - produce concrete executable tasks
 - group them by implementation phase
 - assign phase-scoped task IDs such as `T1.1`
+- map each `AC-*` to at least one task in an explicit acceptance coverage section
 - stop when the plan is underspecified or blocked by the constitution
 
 ## Implement workflow
@@ -351,6 +379,7 @@ It must:
 - reject ambiguous scope such as mixing phase and task selection in the same run
 - update `tasks.md`
 - emit short phase progress updates during runtime, using the configured agent language
+- report implementation coverage in terms of completed task IDs and referenced `AC-*` IDs
 - stop when the plan is insufficient or conflicts with the constitution
 
 ## Configuration file
