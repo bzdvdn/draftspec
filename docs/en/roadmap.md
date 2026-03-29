@@ -27,6 +27,15 @@ Before those field tests, Draftspec should prefer:
 - a minimal required artifact set over growing every feature package
 - stronger traceability and consistency without increasing prompt mass
 
+Lightweight guardrails for the next iterations:
+
+- each phase should define `always load`, `load if needed`, and `never load by default` inputs
+- `implement` should remain task-scoped by default and open deeper artifacts only when the active task requires them
+- `verify` should stay cheap-by-default and only deepen into code or wider review when explicitly requested
+- prerequisite checks should move into helper scripts and readiness checks wherever practical instead of repeated prompt-time reasoning
+- traceability should improve through stable IDs and explicit references instead of new shared summary artifacts
+- `archive` should remain a compact historical record rather than becoming a new mutable working-memory layer
+
 Before those field tests, Draftspec should avoid rushing into:
 
 - new mandatory phases

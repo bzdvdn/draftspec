@@ -154,6 +154,15 @@ Design constraints for low token usage:
 - use `plan.md` as the tasks entrypoint
 - use `tasks.md` as the implement entrypoint
 
+Lightweight guardrails should preserve strictness without broadening default context:
+
+- each phase should define `always load`, `load if needed`, and `never load by default` inputs
+- `implement` should stay task-scoped by default and only open deeper artifacts when the active task requires them
+- `verify` should stay cheap by default and only deepen into code or wider review when explicitly requested
+- helper scripts and readiness checks should be preferred over repeated prompt-time reasoning for prerequisite validation
+- traceability should improve through stable IDs and explicit references instead of new shared summary artifacts
+- `archive` should remain a compact historical record, not a new mutable working-memory layer
+
 ## Plan package
 
 Each feature plan lives under `.draftspec/plans/<slug>/`.
