@@ -47,6 +47,8 @@ Stop and ask for clarification only if:
 - Verify that open tasks do not contradict any claim that the feature is fully complete.
 - Verify acceptance-to-task coverage consistency when `tasks.md` includes an `Acceptance Coverage` section.
 - When `tasks.md` uses task IDs such as `T1.1`, reference those IDs directly in checks, findings, and conclusions.
+- Keep default verification structural and cheap by default.
+- Only deepen into broader implementation validation when the user explicitly asks for it or when a concrete contradiction cannot be resolved from tasks, plan artifacts, and focused evidence.
 - Use a simple verdict: `pass`, `concerns`, or `blocked`.
 - Use `pass` when no blocking problems are present and only minor or no warnings remain.
 - Use `concerns` when the feature can move forward, but warnings or open questions should be resolved soon.

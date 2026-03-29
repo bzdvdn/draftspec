@@ -52,6 +52,10 @@ Create `.draftspec/plans/<slug>/research.md` only when real uncertainty or exter
 - Follow the structure of `.draftspec/templates/plan.md` and `.draftspec/templates/data-model.md` when creating new files.
 - Prefer concrete implementation decisions over generic advice.
 - Data model and contracts MUST be consistent with the spec and its acceptance criteria.
+- A plan is only good enough when it preserves the feature goal, represents major acceptance-critical behavior, keeps optional artifacts justified, and makes downstream task decomposition possible without guessing.
+- If `data-model.md` is created, explicitly state which entities, invariants, or lifecycle concerns require it.
+- If `contracts/` is created, explicitly state which API or event boundary requires it.
+- If neither richer artifact is needed, prefer not creating it.
 - Use repository reality, not idealized architecture.
 - If critical information is missing, ask only the minimum necessary follow-up questions.
 

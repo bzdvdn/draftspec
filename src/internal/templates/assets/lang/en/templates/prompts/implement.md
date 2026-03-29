@@ -63,6 +63,8 @@ Do not broaden scope to solve these problems.
 - Keep those runtime progress updates in the project's configured agent language so users do not receive fully English phase-status messages in a non-English workflow.
 - Load deeper artifacts only when the current task requires them.
 - Do not violate the constitution.
+- Do not silently redesign or re-plan the feature during implementation.
+- If a selected task cannot be implemented safely from the current spec, plan, tasks, and supporting artifacts, stop and send the workflow back to spec, plan, or tasks refinement instead of inventing new scope.
 - Follow the project's preferred code comment language as recorded in `.draftspec/draftspec.yaml` and `.draftspec/constitution.md`.
 - When adding or editing code comments, keep them in the configured comment language unless the surrounding file already uses a different established convention that should be preserved.
 - Do not introduce mixed-language comments in the same local code area without a strong reason.

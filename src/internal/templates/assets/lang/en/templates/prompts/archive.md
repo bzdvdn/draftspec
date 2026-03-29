@@ -41,6 +41,7 @@ Stop and ask a minimal follow-up question if:
 - Archive under `.draftspec/archive/<slug>/<YYYY-MM-DD>/`.
 - Use copy-based archiving in MVP; do not delete active files (`specs/<slug>.md` and `plans/<slug>/`) unless explicitly instructed by the user.
 - Write `summary.md` inside the archive directory.
+- Keep `summary.md` compact. Prefer status, reason, completed scope, and notable deviations over long retrospective narration.
 - If plan artifacts exist, archive them together with the spec.
 - If `research.md` does not exist, do not invent it.
 - If status is `completed` and `tasks.md` exists, use `.draftspec/scripts/verify-task-state.sh <slug>` before archiving. Do not claim a completed archive when required tasks are still open.
