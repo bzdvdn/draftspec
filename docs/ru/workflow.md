@@ -78,6 +78,8 @@ slug: add-dark-mode
 
 Проверяет качество и согласованность одной фичи. Фаза может находить отсутствующие сценарии, слабые acceptance criteria, конфликт с конституцией, drift между spec и plan или отсутствие покрытия задачами.
 
+`inspect` обязателен перед `plan`. Планирование не должно продолжаться, пока у фичи нет сохраненного inspect report в каноническом пути.
+
 Полный inspection report должен использовать стабильную структуру:
 
 - `# Inspect Report: <slug>`
@@ -102,12 +104,12 @@ slug: add-dark-mode
 - `concerns`: workflow можно продолжать, но warnings или открытые вопросы желательно закрыть в ближайшее время
 - `blocked`: следующая фаза иначе продолжила бы работу с отсутствующей или противоречивой информацией
 
-Если inspection report нужно сохранить на диск, Draftspec должен по умолчанию использовать такие пути:
+Если inspection report сохраняется на диск, Draftspec должен использовать канонический путь:
 
-- `.draftspec/plans/<slug>/inspect.md`, если plan package уже существует
-- `.draftspec/specs/<slug>.inspect.md`, если plan package еще не существует
+- `.draftspec/specs/<slug>.inspect.md`
 
 Используйте `.draftspec/templates/inspect-report.md` как канонический шаблон, если отчет записывается в файл.
+Сохраненные inspect и verify reports должны начинаться с machine-readable metadata block с полями `report_type`, `slug`, `status`, `docs_language` и `generated_at`.
 
 Стабильные идентификаторы критериев вроде `AC-001` делают traceability легче и проще для валидации.
 
@@ -181,7 +183,19 @@ AC-001 -> T1.1, T2.1
 - `## Errors`
 - `## Warnings`
 - `## Questions`
+- `## Not Verified`
 - `## Next Step`
+
+Рекомендуемые детали отчета:
+
+- `## Scope` должен фиксировать реальный verification mode, например `default` или `deep`
+- `## Scope` должен перечислять конкретные surfaces, которые реально проверялись
+- `## Verdict` должен включать `archive_readiness`
+- `## Verdict` должен включать однострочное summary, объясняющее, почему verdict обоснован
+- `## Checks` должен включать `task_state`
+- `## Checks` должен включать `acceptance_evidence` для тех `AC-*`, которые действительно подтверждены
+- `## Checks` должен включать `implementation_alignment`, привязанный к конкретной проверенной surface
+- `## Not Verified` должен перечислять material claims или surfaces, которые сознательно не проверялись
 
 `Verdict` должен быть одним из значений:
 
@@ -195,9 +209,15 @@ AC-001 -> T1.1, T2.1
 - `concerns`: по workflow можно двигаться дальше, но warnings или открытые вопросы желательно закрыть в ближайшее время
 - `blocked`: архивирование или заявление о завершенности иначе опирались бы на противоречивое состояние реализации или незавершенную обязательную работу
 
+Если evidence частичны, но явного противоречия не найдено, предпочитайте `concerns`, а не `pass`.
+
 Если verification report нужно сохранить на диск, Draftspec должен по умолчанию использовать `.draftspec/plans/<slug>/verify.md`.
 
 Используйте `.draftspec/templates/verify-report.md` как канонический шаблон, если отчет записывается в файл.
+
+Сохраненные verify reports должны начинаться с того же machine-readable metadata block, что и inspect reports: `report_type`, `slug`, `status`, `docs_language` и `generated_at`.
+
+Если доступен `.draftspec/scripts/check-verify-ready.sh <slug>`, Draftspec должен предпочитать его как дешевую readiness-проверку перед более глубокой verification.
 
 Используйте `.draftspec/scripts/verify-task-state.sh <slug>` как самый дешевый helper первого прохода, когда нужно только подтвердить состояние задач.
 

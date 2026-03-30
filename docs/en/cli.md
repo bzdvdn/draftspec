@@ -91,6 +91,54 @@ Checks workspace health.
 
 Use `--json` for machine-readable output in automation and CI.
 
+### `draftspec feature <slug> [path]`
+
+Shows a detailed workflow view for one feature.
+
+The text view includes:
+
+- current phase and `ready_for`
+- inspect and verify status when reports exist
+- task progress when `tasks.md` exists
+- grouped workflow findings
+- a short `focus` hint for the next likely action
+
+Use `--json` to return structured state plus feature-local findings.
+
+### `draftspec feature repair <slug> [path]`
+
+Repairs safe feature-local Draftspec issues.
+
+Current repair scope includes legacy inspect report migration from:
+
+- `.draftspec/plans/<slug>/inspect.md`
+
+to the canonical path:
+
+- `.draftspec/specs/<slug>.inspect.md`
+
+Use `--dry-run` to preview changes and `--json` for structured output.
+
+### `draftspec features [path]`
+
+Lists workflow status across all discovered features.
+
+The text view summarizes:
+
+- phase and `ready_for`
+- inspect and verify verdicts
+- task progress
+- grouped issue counts
+- artifact presence
+
+Use `--json` for machine-readable output.
+
+### `draftspec migrate [path]`
+
+Runs safe project-wide Draftspec migrations.
+
+Current migration scope focuses on canonicalizing legacy inspect report paths across the project.
+
 ### `draftspec list-specs [path]`
 
 Lists spec slugs from `.draftspec/specs/`.

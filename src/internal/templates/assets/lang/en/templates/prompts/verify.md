@@ -55,20 +55,25 @@ Stop and ask for clarification only if:
 - Prefer helper script output over reading helper script source.
 - Do not read `/.draftspec/scripts/*` by default unless you are debugging the script, working on Draftspec itself, or the user explicitly asks to inspect script logic.
 - Prefer confirming concrete implementation claims over broad subjective review.
+- Treat verify as an evidence log, not a reassurance ritual.
 - Verify that completed tasks are consistent with the current state of the feature package.
 - Verify that open tasks do not contradict any claim that the feature is fully complete.
 - Verify acceptance-to-task coverage consistency when `tasks.md` includes an `Acceptance Coverage` section.
 - When `tasks.md` uses task IDs such as `T1.1`, reference those IDs directly in checks, findings, and conclusions.
+- Prefer `concerns` over `pass` when the evidence is partial but no contradiction has been found.
 - Keep default verification structural and cheap by default.
 - Only deepen into broader implementation validation when the user explicitly asks for it or when a concrete contradiction cannot be resolved from tasks, plan artifacts, and focused evidence.
 - Use a simple verdict: `pass`, `concerns`, or `blocked`.
 - Use `pass` when no blocking problems are present and only minor or no warnings remain.
 - Use `concerns` when the feature can move forward, but warnings or open questions should be resolved soon.
 - Use `blocked` when missing task completion or contradictory implementation state would make archive or completion claims unsafe.
+- Do not use `pass` unless the completed task state is confirmed, no blocking contradiction remains, and every acceptance or implementation claim you mention is backed by inspected evidence.
 - Keep the verification output in the project's configured documentation language when writing it to disk.
 - Use `/.draftspec/scripts/verify-task-state.* <slug>` as the fallback first pass only when `check-verify-ready.*` is unavailable.
 - Use `.draftspec/templates/verify-report.md` as the canonical template when writing the report to disk.
+- When writing the report to disk, include a machine-readable metadata block at the top with `report_type`, `slug`, `status`, `docs_language`, and `generated_at`.
 - Use this report structure:
+  - YAML-style metadata block at the top
   - `# Verify Report: <slug>`
   - `## Scope`
   - `## Verdict`
@@ -76,11 +81,25 @@ Stop and ask for clarification only if:
   - `## Errors`
   - `## Warnings`
   - `## Questions`
+  - `## Not Verified`
   - `## Next Step`
+- In `## Scope`, record the actual verification mode and the surfaces you really inspected.
+- In `## Verdict`, include `archive_readiness` and a one-line summary that explains why the verdict is justified.
+- In `## Checks`, explicitly cover:
+  - `task_state` with completed/open counts
+  - `acceptance_evidence` for the `AC-*` items you actually confirmed
+  - `implementation_alignment` with the concrete surface inspected
+- In `## Not Verified`, list any material claims or surfaces you intentionally did not check. Use `none` only when no material gaps remain inside the chosen verification scope.
+- Keep claims scoped. If you only checked task state plus one endpoint or file path, say that directly instead of implying full feature validation.
+- If verification discovers a workflow gap, send the feature back to the narrowest earlier phase that can honestly fix it:
+  - `implement` for missing or contradictory implementation
+  - `tasks` for missing, misleading, or incomplete task decomposition
+  - `plan` when the implementation cannot be judged honestly because the design intent is underspecified
 
 ## Output expectations
 
 - Output the report to the conversation unless the user asks to persist it
 - If persisted without an explicit path, use `.draftspec/plans/<slug>/verify.md`
 - Summarize the verdict, completed checks, remaining concerns, and whether the feature is safe to archive
-- In `## Checks`, explicitly cover task completion and implementation alignment where inspected
+- In `## Checks`, explicitly cover task completion, acceptance evidence, and implementation alignment where inspected
+- Negative examples: do not return `pass` from checkbox state alone, do not imply full-feature verification from one inspected file, and do not call archive safe when `Not Verified` still lists material gaps

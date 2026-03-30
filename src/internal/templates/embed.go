@@ -121,6 +121,7 @@ func shellScriptDefinitions(shell string) []struct {
 		mode = 0o644
 	}
 	names := []string{
+		"run-draftspec",
 		"inspect-spec",
 		"check-constitution",
 		"check-spec-ready",
@@ -211,6 +212,7 @@ func scriptReplacements(shell string) map[string]string {
 		ext = ".ps1"
 	}
 	names := []string{
+		"run-draftspec",
 		"inspect-spec",
 		"check-constitution",
 		"check-spec-ready",

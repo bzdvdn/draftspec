@@ -31,6 +31,44 @@ func TestCheckHealthyWorkspace(t *testing.T) {
 	}
 }
 
+func TestCheckErrorsWhenPlanSkipsMandatoryInspect(t *testing.T) {
+	root := t.TempDir()
+
+	_, err := project.Initialize(root, project.InitOptions{InitGit: false, DefaultLang: "en", Shell: "sh"})
+	if err != nil {
+		t.Fatalf("Initialize returned error: %v", err)
+	}
+
+	specPath := filepath.Join(root, ".draftspec", "specs", "demo.md")
+	if err := os.WriteFile(specPath, []byte("# Demo\n\n## Goal\nx\n\n## Requirements\n- RQ-001 x\n\n## Acceptance Criteria\n### AC-001 Demo\n- **Given** x\n- **When** y\n- **Then** z\n"), 0o644); err != nil {
+		t.Fatalf("WriteFile(spec) returned error: %v", err)
+	}
+
+	planDir := filepath.Join(root, ".draftspec", "plans", "demo")
+	if err := os.MkdirAll(planDir, 0o755); err != nil {
+		t.Fatalf("MkdirAll(planDir) returned error: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(planDir, "plan.md"), []byte("# Demo Plan\n\n- DEC-001 x\n"), 0o644); err != nil {
+		t.Fatalf("WriteFile(plan) returned error: %v", err)
+	}
+
+	result, err := Check(root)
+	if err != nil {
+		t.Fatalf("Check returned error: %v", err)
+	}
+
+	var found bool
+	for _, finding := range result.Findings {
+		if finding.Level == "error" && strings.Contains(finding.Message, "mandatory inspect report") {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Fatalf("expected missing inspect error, got %+v", result.Findings)
+	}
+}
+
 func TestCheckWarnsAboutOrphanedAgentArtifact(t *testing.T) {
 	root := t.TempDir()
 
@@ -150,5 +188,32 @@ func TestCheckErrorsOnUnsupportedShell(t *testing.T) {
 	}
 	if !found {
 		t.Fatalf("expected unsupported shell error, got %+v", result.Findings)
+	}
+}
+
+func TestCheckWarnsWhenDraftspecEntrypointCannotBeResolved(t *testing.T) {
+	root := t.TempDir()
+	t.Setenv("PATH", "")
+	t.Setenv("DRAFTSPEC_BIN", "")
+
+	_, err := project.Initialize(root, project.InitOptions{InitGit: false, DefaultLang: "en", Shell: "sh"})
+	if err != nil {
+		t.Fatalf("Initialize returned error: %v", err)
+	}
+
+	result, err := Check(root)
+	if err != nil {
+		t.Fatalf("Check returned error: %v", err)
+	}
+
+	var foundWarning bool
+	for _, finding := range result.Findings {
+		if finding.Level == "warning" && strings.Contains(finding.Message, "set DRAFTSPEC_BIN or add draftspec to PATH") {
+			foundWarning = true
+			break
+		}
+	}
+	if !foundWarning {
+		t.Fatalf("expected missing entrypoint warning, got %+v", result.Findings)
 	}
 }

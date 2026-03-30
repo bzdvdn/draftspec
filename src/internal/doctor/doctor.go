@@ -3,11 +3,15 @@ package doctor
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"runtime"
 	"sort"
+	"strings"
 
 	"draftspec/src/internal/agents"
 	"draftspec/src/internal/config"
+	"draftspec/src/internal/workflow"
 )
 
 type Finding struct {
@@ -80,6 +84,7 @@ func Check(root string) (Result, error) {
 		filepath.Join(templatesDir, cfg.Templates.ImplementPrompt),
 		filepath.Join(templatesDir, cfg.Templates.ArchivePrompt),
 		filepath.Join(templatesDir, cfg.Templates.VerifyPrompt),
+		filepath.Join(scriptsDir, cfg.Scripts.RunDraftspec),
 		filepath.Join(scriptsDir, cfg.Scripts.CheckConstitution),
 		filepath.Join(scriptsDir, cfg.Scripts.CheckSpecReady),
 		filepath.Join(scriptsDir, cfg.Scripts.CheckInspectReady),
@@ -103,6 +108,9 @@ func Check(root string) (Result, error) {
 	}
 	if _, err := config.NormalizeShell(cfg.Runtime.Shell); err != nil {
 		findings = append(findings, Finding{Level: "error", Message: err.Error()})
+	}
+	if warning := draftspecEntrypointWarning(root); warning != "" {
+		findings = append(findings, Finding{Level: "warning", Message: warning})
 	}
 
 	enabledTargets := map[string]struct{}{}
@@ -131,6 +139,15 @@ func Check(root string) (Result, error) {
 			if _, err := os.Stat(fullPath); err == nil {
 				findings = append(findings, Finding{Level: "warning", Message: fmt.Sprintf("orphaned agent artifact for disabled target %s: %s", target, fullPath)})
 			}
+		}
+	}
+
+	workflowFindings, err := workflow.ValidateProject(root)
+	if err != nil {
+		findings = append(findings, Finding{Level: "error", Message: err.Error()})
+	} else {
+		for _, finding := range workflowFindings {
+			findings = append(findings, Finding{Level: finding.Level, Message: finding.Message})
 		}
 	}
 
@@ -189,4 +206,39 @@ func severityRank(level string) int {
 	default:
 		return 3
 	}
+}
+
+func draftspecEntrypointWarning(root string) string {
+	configured := strings.TrimSpace(os.Getenv("DRAFTSPEC_BIN"))
+	if configured != "" {
+		if _, err := resolveDraftspecBinary(root, configured); err != nil {
+			return fmt.Sprintf("DRAFTSPEC_BIN could not be resolved: %s", configured)
+		}
+		return ""
+	}
+	if _, err := exec.LookPath("draftspec"); err != nil {
+		return "draftspec CLI entrypoint not found; set DRAFTSPEC_BIN or add draftspec to PATH"
+	}
+	return ""
+}
+
+func resolveDraftspecBinary(root, value string) (string, error) {
+	if strings.ContainsAny(value, `/\`) || filepath.IsAbs(value) {
+		candidate := value
+		if !filepath.IsAbs(candidate) {
+			candidate = filepath.Join(root, candidate)
+		}
+		info, err := os.Stat(candidate)
+		if err != nil {
+			return "", err
+		}
+		if info.IsDir() {
+			return "", fmt.Errorf("configured path is a directory")
+		}
+		if runtime.GOOS != "windows" && info.Mode()&0o111 == 0 {
+			return "", fmt.Errorf("configured path is not executable")
+		}
+		return candidate, nil
+	}
+	return exec.LookPath(value)
 }

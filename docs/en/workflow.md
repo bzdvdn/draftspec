@@ -78,6 +78,8 @@ If the request is ambiguous, combines multiple features, or asks to derive one s
 
 Checks consistency and quality for a single feature. It can flag missing scenarios, weak acceptance criteria, constitutional conflicts, plan drift, or missing task coverage.
 
+`inspect` is mandatory before `plan`. Planning should not proceed until the feature has a persisted inspect report at the canonical path.
+
 A full inspection report should use a stable structure:
 
 - `# Inspect Report: <slug>`
@@ -102,12 +104,12 @@ Suggested semantics:
 - `concerns`: the workflow can continue, but warnings or open questions should be resolved soon
 - `blocked`: the next workflow step would otherwise proceed on missing or contradictory information
 
-When an inspection report should be persisted to disk, Draftspec should prefer these default paths:
+When an inspection report is persisted to disk, Draftspec should use this canonical path:
 
-- `.draftspec/plans/<slug>/inspect.md` when the plan package already exists
-- `.draftspec/specs/<slug>.inspect.md` when no plan package exists yet
+- `.draftspec/specs/<slug>.inspect.md`
 
 Use `.draftspec/templates/inspect-report.md` as the canonical template when the report is written to disk.
+Persisted inspect and verify reports should start with a machine-readable metadata block containing `report_type`, `slug`, `status`, `docs_language`, and `generated_at`.
 
 Stable acceptance IDs such as `AC-001` make traceability lighter and easier to validate.
 
@@ -181,7 +183,19 @@ A full verification report should use a stable structure:
 - `## Errors`
 - `## Warnings`
 - `## Questions`
+- `## Not Verified`
 - `## Next Step`
+
+Recommended report details:
+
+- `## Scope` should record the actual verification mode such as `default` or `deep`
+- `## Scope` should list the concrete surfaces that were inspected
+- `## Verdict` should include `archive_readiness`
+- `## Verdict` should include a one-line summary of why the verdict is justified
+- `## Checks` should include `task_state`
+- `## Checks` should include `acceptance_evidence` for the `AC-*` items actually confirmed
+- `## Checks` should include `implementation_alignment` tied to the concrete surface inspected
+- `## Not Verified` should list material claims or surfaces that were intentionally not checked
 
 `Verdict` should be one of:
 
@@ -195,9 +209,15 @@ Suggested semantics:
 - `concerns`: the feature can move forward, but warnings or open questions should be resolved soon
 - `blocked`: archive or completion claims would otherwise proceed on contradictory implementation state or unfinished required work
 
+Use `concerns` rather than `pass` when the evidence is partial but no concrete contradiction has been found.
+
 When a verification report should be persisted to disk, Draftspec should prefer `.draftspec/plans/<slug>/verify.md`.
 
 Use `.draftspec/templates/verify-report.md` as the canonical template when the report is written to disk.
+
+Persisted verify reports should start with the same machine-readable metadata block used by inspect reports: `report_type`, `slug`, `status`, `docs_language`, and `generated_at`.
+
+When available, Draftspec should prefer `.draftspec/scripts/check-verify-ready.sh <slug>` as the cheap readiness pass before deeper verification.
 
 Use `.draftspec/scripts/verify-task-state.sh <slug>` as the cheapest first-pass helper when you only need task-state confirmation.
 

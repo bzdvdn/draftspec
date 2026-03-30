@@ -14,13 +14,16 @@ Workflow commands:
 - `/draftspec.plan`: create or patch `.draftspec/plans/<slug>/plan.md`, `data-model.md`, and `contracts/`
 - `/draftspec.tasks`: create or patch `.draftspec/plans/<slug>/tasks.md`
 - `/draftspec.implement`: execute unfinished tasks
+- `/draftspec.verify`: verify one implemented feature package before archive
 - `/draftspec.archive`: archive one feature package under `.draftspec/archive/`
 
 Read discipline:
-- Follow `constitution -> spec -> inspect -> plan -> tasks -> implement -> archive`
+- Follow `constitution -> spec -> inspect -> plan -> tasks -> implement -> verify -> archive`
 - Do not skip prerequisites
 - Load only the current feature slug by default
 - Prefer the readiness scripts for each phase before reading deeper artifacts
+- When you need the Draftspec CLI itself, prefer `./.draftspec/scripts/run-draftspec.sh`; it resolves `DRAFTSPEC_BIN` first and falls back to `draftspec` from `PATH`
+- Persist the required inspect report at `.draftspec/specs/<slug>.inspect.md` before planning
 - `/draftspec.spec` supports `--name`, optional `--slug`, and optional `--branch`; for chat-based input, the feature description may arrive in the next message
 - For file-based `/draftspec.spec` input, prefer a top-of-file `name:` and optional `slug:` before falling back to the filename
 - Allow an explicit `--branch <name>` override for repository-specific branch naming conventions such as Jira keys

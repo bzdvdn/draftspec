@@ -39,7 +39,6 @@ Lightweight guardrails for the next iterations:
 Before those field tests, Draftspec should avoid rushing into:
 
 - new mandatory phases
-- mandatory persisted reports for every feature
 - wider default inspect/verify context
 - automation that makes the workflow heavier before its value is proven
 
@@ -49,15 +48,17 @@ Before those field tests, Draftspec should avoid rushing into:
 
 Strengthen `inspect` as the central quality layer.
 
+Status: the mandatory persisted inspect report, shared report parsing, and core semantic validation are now in place.
+
 Release filter: strengthen `inspect` only in ways that keep it cheap in context terms and prevent it from becoming a mandatory heavy review engine.
 
 ### Planned work
 
-- define and refine an explicit inspection report structure and verdict semantics
-- improve checks for `constitution <-> spec`
-- improve checks for `spec <-> plan`
-- improve checks for `plan <-> tasks`
-- strengthen acceptance-to-task traceability checks
+- deepen semantic checks for `constitution <-> spec`
+- deepen semantic checks for `spec <-> plan`
+- deepen semantic checks for `plan <-> tasks`
+- improve how inspect findings are presented in CLI and docs
+- keep strengthening acceptance-to-task traceability checks
 
 ### Anti-Bloat Notes
 
@@ -70,7 +71,6 @@ Safe direction:
 
 Use caution with:
 
-- making persisted inspect reports mandatory for every feature
 - reading implementation code by default during inspect
 - turning inspect into a broad review engine
 - pulling `data-model`, `contracts`, and code into every inspect run by default
@@ -85,15 +85,16 @@ If `inspect` is strong, every downstream phase gets better with less wasted impl
 
 Add a lightweight post-implementation verification layer.
 
-Status: lightweight contract, prompt, readiness script, and report template are now in place. The remaining work is to deepen checks without expanding default context.
+Status: lightweight contract, prompt, readiness script, report template, evidence-oriented report shape, and token-safe validator checks are now in place. The remaining work is to deepen checks and improve presentation without expanding default context.
 
-Release filter: `verify` should remain a lightweight optional safety layer, not a new heavy mandatory phase for every feature.
+Release filter: `verify` should remain a lightweight safety layer, not a new heavy review or QA engine.
 
 ### Planned work
 
-- introduce a small `verify` or review-oriented workflow after `implement`
-- check whether completed tasks match implementation state
-- check whether implementation still matches spec and plan intent
+- deepen checks for whether completed tasks match implementation state
+- deepen checks for whether implementation still matches spec and plan intent
+- improve verify report evidence quality and archive-readiness consistency
+- improve verify findings and status presentation in CLI
 - ensure archived feature state and task state remain consistent where verification depends on them
 
 ### Anti-Bloat Notes
@@ -102,14 +103,13 @@ Safe direction:
 
 - task-state verification helpers
 - archive/task consistency checks
-  Status: coarse helper-based sync checks are now in place for `verify`.
-- optional persisted verify reports
+- evidence-oriented verify reports without broadening default reads
+  Status: coarse helper-based sync checks and basic report semantics are now in place for `verify`.
 
 Use caution with:
 
 - reading code by default during verify
 - turning verify into a heavy review or QA engine
-- requiring verify artifacts before every downstream action
 
 ### Why this matters
 

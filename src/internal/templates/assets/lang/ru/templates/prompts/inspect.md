@@ -9,7 +9,7 @@
 ## Phase Contract
 
 Inputs: смотрите Load First и Load Only If Needed.
-Outputs: отчет проверки в чате или файле по запросу.
+Outputs: сохраненный inspect report и компактное резюме в чате.
 Stop if: смотрите Stop Conditions.
 
 ## Load First
@@ -77,7 +77,9 @@ Stop if: смотрите Stop Conditions.
 - Предпочитайте конкретные находки вместо общих советов.
 - По умолчанию делайте compact report в разговоре: всегда включайте `Verdict`, включайте `Errors`, `Warnings` и `Next Step`, если они не пусты, а `Questions`, `Suggestions` и `Traceability` — только когда они действительно добавляют сигнал.
 - Полный sectioned report используйте только если пользователь явно просит полный отчет или если отчет сохраняется в файл.
+- Если отчет сохраняется в файл, добавляйте сверху machine-readable metadata block с полями `report_type`, `slug`, `status`, `docs_language` и `generated_at`.
 - Используйте такую структуру отчета:
+  - YAML-подобный metadata block в начале
   - `# Inspect Report: <slug>`
   - `## Scope`
   - `## Verdict`
@@ -97,8 +99,8 @@ Stop if: смотрите Stop Conditions.
 
 ## Output expectations
 
-- Выведите отчёт в разговор, если пользователь не просит сохранить его в файл.
-- Если пользователь просит сохранить отчет, но не задает путь явно, используйте `.draftspec/plans/<slug>/inspect.md`, когда plan package уже существует. В противном случае используйте `.draftspec/specs/<slug>.inspect.md`.
+- По умолчанию сохраняйте отчет в `.draftspec/specs/<slug>.inspect.md`, если пользователь явно не просит другой путь.
 - Если пользователь задал явный путь, используйте именно его.
+- Также кратко суммируйте verdict в разговоре.
 - В разговоре по умолчанию предпочитайте compact report только с непустыми секциями.
 - Кратко суммируйте ошибки, предупреждения, открытые вопросы, предложения и итоговый verdict.

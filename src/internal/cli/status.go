@@ -38,10 +38,18 @@ func newStatusCmd() *cobra.Command {
 			fmt.Fprintf(cmd.OutOrStdout(), "slug: %s\n", result.Slug)
 			fmt.Fprintf(cmd.OutOrStdout(), "phase: %s\n", result.Phase)
 			fmt.Fprintf(cmd.OutOrStdout(), "spec_exists: %t\n", result.SpecExists)
+			fmt.Fprintf(cmd.OutOrStdout(), "inspect_exists: %t\n", result.InspectExists)
 			fmt.Fprintf(cmd.OutOrStdout(), "plan_exists: %t\n", result.PlanExists)
 			fmt.Fprintf(cmd.OutOrStdout(), "tasks_exists: %t\n", result.TasksExists)
+			fmt.Fprintf(cmd.OutOrStdout(), "verify_exists: %t\n", result.VerifyExists)
 			if result.TasksExists {
 				fmt.Fprintf(cmd.OutOrStdout(), "tasks: total=%d completed=%d open=%d\n", result.TasksTotal, result.TasksCompleted, result.TasksOpen)
+			}
+			if result.InspectPath != "" {
+				fmt.Fprintf(cmd.OutOrStdout(), "inspect_path: %s\n", result.InspectPath)
+			}
+			if result.VerifyPath != "" {
+				fmt.Fprintf(cmd.OutOrStdout(), "verify_path: %s\n", result.VerifyPath)
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "archived: %t\n", result.Archived)
 			if result.ReadyFor != "" {

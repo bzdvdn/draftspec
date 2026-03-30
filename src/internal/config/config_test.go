@@ -26,6 +26,9 @@ func TestDefaultAppliesExpectedDefaults(t *testing.T) {
 	if cfg.Scripts.CheckInspectReady != "check-inspect-ready.sh" {
 		t.Fatalf("CheckInspectReady = %q, want %q", cfg.Scripts.CheckInspectReady, "check-inspect-ready.sh")
 	}
+	if cfg.Scripts.RunDraftspec != "run-draftspec.sh" {
+		t.Fatalf("RunDraftspec = %q, want %q", cfg.Scripts.RunDraftspec, "run-draftspec.sh")
+	}
 	if cfg.Scripts.VerifyTaskState != "verify-task-state.sh" {
 		t.Fatalf("VerifyTaskState = %q, want %q", cfg.Scripts.VerifyTaskState, "verify-task-state.sh")
 	}
@@ -93,6 +96,9 @@ func TestScriptDefaultsForShell(t *testing.T) {
 	ps := ScriptDefaultsForShell("powershell")
 	if ps.CheckSpecReady != "check-spec-ready.ps1" {
 		t.Fatalf("CheckSpecReady = %q, want check-spec-ready.ps1", ps.CheckSpecReady)
+	}
+	if ps.RunDraftspec != "run-draftspec.ps1" {
+		t.Fatalf("RunDraftspec = %q, want run-draftspec.ps1", ps.RunDraftspec)
 	}
 	if ps.VerifyTaskState != "verify-task-state.ps1" {
 		t.Fatalf("VerifyTaskState = %q, want verify-task-state.ps1", ps.VerifyTaskState)

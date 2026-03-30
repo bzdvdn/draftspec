@@ -128,15 +128,16 @@ type commandSpec struct {
 
 func commandSpecs(shell string) []commandSpec {
 	normalizedShell := normalizeShell(shell)
+	launcher := scriptPath("run-draftspec", normalizedShell)
 	return []commandSpec{
-		{Name: "constitution", Description: "Create or update the project constitution", PromptPath: ".draftspec/templates/prompts/constitution.md", Extras: []string{scriptPath("check-constitution", normalizedShell)}},
-		{Name: "spec", Description: "Create or update one feature spec", PromptPath: ".draftspec/templates/prompts/spec.md", Extras: []string{scriptPath("check-spec-ready", normalizedShell)}},
-		{Name: "inspect", Description: "Inspect one feature for consistency and quality", PromptPath: ".draftspec/templates/prompts/inspect.md", Extras: []string{scriptPath("check-inspect-ready", normalizedShell), scriptPath("inspect-spec", normalizedShell)}},
-		{Name: "plan", Description: "Create or update one feature plan package", PromptPath: ".draftspec/templates/prompts/plan.md", Extras: []string{scriptPath("check-plan-ready", normalizedShell)}},
-		{Name: "tasks", Description: "Create or update tasks for one feature", PromptPath: ".draftspec/templates/prompts/tasks.md", Extras: []string{scriptPath("check-tasks-ready", normalizedShell)}},
-		{Name: "implement", Description: "Implement one feature from tasks", PromptPath: ".draftspec/templates/prompts/implement.md", Extras: []string{scriptPath("check-implement-ready", normalizedShell), scriptPath("list-open-tasks", normalizedShell)}},
-		{Name: "verify", Description: "Verify one implemented feature package", PromptPath: ".draftspec/templates/prompts/verify.md", Extras: []string{scriptPath("check-verify-ready", normalizedShell), scriptPath("verify-task-state", normalizedShell)}},
-		{Name: "archive", Description: "Archive one feature package", PromptPath: ".draftspec/templates/prompts/archive.md", Extras: []string{scriptPath("check-archive-ready", normalizedShell)}},
+		{Name: "constitution", Description: "Create or update the project constitution", PromptPath: ".draftspec/templates/prompts/constitution.md", Extras: []string{launcher, scriptPath("check-constitution", normalizedShell)}},
+		{Name: "spec", Description: "Create or update one feature spec", PromptPath: ".draftspec/templates/prompts/spec.md", Extras: []string{launcher, scriptPath("check-spec-ready", normalizedShell)}},
+		{Name: "inspect", Description: "Inspect one feature for consistency and quality", PromptPath: ".draftspec/templates/prompts/inspect.md", Extras: []string{launcher, scriptPath("check-inspect-ready", normalizedShell), scriptPath("inspect-spec", normalizedShell)}},
+		{Name: "plan", Description: "Create or update one feature plan package", PromptPath: ".draftspec/templates/prompts/plan.md", Extras: []string{launcher, scriptPath("check-plan-ready", normalizedShell)}},
+		{Name: "tasks", Description: "Create or update tasks for one feature", PromptPath: ".draftspec/templates/prompts/tasks.md", Extras: []string{launcher, scriptPath("check-tasks-ready", normalizedShell)}},
+		{Name: "implement", Description: "Implement one feature from tasks", PromptPath: ".draftspec/templates/prompts/implement.md", Extras: []string{launcher, scriptPath("check-implement-ready", normalizedShell), scriptPath("list-open-tasks", normalizedShell)}},
+		{Name: "verify", Description: "Verify one implemented feature package", PromptPath: ".draftspec/templates/prompts/verify.md", Extras: []string{launcher, scriptPath("check-verify-ready", normalizedShell), scriptPath("verify-task-state", normalizedShell)}},
+		{Name: "archive", Description: "Archive one feature package", PromptPath: ".draftspec/templates/prompts/archive.md", Extras: []string{launcher, scriptPath("check-archive-ready", normalizedShell)}},
 	}
 }
 

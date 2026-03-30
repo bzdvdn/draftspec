@@ -2,17 +2,6 @@
 
 set -eu
 
-SPEC_SLUG="${1:-}"
-TASKS_FILE=".draftspec/plans/$SPEC_SLUG/tasks.md"
+SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 
-if [ -z "$SPEC_SLUG" ]; then
-  echo "usage: list-open-tasks.sh <spec-slug>" >&2
-  exit 1
-fi
-
-if [ ! -f "$TASKS_FILE" ]; then
-  echo "tasks file not found: $TASKS_FILE" >&2
-  exit 1
-fi
-
-grep '^\- \[ \]' "$TASKS_FILE" || true
+exec "$SCRIPT_DIR/run-draftspec.sh" __internal list-open-tasks --root . "$@"

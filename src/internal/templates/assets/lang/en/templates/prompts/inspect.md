@@ -9,7 +9,7 @@ Produce a focused inspection report for one feature without expanding scope.
 ## Phase Contract
 
 Inputs: see Load First and Load Only If Needed.
-Outputs: inspection report in conversation or file when requested.
+Outputs: persisted inspection report plus a compact conversation summary.
 Stop if: see Stop Conditions.
 
 ## Load First
@@ -77,7 +77,9 @@ Stop and ask a minimal follow-up question only if:
 - Prefer concrete findings over generic advice.
 - Default to a compact report in conversation output: always include `Verdict`, include `Errors`, `Warnings`, and `Next Step` when non-empty, and include `Questions`, `Suggestions`, or `Traceability` only when they add real signal.
 - Produce the full sectioned report only when the user explicitly asks for a full report or when the report is being persisted to a file.
+- When writing the report to disk, include a machine-readable metadata block at the top with `report_type`, `slug`, `status`, `docs_language`, and `generated_at`.
 - Use this report structure:
+  - YAML-style metadata block at the top
   - `# Inspect Report: <slug>`
   - `## Scope`
   - `## Verdict`
@@ -97,8 +99,8 @@ Stop and ask a minimal follow-up question only if:
 
 ## Output expectations
 
-- Output the report to the conversation unless the user asks to persist it.
-- If the user asks to persist the report without specifying a file path, use `.draftspec/plans/<slug>/inspect.md` when the plan package exists. Otherwise use `.draftspec/specs/<slug>.inspect.md`.
+- Persist the report by default to `.draftspec/specs/<slug>.inspect.md` unless the user explicitly requests another path.
 - If the user provides an explicit file path, use that path.
+- Also summarize the verdict in the conversation.
 - In default conversation mode, prefer a compact report with only non-empty sections.
 - Summarize errors, warnings, open questions, suggestions, and the final verdict.

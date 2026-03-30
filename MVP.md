@@ -243,6 +243,7 @@ Inputs:
 Outputs:
 
 - a focused inspection report for one feature
+- a persisted inspect report at `.draftspec/specs/<slug>.inspect.md` before planning proceeds
 - compact by default in conversation output, with full sectioned output only when explicitly requested or persisted to a file
 - explicit Given/When/Then acceptance criteria, with `Given`, `When`, and `Then` kept canonical across documentation languages and inspect treating missing G/W/T as an error
 - explicit cheap checks for `constitution <-> spec`, `spec <-> plan`, and `plan <-> tasks` when those downstream artifacts exist
@@ -279,6 +280,30 @@ Outputs:
 - a cheap current-state summary for one feature
 - machine-readable JSON via `draftspec status <slug> --json`
 - task counts when `tasks.md` exists, including total, completed, and open items
+
+## Repair and migration workflow
+
+`feature repair` and `migrate` are CLI-driven.
+
+Safe repair scope for the MVP:
+
+- migrate legacy inspect reports from `.draftspec/plans/<slug>/inspect.md` to `.draftspec/specs/<slug>.inspect.md`
+- remove duplicate legacy inspect reports when the canonical and legacy copies are byte-identical
+- stop with a warning instead of mutating files when canonical and legacy copies differ
+
+## CLI entrypoint contract
+
+Generated workspaces should include a lightweight launcher script under `.draftspec/scripts/`:
+
+- `run-draftspec.sh` for `sh`
+- `run-draftspec.ps1` for `powershell`
+
+Resolution order:
+
+1. `DRAFTSPEC_BIN`
+2. `draftspec` from `PATH`
+
+This launcher is the stable way for generated agent artifacts to invoke the Draftspec CLI without hardcoding absolute install paths.
 
 ## Spec workflow
 

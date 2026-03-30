@@ -40,6 +40,7 @@ func TestInitializeCreatesWorkspaceAndAgentTargets(t *testing.T) {
 	required := []string{
 		filepath.Join(root, ".draftspec", "draftspec.yaml"),
 		filepath.Join(root, ".draftspec", "constitution.md"),
+		filepath.Join(root, ".draftspec", "scripts", "run-draftspec.sh"),
 		filepath.Join(root, "AGENTS.md"),
 		filepath.Join(root, ".claude", "commands", "draftspec.inspect.md"),
 		filepath.Join(root, ".cursor", "rules", "draftspec-inspect.mdc"),
@@ -140,6 +141,7 @@ func TestInitializeWithPowerShellGeneratesPS1Scripts(t *testing.T) {
 	}
 
 	required := []string{
+		filepath.Join(root, ".draftspec", "scripts", "run-draftspec.ps1"),
 		filepath.Join(root, ".draftspec", "scripts", "check-spec-ready.ps1"),
 		filepath.Join(root, ".draftspec", "scripts", "verify-task-state.ps1"),
 	}
@@ -169,22 +171,22 @@ func TestInitializeGeneratesReadinessScriptsWithTraceabilityChecks(t *testing.T)
 		{
 			path: filepath.Join(root, ".draftspec", "scripts", "check-spec-ready.sh"),
 			want: []string{
-				"spec template includes requirement IDs",
-				"spec template includes acceptance IDs",
+				"run-draftspec.sh",
+				"__internal check-spec-ready --root .",
 			},
 		},
 		{
 			path: filepath.Join(root, ".draftspec", "scripts", "check-implement-ready.sh"),
 			want: []string{
-				"tasks include acceptance coverage section",
-				"tasks include AC-to-task coverage lines",
+				"run-draftspec.sh",
+				"__internal check-implement-ready --root .",
 			},
 		},
 		{
 			path: filepath.Join(root, ".draftspec", "scripts", "check-verify-ready.sh"),
 			want: []string{
-				"./.draftspec/scripts/inspect-spec.sh",
-				"./.draftspec/scripts/verify-task-state.sh",
+				"run-draftspec.sh",
+				"__internal check-verify-ready --root .",
 			},
 		},
 	}
@@ -198,6 +200,31 @@ func TestInitializeGeneratesReadinessScriptsWithTraceabilityChecks(t *testing.T)
 			if !strings.Contains(string(content), want) {
 				t.Fatalf("expected %s to contain %q", tc.path, want)
 			}
+		}
+	}
+}
+
+func TestInitializeGeneratesDraftspecLauncher(t *testing.T) {
+	root := t.TempDir()
+
+	_, err := Initialize(root, InitOptions{
+		InitGit:     false,
+		DefaultLang: "en",
+		Shell:       "sh",
+	})
+	if err != nil {
+		t.Fatalf("Initialize returned error: %v", err)
+	}
+
+	launcherPath := filepath.Join(root, ".draftspec", "scripts", "run-draftspec.sh")
+	content, err := os.ReadFile(launcherPath)
+	if err != nil {
+		t.Fatalf("ReadFile(%s) returned error: %v", launcherPath, err)
+	}
+
+	for _, want := range []string{"DRAFTSPEC_BIN", "draftspec CLI not found", "add draftspec to PATH"} {
+		if !strings.Contains(string(content), want) {
+			t.Fatalf("expected %s to contain %q", launcherPath, want)
 		}
 	}
 }

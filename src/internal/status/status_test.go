@@ -43,7 +43,14 @@ func TestCheckInfersPhaseAcrossFeatureLifecycle(t *testing.T) {
 	if err := os.WriteFile(specPath, []byte("# Demo\n"), 0o644); err != nil {
 		t.Fatalf("WriteFile(spec) returned error: %v", err)
 	}
-	check("spec", "plan", false)
+	check("spec", "inspect", false)
+
+	inspectPath := filepath.Join(root, ".draftspec", "specs", "demo.inspect.md")
+	inspectContent := "---\nreport_type: inspect\nslug: demo\nstatus: pass\ndocs_language: en\ngenerated_at: 2026-03-30\n---\n# Inspect Report: demo\n\n## Verdict\n\n- status: pass\n"
+	if err := os.WriteFile(inspectPath, []byte(inspectContent), 0o644); err != nil {
+		t.Fatalf("WriteFile(inspect) returned error: %v", err)
+	}
+	check("inspect", "plan", false)
 
 	planDir := filepath.Join(root, ".draftspec", "plans", "demo")
 	if err := os.MkdirAll(planDir, 0o755); err != nil {
@@ -74,6 +81,12 @@ func TestCheckInfersPhaseAcrossFeatureLifecycle(t *testing.T) {
 		t.Fatalf("WriteFile(tasks complete) returned error: %v", err)
 	}
 	check("verify", "verify", false)
+
+	verifyContent := "---\nreport_type: verify\nslug: demo\nstatus: pass\ndocs_language: en\ngenerated_at: 2026-03-30\n---\n# Verify Report: demo\n\n## Verdict\n\n- status: pass\n"
+	if err := os.WriteFile(filepath.Join(planDir, "verify.md"), []byte(verifyContent), 0o644); err != nil {
+		t.Fatalf("WriteFile(verify) returned error: %v", err)
+	}
+	check("verify", "archive", false)
 
 	archiveDir := filepath.Join(root, ".draftspec", "archive", "demo", "2026-03-30")
 	if err := os.MkdirAll(archiveDir, 0o755); err != nil {

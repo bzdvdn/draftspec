@@ -3,8 +3,10 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
+	"sort"
 
 	"draftspec/src/internal/doctor"
+	"draftspec/src/internal/workflow"
 	"github.com/spf13/cobra"
 )
 
@@ -32,8 +34,18 @@ func newDoctorCmd() *cobra.Command {
 				fmt.Fprintln(cmd.OutOrStdout(), string(payload))
 				return nil
 			}
-			for _, finding := range result.Findings {
-				fmt.Fprintf(cmd.OutOrStdout(), "%s: %s\n", finding.Level, finding.Message)
+
+			errorCount, warningCount, okCount := doctorFindingCounts(result.Findings)
+			fmt.Fprintf(cmd.OutOrStdout(), "summary: %d error(s), %d warning(s), %d ok\n", errorCount, warningCount, okCount)
+			for _, group := range []string{"error", "warning", "ok"} {
+				lines := doctorLinesForLevel(result.Findings, group)
+				if len(lines) == 0 {
+					continue
+				}
+				fmt.Fprintf(cmd.OutOrStdout(), "%ss:\n", group)
+				for _, line := range lines {
+					fmt.Fprintf(cmd.OutOrStdout(), "- %s\n", line)
+				}
 			}
 			return nil
 		},
@@ -41,4 +53,37 @@ func newDoctorCmd() *cobra.Command {
 
 	cmd.Flags().BoolVar(&jsonOutput, "json", false, "Output doctor findings as JSON")
 	return cmd
+}
+
+func doctorFindingCounts(findings []doctor.Finding) (errors int, warnings int, oks int) {
+	for _, finding := range findings {
+		switch finding.Level {
+		case "error":
+			errors++
+		case "warning":
+			warnings++
+		case "ok":
+			oks++
+		}
+	}
+	return errors, warnings, oks
+}
+
+func doctorLinesForLevel(findings []doctor.Finding, level string) []string {
+	lines := make([]string, 0, len(findings))
+	for _, finding := range findings {
+		if finding.Level == level {
+			lines = append(lines, renderDoctorFinding(finding))
+		}
+	}
+	sort.Strings(lines)
+	return lines
+}
+
+func renderDoctorFinding(finding doctor.Finding) string {
+	slug := workflow.FindingSlug(workflow.Finding{Message: finding.Message})
+	if slug == "" {
+		return "[workspace] " + finding.Message
+	}
+	return fmt.Sprintf("[%s] %s", slug, displayFeatureFinding(slug, finding.Message))
 }

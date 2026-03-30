@@ -124,6 +124,7 @@ type Templates struct {
 }
 
 type Scripts struct {
+	RunDraftspec        string `yaml:"run_draftspec"`
 	InspectSpec         string `yaml:"inspect_spec"`
 	CheckConstitution   string `yaml:"check_constitution"`
 	CheckSpecReady      string `yaml:"check_spec_ready"`
@@ -162,6 +163,7 @@ func ScriptDefaultsForShell(shell string) Scripts {
 	}
 
 	return Scripts{
+		RunDraftspec:        "run-draftspec" + ext,
 		InspectSpec:         "inspect-spec" + ext,
 		CheckConstitution:   "check-constitution" + ext,
 		CheckSpecReady:      "check-spec-ready" + ext,
@@ -341,6 +343,9 @@ func (c *Config) applyDefaults() {
 		c.Templates.VerifyPrompt = defaultConfig.Templates.VerifyPrompt
 	}
 	defaultScripts := ScriptDefaultsForShell(c.Runtime.Shell)
+	if c.Scripts.RunDraftspec == "" {
+		c.Scripts.RunDraftspec = defaultScripts.RunDraftspec
+	}
 	if c.Scripts.InspectSpec == "" {
 		c.Scripts.InspectSpec = defaultScripts.InspectSpec
 	}

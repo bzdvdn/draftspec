@@ -1,11 +1,16 @@
+---
+report_type: inspect
+slug: <slug>
+status: pass
+docs_language: <en|ru>
+generated_at: <YYYY-MM-DD>
+---
+
 # Inspect Report: <slug>
 
 ## Scope
 
 - snapshot: однострочное резюме того, что проверили
-- slug: <slug>
-- inspected_at: <YYYY-MM-DD>
-- docs_language: <en|ru>
 - artifacts:
   - .draftspec/constitution.md
   - .draftspec/specs/<slug>.md

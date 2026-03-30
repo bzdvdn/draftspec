@@ -42,6 +42,7 @@ In short, Draftspec aims to sit between OpenSpec and Spec Kit: stricter than Ope
 - Lightweight traceability. Stable IDs and cheap readiness checks reduce prompt bloat.
 - Brownfield-friendly workflow. Draftspec works well in existing repositories without forcing a heavyweight process layer.
 - Branch-first collaboration. Active feature state stays local to the feature instead of spreading through shared mutable memory.
+- Inspect is mandatory before planning. Each feature should persist an inspect report that confirms the spec is ready for plan work.
 
 OpenSpec is more flexible by design and works well when teams want a looser artifact-guided workflow.
 
@@ -67,6 +68,10 @@ draftspec remove-agent [path]
 draftspec cleanup-agents [path]
 draftspec doctor [path]
 draftspec doctor [path] --json
+draftspec feature <slug> [path]
+draftspec feature repair <slug> [path]
+draftspec features [path]
+draftspec migrate [path]
 draftspec list-specs [path]
 draftspec show-spec <name> [path]
 ```
@@ -88,6 +93,8 @@ constitution -> spec -> inspect -> plan -> tasks -> implement -> verify -> archi
 - Strictness comes from phase entrypoints, templates, stable artifact structure, and readiness checks rather than large default prompts.
 - Agent-facing `/draftspec.spec` is branch-first: it should work from `feature/<slug>`, support `--name` with optional `--slug` / `--branch`, and still prefer explicit `name:` / `slug:` metadata for prompt files.
 - `draftspec init` requires an explicit `--shell` and generates one script family: `sh` or `powershell`.
+- Generated workspaces include `.draftspec/scripts/run-draftspec.*` as the stable CLI launcher for agents; it resolves `DRAFTSPEC_BIN` first and falls back to `draftspec` from `PATH`.
+- `draftspec feature repair` and `draftspec migrate` provide safe canonicalization for legacy artifacts such as old inspect report paths.
 - Generated docs and prompts support English and Russian.
 
 ## Quick Example

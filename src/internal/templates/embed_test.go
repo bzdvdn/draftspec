@@ -116,6 +116,7 @@ func TestFilesBuildForSupportedLanguages(t *testing.T) {
 				ext = ".ps1"
 			}
 			requiredFiles = append(requiredFiles,
+				"scripts/run-draftspec"+ext,
 				"scripts/check-inspect-ready"+ext,
 				"scripts/check-archive-ready"+ext,
 				"scripts/check-verify-ready"+ext,
@@ -154,11 +155,143 @@ func TestInspectPromptDefinesCheapScopeAndVerdictRules(t *testing.T) {
 		"Verify `spec <-> plan`",
 		"verify `plan <-> tasks`",
 		"The `## Verdict` section MUST use one of: `pass`, `concerns`, `blocked`.",
+		"machine-readable metadata block",
 		"major `spec <-> plan` contradictions",
 	}
 	for _, snippet := range requiredSnippets {
 		if !strings.Contains(content, snippet) {
 			t.Fatalf("expected inspect prompt to contain %q", snippet)
+		}
+	}
+}
+
+func TestReportTemplatesIncludeMetadataFrontmatter(t *testing.T) {
+	files, err := Files(LanguageSettings{
+		Default:  "en",
+		Docs:     "en",
+		Agent:    "en",
+		Comments: "en",
+		Shell:    "sh",
+	})
+	if err != nil {
+		t.Fatalf("Files() returned error: %v", err)
+	}
+
+	testCases := []struct {
+		target string
+		want   []string
+	}{
+		{
+			target: "templates/inspect-report.md",
+			want: []string{
+				"report_type: inspect",
+				"slug: <slug>",
+				"status: pass",
+				"generated_at: <YYYY-MM-DD>",
+			},
+		},
+		{
+			target: "templates/verify-report.md",
+			want: []string{
+				"report_type: verify",
+				"slug: <slug>",
+				"status: pass",
+				"generated_at: <YYYY-MM-DD>",
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		content := fileContentByTarget(t, files, tc.target)
+		for _, snippet := range tc.want {
+			if !strings.Contains(content, snippet) {
+				t.Fatalf("expected %s to contain %q", tc.target, snippet)
+			}
+		}
+	}
+}
+
+func TestGeneratedAgentSnippetMentionsDraftspecLauncher(t *testing.T) {
+	files, err := Files(LanguageSettings{
+		Default:  "en",
+		Docs:     "en",
+		Agent:    "en",
+		Comments: "en",
+		Shell:    "powershell",
+	})
+	if err != nil {
+		t.Fatalf("Files() returned error: %v", err)
+	}
+
+	content := fileContentByTarget(t, files, "templates/agents-snippet.md")
+	requiredSnippets := []string{
+		"./.draftspec/scripts/run-draftspec.ps1",
+		"DRAFTSPEC_BIN",
+		"draftspec` from `PATH",
+	}
+	for _, snippet := range requiredSnippets {
+		if !strings.Contains(content, snippet) {
+			t.Fatalf("expected agents snippet to contain %q", snippet)
+		}
+	}
+}
+
+func TestCoreTemplatesPreferDetailedButTightArtifacts(t *testing.T) {
+	files, err := Files(LanguageSettings{
+		Default:  "en",
+		Docs:     "en",
+		Agent:    "en",
+		Comments: "en",
+		Shell:    "sh",
+	})
+	if err != nil {
+		t.Fatalf("Files() returned error: %v", err)
+	}
+
+	testCases := []struct {
+		target string
+		want   []string
+	}{
+		{
+			target: "templates/spec.md",
+			want: []string{
+				"## Primary User Flow",
+				"who benefits, what changes for them",
+				"Evidence:",
+			},
+		},
+		{
+			target: "templates/plan.md",
+			want: []string{
+				"Tradeoff:",
+				"## Rollout and Compatibility",
+				"proof that the result will be observable",
+			},
+		},
+		{
+			target: "templates/tasks.md",
+			want: []string{
+				"Goal: establish the minimum structure",
+				"Goal: deliver the primary feature behavior",
+				"Separate validation work from broad implementation work",
+			},
+		},
+		{
+			target: "templates/data-model.md",
+			want: []string{
+				"Source of truth:",
+				"Failure or consistency notes:",
+				"## State Transitions",
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		content := fileContentByTarget(t, files, tc.target)
+		for _, snippet := range tc.want {
+			if !strings.Contains(content, snippet) {
+				t.Fatalf("expected %s to contain %q", tc.target, snippet)
+			}
 		}
 	}
 }
@@ -184,10 +317,13 @@ func TestImplementPromptSupportsFullRunAndScopedExecution(t *testing.T) {
 		"If scoped execution skips unfinished earlier work, warn about the ordering risk",
 		"the selected work would force changes across another feature package or slug",
 		"the next safe step would require inventing new tasks or acceptance coverage",
+		"Leave the feature in a state that the next verify pass can inspect without guessing",
+		"Before marking a task done, confirm that the observable outcome named in the task text is actually present.",
 		"[T1.1] started",
 		"[T1.1] done",
 		"[T1.1] blocked: <reason>",
 		"[Phase 1] done: T1.1, T1.2",
+		"do not mark a task done after partial scaffolding",
 	}
 	for _, snippet := range requiredSnippets {
 		if !strings.Contains(content, snippet) {
@@ -213,6 +349,11 @@ func TestSpecPromptDefinesDeterministicStagedMode(t *testing.T) {
 		"keep staged mode active for the next non-command user message",
 		"If the next user message begins with `/draftspec.`, staged mode is canceled",
 		"If the next user message does not begin with `/draftspec.`, treat it as the continuation of the staged spec request.",
+		"The spec should be detailed enough that both an agent and a human reviewer can understand the user flow",
+		"`## Primary User Flow` should describe the main path in 3-5 concrete steps",
+		"prefer a tiny structured clarify pass instead of a broad open-ended interview",
+		"`## Change Delta` should make it obvious what becomes newly possible, what changes, and what stays unchanged.",
+		"Prefer density over length",
 	}
 	for _, snippet := range requiredSnippets {
 		if !strings.Contains(content, snippet) {
@@ -238,6 +379,7 @@ func TestPlanPromptDefinesConcreteResearchTriggers(t *testing.T) {
 		"Create `.draftspec/plans/<slug>/research.md` only when at least one of these is true:",
 		"external system, API, or dependency",
 		"multiple realistic implementation options",
+		"Before creating `research.md`, write down the concrete unknowns first:",
 		"Do not create `research.md` for generic brainstorming",
 	}
 	for _, snippet := range requiredSnippets {
@@ -266,6 +408,52 @@ func TestTasksAndImplementPromptsDoNotAssumeResearchArtifact(t *testing.T) {
 		content := fileContentByTarget(t, files, target)
 		if !strings.Contains(content, "Do not assume `research.md` should exist;") {
 			t.Fatalf("expected %s to explain that research.md is not assumed by default", target)
+		}
+	}
+}
+
+func TestPlanAndTasksPromptsReinforceDetailedButTightArtifacts(t *testing.T) {
+	files, err := Files(LanguageSettings{
+		Default:  "en",
+		Docs:     "en",
+		Agent:    "en",
+		Comments: "en",
+		Shell:    "sh",
+	})
+	if err != nil {
+		t.Fatalf("Files() returned error: %v", err)
+	}
+
+	testCases := []struct {
+		target string
+		want   []string
+	}{
+		{
+			target: "templates/prompts/plan.md",
+			want: []string{
+				"The plan should be specific enough that both an agent and a human reviewer can see the intended implementation shape",
+				"Each significant `DEC-*` should capture `Why`, `Tradeoff`, `Affects`, and `Validation`.",
+				"Add a short `Unknowns First` pass before finalizing the plan",
+				"`## Rollout and Compatibility` should be explicit",
+			},
+		},
+		{
+			target: "templates/prompts/tasks.md",
+			want: []string{
+				"The task list should be readable to both an implementation agent and a human reviewer",
+				"Each phase should have a short goal",
+				"add a short `Touches:` hint",
+				"Could another developer execute these tasks in order without guessing what `done` means",
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		content := fileContentByTarget(t, files, tc.target)
+		for _, snippet := range tc.want {
+			if !strings.Contains(content, snippet) {
+				t.Fatalf("expected %s to contain %q", tc.target, snippet)
+			}
 		}
 	}
 }
@@ -325,14 +513,56 @@ func TestPromptsDefineScopeTripwiresForRefinement(t *testing.T) {
 	}
 }
 
-func TestInspectHelperScriptsSupportAcceptanceIDsAndCoverageFormat(t *testing.T) {
+func TestVerifyTemplateAndPromptPreferEvidenceScopedVerification(t *testing.T) {
+	files, err := Files(LanguageSettings{
+		Default:  "en",
+		Docs:     "en",
+		Agent:    "en",
+		Comments: "en",
+		Shell:    "sh",
+	})
+	if err != nil {
+		t.Fatalf("Files() returned error: %v", err)
+	}
+
+	templateContent := fileContentByTarget(t, files, "templates/verify-report.md")
+	for _, snippet := range []string{
+		"verification_mode: default | deep",
+		"archive_readiness: safe",
+		"acceptance_evidence:",
+		"implementation_alignment:",
+		"## Not Verified",
+	} {
+		if !strings.Contains(templateContent, snippet) {
+			t.Fatalf("expected verify report template to contain %q", snippet)
+		}
+	}
+
+	promptContent := fileContentByTarget(t, files, "templates/prompts/verify.md")
+	for _, snippet := range []string{
+		"Treat verify as an evidence log, not a reassurance ritual.",
+		"Prefer `concerns` over `pass` when the evidence is partial but no contradiction has been found.",
+		"`acceptance_evidence` for the `AC-*` items you actually confirmed",
+		"`## Not Verified`",
+		"Keep claims scoped.",
+		"send the feature back to the narrowest earlier phase that can honestly fix it",
+		"do not return `pass` from checkbox state alone",
+	} {
+		if !strings.Contains(promptContent, snippet) {
+			t.Fatalf("expected verify prompt to contain %q", snippet)
+		}
+	}
+}
+
+func TestInspectHelperScriptsDelegateToInternalCLI(t *testing.T) {
 	testCases := []struct {
 		name   string
 		shell  string
 		target string
+		want   []string
 	}{
-		{name: "sh", shell: "sh", target: "scripts/inspect-spec.sh"},
-		{name: "powershell", shell: "powershell", target: "scripts/inspect-spec.ps1"},
+		{name: "sh", shell: "sh", target: "scripts/inspect-spec.sh", want: []string{"run-draftspec.sh", "__internal inspect-spec --root ."}},
+		{name: "powershell", shell: "powershell", target: "scripts/inspect-spec.ps1", want: []string{"run-draftspec.ps1", "__internal inspect-spec --root ."}},
 	}
 
 	for _, tc := range testCases {
@@ -349,12 +579,7 @@ func TestInspectHelperScriptsSupportAcceptanceIDsAndCoverageFormat(t *testing.T)
 			}
 
 			content := fileContentByTarget(t, files, tc.target)
-			requiredSnippets := []string{
-				"acceptance IDs",
-				"acceptance coverage contains malformed entries",
-				"AC-001 -> T1.1",
-			}
-			for _, snippet := range requiredSnippets {
+			for _, snippet := range tc.want {
 				if !strings.Contains(content, snippet) {
 					t.Fatalf("expected %s to contain %q", tc.target, snippet)
 				}
@@ -363,7 +588,7 @@ func TestInspectHelperScriptsSupportAcceptanceIDsAndCoverageFormat(t *testing.T)
 	}
 }
 
-func TestReadinessScriptsEnforceLeanTraceabilityRules(t *testing.T) {
+func TestReadinessScriptsDelegateToInternalCLI(t *testing.T) {
 	testCases := []struct {
 		name   string
 		shell  string
@@ -375,9 +600,8 @@ func TestReadinessScriptsEnforceLeanTraceabilityRules(t *testing.T) {
 			shell:  "sh",
 			target: "scripts/check-spec-ready.sh",
 			want: []string{
-				"spec template includes requirement IDs",
-				"spec template includes acceptance IDs",
-				"spec template includes Given marker",
+				"run-draftspec.sh",
+				"__internal check-spec-ready --root .",
 			},
 		},
 		{
@@ -385,8 +609,8 @@ func TestReadinessScriptsEnforceLeanTraceabilityRules(t *testing.T) {
 			shell:  "sh",
 			target: "scripts/check-plan-ready.sh",
 			want: []string{
-				"spec has stable acceptance IDs",
-				"./.draftspec/scripts/inspect-spec.sh",
+				"run-draftspec.sh",
+				"__internal check-plan-ready --root .",
 			},
 		},
 		{
@@ -394,8 +618,8 @@ func TestReadinessScriptsEnforceLeanTraceabilityRules(t *testing.T) {
 			shell:  "sh",
 			target: "scripts/check-tasks-ready.sh",
 			want: []string{
-				"plan has stable decision IDs",
-				"spec has stable acceptance IDs",
+				"run-draftspec.sh",
+				"__internal check-tasks-ready --root .",
 			},
 		},
 		{
@@ -403,8 +627,8 @@ func TestReadinessScriptsEnforceLeanTraceabilityRules(t *testing.T) {
 			shell:  "sh",
 			target: "scripts/check-implement-ready.sh",
 			want: []string{
-				"tasks include acceptance coverage section",
-				"tasks include AC-to-task coverage lines",
+				"run-draftspec.sh",
+				"__internal check-implement-ready --root .",
 			},
 		},
 		{
@@ -412,8 +636,8 @@ func TestReadinessScriptsEnforceLeanTraceabilityRules(t *testing.T) {
 			shell:  "sh",
 			target: "scripts/check-verify-ready.sh",
 			want: []string{
-				"./.draftspec/scripts/inspect-spec.sh",
-				"./.draftspec/scripts/verify-task-state.sh",
+				"run-draftspec.sh",
+				"__internal check-verify-ready --root .",
 			},
 		},
 		{
@@ -421,10 +645,71 @@ func TestReadinessScriptsEnforceLeanTraceabilityRules(t *testing.T) {
 			shell:  "powershell",
 			target: "scripts/verify-task-state.ps1",
 			want: []string{
-				"TASK_IDS=",
-				"AC_COVERAGE_LINES=",
-				"no AC-to-task coverage lines found",
+				"run-draftspec.ps1",
+				"__internal verify-task-state --root .",
 			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			files, err := Files(LanguageSettings{
+				Default:  "en",
+				Docs:     "en",
+				Agent:    "en",
+				Comments: "en",
+				Shell:    tc.shell,
+			})
+			if err != nil {
+				t.Fatalf("Files() returned error: %v", err)
+			}
+
+			content := fileContentByTarget(t, files, tc.target)
+			for _, snippet := range tc.want {
+				if !strings.Contains(content, snippet) {
+					t.Fatalf("expected %s to contain %q", tc.target, snippet)
+				}
+			}
+		})
+	}
+}
+
+func TestUtilityScriptsDelegateToCLIBackends(t *testing.T) {
+	testCases := []struct {
+		name   string
+		shell  string
+		target string
+		want   []string
+	}{
+		{
+			name:   "sh list-open-tasks",
+			shell:  "sh",
+			target: "scripts/list-open-tasks.sh",
+			want:   []string{"run-draftspec.sh", "__internal list-open-tasks --root ."},
+		},
+		{
+			name:   "sh list-specs",
+			shell:  "sh",
+			target: "scripts/list-specs.sh",
+			want:   []string{"run-draftspec.sh", "__internal list-specs --root ."},
+		},
+		{
+			name:   "sh show-spec",
+			shell:  "sh",
+			target: "scripts/show-spec.sh",
+			want:   []string{"run-draftspec.sh", "__internal show-spec --root ."},
+		},
+		{
+			name:   "sh link-agents",
+			shell:  "sh",
+			target: "scripts/link-agents.sh",
+			want:   []string{"run-draftspec.sh", "__internal link-agents --root ."},
+		},
+		{
+			name:   "powershell list-specs",
+			shell:  "powershell",
+			target: "scripts/list-specs.ps1",
+			want:   []string{"run-draftspec.ps1", "__internal list-specs --root ."},
 		},
 	}
 

@@ -91,6 +91,54 @@ draftspec add-agent my-project --agents claude --agents codex
 
 Используй `--json`, если нужен machine-readable output для automation и CI.
 
+### `draftspec feature <slug> [path]`
+
+Показывает подробную workflow-карточку одной фичи.
+
+Текстовый вывод включает:
+
+- текущую фазу и `ready_for`
+- статус inspect и verify, если отчеты существуют
+- прогресс задач, если существует `tasks.md`
+- сгруппированные workflow-findings
+- короткую подсказку `focus` о наиболее вероятном следующем действии
+
+Используй `--json`, чтобы получить структурированное состояние и feature-local findings.
+
+### `draftspec feature repair <slug> [path]`
+
+Исправляет безопасные feature-local проблемы Draftspec.
+
+Сейчас repair умеет, в частности, переносить legacy inspect report из:
+
+- `.draftspec/plans/<slug>/inspect.md`
+
+в канонический путь:
+
+- `.draftspec/specs/<slug>.inspect.md`
+
+Используй `--dry-run`, чтобы посмотреть изменения без применения, и `--json` для структурированного вывода.
+
+### `draftspec features [path]`
+
+Показывает workflow-состояние по всем найденным фичам.
+
+Текстовый вывод суммирует:
+
+- фазу и `ready_for`
+- verdict для inspect и verify
+- прогресс задач
+- сгруппированные issue counts
+- наличие артефактов
+
+Используй `--json`, если нужен machine-readable output.
+
+### `draftspec migrate [path]`
+
+Запускает безопасные project-wide миграции Draftspec.
+
+Сейчас основная область миграции — каноникализация legacy inspect reports по всему проекту.
+
 ### `draftspec list-specs [path]`
 
 Показывает список spec slug'ов из `.draftspec/specs/`.

@@ -50,6 +50,13 @@ Stop and ask a minimal follow-up question if:
 
 If the user provided `--name` but has not yet given enough feature detail, do not lose the request context: ask for the missing description and treat the next non-command user message as the continuation of the same spec request.
 
+If clarification is needed, prefer a tiny structured clarify pass instead of a broad open-ended interview:
+
+- ask at most 1-3 questions
+- ask only about gaps that would otherwise force invented acceptance criteria, unclear scope boundaries, or ambiguous success conditions
+- prefer coverage-based questions such as missing scenario, constraint, actor, or edge-condition clarification
+- once the answers are sufficient, patch the spec immediately instead of starting a separate clarification workflow
+
 Do not continue into planning or implementation thinking when the spec itself is still unclear.
 
 If the spec already exists and is current, say so and do not modify the file.
@@ -61,6 +68,7 @@ If the spec already exists and is current, say so and do not modify the file.
 - Never load unrelated feature artifacts to compensate for unclear requirements.
 - Derive acceptance criteria from the request and repository reality; do not invent them.
 - Use explicit scope boundaries. The out-of-scope section is mandatory.
+- The spec should be detailed enough that both an agent and a human reviewer can understand the user flow and scope boundaries without reading planning artifacts.
 - Do not mix languages inside the same spec without a strong project reason.
 - Follow `.draftspec/templates/spec.md` when creating a new file.
 - Every acceptance criterion MUST use Given/When/Then format.
@@ -100,6 +108,23 @@ If the spec already exists and is current, say so and do not modify the file.
   - **Then** — the expected observable outcome
 - Acceptance criteria should be observable and testable.
 - Prefer a small set of strong criteria over a long redundant list.
+- Each `AC-*` should explain why it matters in one short line when that context helps downstream planning stay grounded.
+- Each `AC-*` should include evidence or an observable proof signal, not just a generic desired state.
+
+## Content Quality Rules
+
+- `## Goal` should explain who benefits, what changes, and what success looks like.
+- `## Why Now` should capture why this change matters now when timing, pain, or business pressure materially affects prioritization.
+- `## Primary User Flow` should describe the main path in 3-5 concrete steps, not generic prose.
+- `## Change Delta` should make it obvious what becomes newly possible, what changes, and what stays unchanged.
+- `## Affected Surfaces` should stay compact and name only the user-visible or repository-visible surfaces that define the feature boundary.
+- `## Scope Snapshot`, `## Scope`, and `## Non-Goals` should make the feature boundary obvious to a reviewer.
+- `## Context` should capture repository constraints, preserved behavior, and assumptions that materially affect the feature.
+- `## Requirements` should stay clear and testable; avoid vague wording like `support this properly` or `handle it cleanly`.
+- `## Edge Cases` should include only behavior that materially changes implementation or validation, not a brainstorming dump.
+- `## Open Questions` should say `none` when no real question remains.
+- Negative examples: do not merge multiple features into one spec, do not hide scope expansion inside edge cases, and do not use `TBD` acceptance criteria.
+- Prefer density over length: every section should help planning or review, and filler text is a defect.
 
 ## Output expectations
 
@@ -112,4 +137,5 @@ If the spec already exists and is current, say so and do not modify the file.
 - Did I stay within one feature?
 - Did I avoid planning and implementation detail?
 - Did every acceptance criterion get a stable ID and Given/When/Then form?
+- Would a human reviewer understand the primary user flow and scope boundary without additional explanation?
 - Did I avoid loading unrelated artifacts?

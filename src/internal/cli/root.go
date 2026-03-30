@@ -16,8 +16,12 @@ func NewRootCmd() *cobra.Command {
 	cmd.AddCommand(newCleanupAgentsCmd())
 	cmd.AddCommand(newDoctorCmd())
 	cmd.AddCommand(newStatusCmd())
+	cmd.AddCommand(newFeatureCmd())
+	cmd.AddCommand(newFeaturesCmd())
+	cmd.AddCommand(newMigrateCmd())
 	cmd.AddCommand(newListSpecsCmd())
 	cmd.AddCommand(newShowSpecCmd())
+	cmd.AddCommand(newInternalCmd())
 
 	return cmd
 }

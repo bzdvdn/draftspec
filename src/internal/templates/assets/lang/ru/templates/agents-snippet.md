@@ -14,13 +14,16 @@ Workflow-команды:
 - `/draftspec.plan`: создать или обновить `.draftspec/plans/<slug>/plan.md`, `data-model.md` и `contracts/`
 - `/draftspec.tasks`: создать или обновить `.draftspec/plans/<slug>/tasks.md`
 - `/draftspec.implement`: выполнить незавершенные задачи
+- `/draftspec.verify`: проверить один реализованный feature package перед archive
 - `/draftspec.archive`: архивировать один feature package в `.draftspec/archive/`
 
 Дисциплина чтения:
-- Следуйте цепочке `constitution -> spec -> inspect -> plan -> tasks -> implement -> archive`
+- Следуйте цепочке `constitution -> spec -> inspect -> plan -> tasks -> implement -> verify -> archive`
 - Не пропускайте prerequisites
 - По умолчанию загружайте только текущий feature slug
 - Предпочитайте readiness scripts каждой фазы перед чтением более глубоких артефактов
+- Когда нужен сам Draftspec CLI, предпочитайте `./.draftspec/scripts/run-draftspec.sh`; этот launcher сначала проверяет `DRAFTSPEC_BIN`, а затем `draftspec` из `PATH`
+- Сохраняйте обязательный inspect report в `.draftspec/specs/<slug>.inspect.md` до начала planning
 - `/draftspec.spec` поддерживает `--name`, optional `--slug` и optional `--branch`; для chat-based ввода описание фичи может прийти следующим сообщением
 - Для file-based входа в `/draftspec.spec` предпочитайте `name:` и опциональный `slug:` в начале файла, а не fallback на filename
 - Разрешайте явный `--branch <name>` override для repository-specific branch naming conventions, например Jira keys

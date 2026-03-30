@@ -71,6 +71,7 @@ Do not jump ahead into implementation.
 - Prefer concrete, testable, implementation-oriented tasks.
 - Include validation and documentation alignment work only when needed.
 - Do not generate vague umbrella tasks.
+- The task list should be readable to both an implementation agent and a human reviewer without extra interpretation.
 - Targeted code reading during task decomposition is useful when it reduces re-reading during implementation.
 
 ## Language Rules
@@ -86,11 +87,25 @@ Do not jump ahead into implementation.
 - Each task MUST include a phase-scoped task ID in the form `T<phase>.<index>`.
 - Each task MUST follow the format: `- [ ] T<phase>.<index> <action verb> — <concrete measurable outcome>`
 - Each task SHOULD reference 1-2 stable IDs when possible (`AC-*`, `RQ-*`, `DEC-*`).
+- When it materially reduces downstream guesswork, add a short `Touches:` hint to a phase goal or task line naming the concrete surfaces likely to change. Keep it compact and use it only when confidence is high.
 - The tasks taken together MUST cover all acceptance criteria from the spec. Any uncovered criterion is a blocker.
 - The `## Acceptance Coverage` section MUST include at least one explicit coverage line for each acceptance criterion.
 - Coverage lines SHOULD reference stable acceptance IDs and task IDs such as `AC-001 -> T1.1, T2.1`.
 - For newly created task lists, task IDs are required.
 - When meaningfully updating an existing task list without task IDs, normalize it to the ID-based format.
+
+## Content Quality Rules
+
+- Each phase should have a short goal that explains why the phase exists.
+- Prefer a few concrete tasks with measurable outcomes over many tiny bookkeeping items.
+- Use action verbs tied to observable work: implement, add, migrate, validate, remove, backfill, document.
+- Keep foundational setup separate from core behavior and separate proof/validation from broad implementation.
+- If a task would benefit from a surface hint, prefer a compact `Touches: auth flow, session store` style note instead of speculative file-by-file path lists.
+- When a task exists only to prove behavior, make that explicit instead of hiding it inside a larger implementation task.
+- If a phase is unnecessary for this feature, omit it or state that it is intentionally not needed instead of filling it with generic tasks.
+- Task text should make the intended outcome obvious to a reviewer without needing to reopen the plan for every line.
+- Negative examples: avoid `misc`, `cleanup as needed`, `wire everything up`, `final polish`, or task text that hides the outcome behind a generic verb.
+- Avoid `misc`, `cleanup as needed`, `wire everything up`, `final polish`, or other vague umbrella wording.
 
 ## Output expectations
 
@@ -105,3 +120,4 @@ Do not jump ahead into implementation.
 - Is every acceptance criterion covered explicitly?
 - Did I avoid reading implementation files unless decomposition required it?
 - If I read code, did I read only the smallest slice needed to avoid vague tasks?
+- Could another developer execute these tasks in order without guessing what `done` means for each line?

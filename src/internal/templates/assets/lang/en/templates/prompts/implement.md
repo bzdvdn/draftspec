@@ -88,6 +88,7 @@ Do not broaden scope to solve these problems.
 - Mark completed tasks in `tasks.md`.
 - Keep runtime updates short and tied to the current phase and task IDs.
 - Do not violate the constitution.
+- Leave the feature in a state that the next verify pass can inspect without guessing what changed, what remains, and why a task is done.
 
 ## Progress Rules
 
@@ -100,6 +101,16 @@ Do not broaden scope to solve these problems.
   - `[T1.1] blocked: <reason>`
   - `[Phase 1] done: T1.1, T1.2`
 - Load deeper artifacts only when the current task requires them.
+
+## Handoff Rules
+
+- Before marking a task done, confirm that the observable outcome named in the task text is actually present.
+- If the task references `AC-*`, keep the implementation aligned with that acceptance scope instead of silently widening behavior.
+- When the active scope finishes, leave enough evidence for the next phase:
+  - completed checkboxes in `tasks.md`
+  - concise summary of what changed
+  - clear blockers or remaining open tasks
+- If implementation reveals that the task text, acceptance coverage, or plan is wrong, stop and send the workflow back to `tasks` or `plan` refinement instead of silently repairing the process contract in code.
 
 ## Language Rules
 
@@ -116,6 +127,7 @@ Do not broaden scope to solve these problems.
 - Report phase progress in runtime: when a phase starts, when it completes, and what remains next inside the current scope
 - Summarize completed tasks, remaining tasks, and any blockers
 - Explicitly state which acceptance criteria from the spec are now covered by the implementation
+- Negative examples: do not mark a task done after partial scaffolding, do not slip unrelated cleanup or refactors into the same run, and do not claim acceptance coverage that was not actually implemented
 
 ## Self-Check
 
@@ -124,3 +136,4 @@ Do not broaden scope to solve these problems.
 - Did I read only the artifacts needed for the active task?
 - Did I update completed tasks and report acceptance coverage?
 - Did I begin from the active task surfaces before widening into more code?
+- Would `verify` understand what changed and what remains without rereading the whole repository?
