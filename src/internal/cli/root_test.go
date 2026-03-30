@@ -188,6 +188,130 @@ func TestStatusCommandJSONOutput(t *testing.T) {
 	}
 }
 
+func TestInitAndStatusCommandsFollowFeatureLifecycle(t *testing.T) {
+	root := t.TempDir()
+
+	if _, _, err := executeRoot(t, "init", root, "--git=false", "--lang", "en", "--shell", "sh"); err != nil {
+		t.Fatalf("init command returned error: %v", err)
+	}
+
+	type statusPayload struct {
+		Slug           string `json:"slug"`
+		Phase          string `json:"phase"`
+		SpecExists     bool   `json:"spec_exists"`
+		PlanExists     bool   `json:"plan_exists"`
+		TasksExists    bool   `json:"tasks_exists"`
+		TasksTotal     int    `json:"tasks_total"`
+		TasksCompleted int    `json:"tasks_completed"`
+		TasksOpen      int    `json:"tasks_open"`
+		ReadyFor       string `json:"ready_for"`
+		Blocked        bool   `json:"blocked"`
+	}
+
+	checkStatus := func(want statusPayload) {
+		t.Helper()
+
+		stdout, _, err := executeRoot(t, "status", "demo", root, "--json")
+		if err != nil {
+			t.Fatalf("status --json returned error: %v", err)
+		}
+
+		var payload statusPayload
+		if err := json.Unmarshal([]byte(stdout), &payload); err != nil {
+			t.Fatalf("failed to parse status json output %q: %v", stdout, err)
+		}
+
+		if payload.Slug != "demo" {
+			t.Fatalf("slug = %q, want demo", payload.Slug)
+		}
+		if payload.Phase != want.Phase || payload.ReadyFor != want.ReadyFor || payload.Blocked != want.Blocked {
+			t.Fatalf("unexpected phase payload: %+v, want %+v", payload, want)
+		}
+		if payload.SpecExists != want.SpecExists || payload.PlanExists != want.PlanExists || payload.TasksExists != want.TasksExists {
+			t.Fatalf("unexpected artifact flags: %+v, want %+v", payload, want)
+		}
+		if payload.TasksTotal != want.TasksTotal || payload.TasksCompleted != want.TasksCompleted || payload.TasksOpen != want.TasksOpen {
+			t.Fatalf("unexpected task counts: %+v, want %+v", payload, want)
+		}
+	}
+
+	checkStatus(statusPayload{
+		Phase:      "constitution",
+		ReadyFor:   "spec",
+		Blocked:    true,
+		SpecExists: false,
+		PlanExists: false,
+		TasksExists:false,
+	})
+
+	specPath := filepath.Join(root, ".draftspec", "specs", "demo.md")
+	specContent := "# Feature Specification: Demo\n\n## Requirements\n- RQ-001 Support a minimal demo flow.\n\n## Acceptance Criteria\n- AC-001\n  - Given a prepared workspace\n  - When the feature lifecycle is checked\n  - Then the status should advance predictably.\n"
+	if err := os.WriteFile(specPath, []byte(specContent), 0o644); err != nil {
+		t.Fatalf("WriteFile(spec) returned error: %v", err)
+	}
+
+	checkStatus(statusPayload{
+		Phase:      "spec",
+		ReadyFor:   "plan",
+		Blocked:    false,
+		SpecExists: true,
+		PlanExists: false,
+		TasksExists:false,
+	})
+
+	planDir := filepath.Join(root, ".draftspec", "plans", "demo")
+	if err := os.MkdirAll(planDir, 0o755); err != nil {
+		t.Fatalf("MkdirAll(planDir) returned error: %v", err)
+	}
+	planContent := "# Implementation Plan: Demo\n\n## Decisions\n- DEC-001 Keep the integration test minimal and deterministic.\n"
+	if err := os.WriteFile(filepath.Join(planDir, "plan.md"), []byte(planContent), 0o644); err != nil {
+		t.Fatalf("WriteFile(plan) returned error: %v", err)
+	}
+
+	checkStatus(statusPayload{
+		Phase:      "plan",
+		ReadyFor:   "tasks",
+		Blocked:    false,
+		SpecExists: true,
+		PlanExists: true,
+		TasksExists:false,
+	})
+
+	tasksContent := "# Tasks: Demo\n\n## Phase 1: Implementation\n- [x] T1.1 Create the first slice\n- [ ] T1.2 Finish the second slice\n\n## Acceptance Coverage\n- AC-001 -> T1.1, T1.2\n"
+	if err := os.WriteFile(filepath.Join(planDir, "tasks.md"), []byte(tasksContent), 0o644); err != nil {
+		t.Fatalf("WriteFile(tasks) returned error: %v", err)
+	}
+
+	checkStatus(statusPayload{
+		Phase:          "implement",
+		ReadyFor:       "implement",
+		Blocked:        false,
+		SpecExists:     true,
+		PlanExists:     true,
+		TasksExists:    true,
+		TasksTotal:     2,
+		TasksCompleted: 1,
+		TasksOpen:      1,
+	})
+
+	completeTasks := "# Tasks: Demo\n\n## Phase 1: Implementation\n- [x] T1.1 Create the first slice\n- [x] T1.2 Finish the second slice\n\n## Acceptance Coverage\n- AC-001 -> T1.1, T1.2\n"
+	if err := os.WriteFile(filepath.Join(planDir, "tasks.md"), []byte(completeTasks), 0o644); err != nil {
+		t.Fatalf("WriteFile(tasks complete) returned error: %v", err)
+	}
+
+	checkStatus(statusPayload{
+		Phase:          "verify",
+		ReadyFor:       "verify",
+		Blocked:        false,
+		SpecExists:     true,
+		PlanExists:     true,
+		TasksExists:    true,
+		TasksTotal:     2,
+		TasksCompleted: 2,
+		TasksOpen:      0,
+	})
+}
+
 func TestCleanupAgentsCommandRemovesOrphanedArtifacts(t *testing.T) {
 	root := t.TempDir()
 
