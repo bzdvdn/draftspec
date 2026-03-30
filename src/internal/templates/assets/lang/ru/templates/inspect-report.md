@@ -2,6 +2,7 @@
 
 ## Scope
 
+- snapshot: однострочное резюме того, что проверили
 - slug: <slug>
 - inspected_at: <YYYY-MM-DD>
 - docs_language: <en|ru>

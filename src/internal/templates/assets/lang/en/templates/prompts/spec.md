@@ -8,6 +8,12 @@ Produce a clear feature specification at `.draftspec/specs/<slug>.md` that is co
 
 Before writing or updating the spec, ensure work is happening on the feature branch for `<slug>`. The default branch naming convention is `feature/<slug>`.
 
+## Phase Contract
+
+Inputs: see Load Only.
+Outputs: see Output expectations.
+Stop if: see Stop Conditions.
+
 ## Operating Mode
 
 - Work on exactly one feature.
@@ -40,6 +46,7 @@ Stop and ask a minimal follow-up question if:
 - the input looks like a URL rather than a concrete feature title
 - acceptance criteria would be invented rather than derived
 - the requested feature appears to conflict with the constitution
+- any required section would be left as TBD or placeholder text
 
 If the user provided `--name` but has not yet given enough feature detail, do not lose the request context: ask for the missing description and treat the next non-command user message as the continuation of the same spec request.
 

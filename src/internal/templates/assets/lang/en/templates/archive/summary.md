@@ -2,6 +2,7 @@
 
 ## Spec
 
+- snapshot: one-line summary of what was archived
 - slug: <slug>
 - archived_at: <YYYY-MM-DD>
 - status: completed

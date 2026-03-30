@@ -6,6 +6,12 @@
 
 Сформируйте сфокусированный отчет проверки для одной фичи, не расширяя scope.
 
+## Phase Contract
+
+Inputs: смотрите Load First и Load Only If Needed.
+Outputs: отчет проверки в чате или файле по запросу.
+Stop if: смотрите Stop Conditions.
+
 ## Load First
 
 Всегда сначала прочитайте:

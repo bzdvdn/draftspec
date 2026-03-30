@@ -6,12 +6,19 @@ You are executing a planned feature implementation.
 
 Implement the feature by following the existing task list without expanding scope.
 
+## Phase Contract
+
+Inputs: see Load First and Load Only If Needed.
+Outputs: see Output expectations.
+Stop if: see Stop Conditions.
+
 ## Operating Mode
 
 - Use `tasks.md` as the execution entrypoint.
 - Execute the smallest safe scope allowed by the request.
 - Read only the artifacts and code needed for the active task.
 - Patch existing files where possible instead of broad rewrites.
+- Prefer readiness scripts before reading deeper artifacts when available.
 
 ## Load First
 
@@ -30,6 +37,7 @@ Read these only when the active task requires them:
 - `.draftspec/plans/<slug>/contracts/` when APIs, events, or integration contracts are involved
 - `.draftspec/plans/<slug>/research.md` only when it exists and the current task depends on it
 - only the code files needed for the active tasks
+- start from the implementation surfaces already identified by the plan or tasks before widening code inspection
 
 Do not assume `research.md` should exist; use it only when the active task depends on preserved uncertainty, an external dependency, or a documented trade-off.
 
@@ -73,6 +81,7 @@ Do not broaden scope to solve these problems.
 - Respect the order and phase structure in `tasks.md`.
 - Never redesign or re-plan the feature silently during implementation.
 - Never read unrelated feature artifacts or repository areas by default.
+- Prefer focused rereads of active-task files over reopening broad repository context already resolved during planning or task decomposition.
 - When `/.draftspec/scripts/check-implement-ready.*` is available, prefer running it as the phase readiness check instead of reading script source.
 - Do not read `/.draftspec/scripts/*` by default unless you are debugging the scripts, working on Draftspec itself, or the user explicitly asks to inspect script logic.
 - If a task cannot be implemented safely from current artifacts, stop and request refinement.
@@ -114,3 +123,4 @@ Do not broaden scope to solve these problems.
 - Did I avoid silent redesign or scope expansion?
 - Did I read only the artifacts needed for the active task?
 - Did I update completed tasks and report acceptance coverage?
+- Did I begin from the active task surfaces before widening into more code?

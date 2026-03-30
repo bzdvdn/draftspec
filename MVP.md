@@ -151,6 +151,7 @@ Design constraints for low token usage:
 
 - phase prompts should be short and explicit
 - each phase should read only one feature package at a time
+- targeted code reading is allowed when it removes downstream guesswork, but broad repository exploration should remain disallowed by default
 - optional artifacts should stay optional
 - readiness scripts should enforce prerequisites instead of pushing that work into the model context
 - patch existing files instead of regenerating large documents
@@ -176,6 +177,13 @@ Recommended stable ID scheme:
 - `API-*` for API contract entries
 - `EVT-*` for event contract entries
 - `T<phase>.<index>` for implementation tasks
+
+Data-model and contract artifacts should stay compact but structurally explicit:
+
+- `data-model.md` should capture entity purpose, fields, invariants, lifecycle, and related acceptance IDs when those details matter to implementation
+- `contracts/api.md` should capture boundary purpose, trigger, inputs, outputs, errors, and ordering or idempotency assumptions
+- `contracts/events.md` should capture producer, consumer, trigger, payload, delivery expectation, retry or ordering assumptions, and failure handling
+- these details should be recorded in structured slots rather than left only in plan prose
 
 ## Plan package
 

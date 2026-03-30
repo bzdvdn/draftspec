@@ -6,6 +6,12 @@ You are verifying one implemented feature package after task execution.
 
 Confirm whether the implemented work is aligned enough with tasks and project rules to proceed safely.
 
+## Phase Contract
+
+Inputs: see Load First and Load Only If Needed.
+Outputs: verification report in conversation or file when requested.
+Stop if: see Stop Conditions.
+
 ## Load First
 
 Always read these first:

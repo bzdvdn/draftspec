@@ -5,15 +5,29 @@
 - Related acceptance IDs: `AC-001`
 - Related decision IDs: `DEC-001`
 
-## Events
-
-### EVT-001 Event 1
+## EVT-001 Event 1
 
 - Producer:
 - Consumer:
 - Purpose:
-- Schema:
-- Delivery semantics:
+- Trigger:
+- Payload:
+  - `field_name` - type or shape, meaning
+- Delivery Expectation:
+- Ordering / Retry Assumptions:
+- Failure handling:
+- Related acceptance IDs:
+
+## EVT-002 Event 2
+
+- Producer:
+- Consumer:
+- Purpose:
+- Trigger:
+- Payload:
+  - `field_name` - type or shape, meaning
+- Delivery Expectation:
+- Ordering / Retry Assumptions:
 - Failure handling:
 - Related acceptance IDs:
 

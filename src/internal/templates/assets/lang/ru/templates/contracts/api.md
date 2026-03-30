@@ -5,16 +5,30 @@
 - Связанные `AC-*`: `AC-001`
 - Связанные `DEC-*`: `DEC-001`
 
-## Эндпоинты
+## API-001 Граница 1
 
-### API-001 Эндпоинт 1
-
-- Метод:
-- Путь:
 - Назначение:
-- Запрос:
-- Ответ:
+- Trigger:
+- Inputs:
+  - `field_name` - тип или shape, required или optional, смысл
+- Outputs:
+  - `field_name` - тип или shape, смысл
 - Ошибки:
+- Idempotency / Ordering:
+- Notes:
+- Связанные `AC-*`:
+
+## API-002 Граница 2
+
+- Назначение:
+- Trigger:
+- Inputs:
+  - `field_name` - тип или shape, required или optional, смысл
+- Outputs:
+  - `field_name` - тип или shape, смысл
+- Ошибки:
+- Idempotency / Ordering:
+- Notes:
 - Связанные `AC-*`:
 
 ## Заметки

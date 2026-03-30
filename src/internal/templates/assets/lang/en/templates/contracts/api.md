@@ -5,16 +5,30 @@
 - Related acceptance IDs: `AC-001`
 - Related decision IDs: `DEC-001`
 
-## Endpoints
+## API-001 Boundary 1
 
-### API-001 Endpoint 1
-
-- Method:
-- Path:
 - Purpose:
-- Request:
-- Response:
+- Trigger:
+- Inputs:
+  - `field_name` - type or shape, required or optional, meaning
+- Outputs:
+  - `field_name` - type or shape, meaning
 - Errors:
+- Idempotency / Ordering:
+- Notes:
+- Related acceptance IDs:
+
+## API-002 Boundary 2
+
+- Purpose:
+- Trigger:
+- Inputs:
+  - `field_name` - type or shape, required or optional, meaning
+- Outputs:
+  - `field_name` - type or shape, meaning
+- Errors:
+- Idempotency / Ordering:
+- Notes:
 - Related acceptance IDs:
 
 ## Notes

@@ -2,6 +2,7 @@
 
 ## Scope
 
+- snapshot: one-line summary of what was verified
 - slug: <slug>
 - verified_at: <YYYY-MM-DD>
 - docs_language: <en|ru>

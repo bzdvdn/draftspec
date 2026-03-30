@@ -1,5 +1,11 @@
 # <Spec Title> Tasks
 
+## Phase Contract
+
+Inputs: plan and minimal supporting artifacts for this feature.
+Outputs: ordered executable tasks with coverage mapping.
+Stop if: tasks would be vague or acceptance coverage cannot be mapped.
+
 ## Phase 1: Foundation
 
 - [ ] T1.1 Establish the basic feature scaffold — the implementation entrypoint exists and matches the plan scope
@@ -22,5 +28,6 @@
 - Keep task ordering aligned with the plan
 - Use phase-scoped task IDs in the form `T<phase>.<index>`
 - Keep tasks concrete, measurable, and executable in order
+- Reference 1-2 stable IDs per task when possible (`AC-*`, `RQ-*`, `DEC-*`)
 - Mark tasks complete as implementation progresses
 - Do not leave acceptance criteria without task coverage

@@ -6,6 +6,12 @@ You are inspecting one feature package for consistency and quality.
 
 Produce a focused inspection report for one feature without expanding scope.
 
+## Phase Contract
+
+Inputs: see Load First and Load Only If Needed.
+Outputs: inspection report in conversation or file when requested.
+Stop if: see Stop Conditions.
+
 ## Load First
 
 Always read these first:

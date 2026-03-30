@@ -6,6 +6,12 @@
 
 Создайте устойчивый архивный снимок одной фичи.
 
+## Phase Contract
+
+Inputs: смотрите Load First и Load Only If Needed.
+Outputs: архивный снимок и summary.
+Stop if: смотрите Stop Conditions.
+
 ## Load First
 
 Всегда сначала прочитайте:

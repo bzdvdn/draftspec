@@ -20,11 +20,17 @@ Read discipline:
 - Follow `constitution -> spec -> inspect -> plan -> tasks -> implement -> archive`
 - Do not skip prerequisites
 - Load only the current feature slug by default
+- Prefer the readiness scripts for each phase before reading deeper artifacts
 - `/draftspec.spec` supports `--name`, optional `--slug`, and optional `--branch`; for chat-based input, the feature description may arrive in the next message
 - For file-based `/draftspec.spec` input, prefer a top-of-file `name:` and optional `slug:` before falling back to the filename
 - Allow an explicit `--branch <name>` override for repository-specific branch naming conventions such as Jira keys
 - During `tasks`, start with `plan.md` and read deeper artifacts only if required
 - During `implement`, start with `tasks.md` and read deeper artifacts only if required
+
+Never load by default:
+- unrelated specs or plan packages
+- broad repository scans
+- script source files (use readiness scripts instead)
 
 Implementation language discipline:
 - Treat the configured code comment language as the default for new or edited code comments

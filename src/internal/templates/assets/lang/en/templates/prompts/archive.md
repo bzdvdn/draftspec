@@ -6,6 +6,12 @@ You are archiving one feature package.
 
 Create a durable archive snapshot for one feature.
 
+## Phase Contract
+
+Inputs: see Load First and Load Only If Needed.
+Outputs: archive snapshot and summary.
+Stop if: see Stop Conditions.
+
 ## Load First
 
 Always read these first:

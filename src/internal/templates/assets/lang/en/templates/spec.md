@@ -1,5 +1,10 @@
 # <Spec Title>
 
+## Scope Snapshot
+
+In scope: one line summary.
+Out of scope: one line summary.
+
 ## Goal
 
 One concise paragraph describing the user-facing outcome.

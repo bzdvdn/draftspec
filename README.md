@@ -37,6 +37,7 @@ In short, Draftspec aims to sit between OpenSpec and Spec Kit: stricter than Ope
 ## Where Draftspec Stands Out
 
 - Narrow context by default. Each phase is designed to load the smallest useful scope.
+- Code reading should stay phase-local and targeted: enough to remove guesswork, not enough to recreate full-repository context.
 - Strict workflow chain. Constitution, spec, inspect, plan, tasks, and implementation stay aligned.
 - Lightweight traceability. Stable IDs and cheap readiness checks reduce prompt bloat.
 - Brownfield-friendly workflow. Draftspec works well in existing repositories without forcing a heavyweight process layer.
@@ -80,6 +81,7 @@ constitution -> spec -> inspect -> plan -> tasks -> implement -> verify -> archi
 
 - The constitution is the highest-priority project document.
 - Plan packages keep `plan.md`, `tasks.md`, `data-model.md`, `contracts/`, and optional `research.md` together.
+- `data-model.md` and `contracts/` are intentionally compact but structured: entities should capture fields, invariants, and lifecycle; contracts should capture boundary IO, failures, and delivery assumptions.
 - Specs use canonical `Given / When / Then` markers across documentation languages.
 - Draftspec prefers stable IDs and explicit references over repeated narrative summaries: `RQ-*` for requirements, `AC-*` for acceptance criteria, `DEC-*` for plan decisions, and phase-scoped `T*` task IDs.
 - Agent workflows are designed to load only the minimum context required.

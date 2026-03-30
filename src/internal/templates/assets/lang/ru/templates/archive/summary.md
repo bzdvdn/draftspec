@@ -2,6 +2,7 @@
 
 ## Спецификация
 
+- snapshot: однострочное резюме того, что архивировано
 - slug: <slug>
 - archived_at: <YYYY-MM-DD>
 - status: completed
