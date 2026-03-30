@@ -194,6 +194,15 @@ Optional artifact:
 
 `research.md` should only be created when there is genuine uncertainty, external investigation, or architectural tradeoff analysis that needs to be preserved.
 
+Concrete triggers for creating `research.md`:
+
+- an external system, API, or dependency has behavior that is still unclear
+- multiple realistic implementation options have meaningful tradeoffs that should be recorded
+- a non-obvious performance, security, reliability, or integration risk affects planning
+- a repository constraint or architecture boundary must be investigated before the plan can be made concrete
+
+`research.md` should not be created for generic brainstorming or obvious implementation work that can already be planned from the spec and repository evidence.
+
 ## Constitution workflow
 
 `constitution` is agent-driven and strict.
@@ -226,6 +235,7 @@ Inputs:
 Outputs:
 
 - a focused inspection report for one feature
+- compact by default in conversation output, with full sectioned output only when explicitly requested or persisted to a file
 - explicit Given/When/Then acceptance criteria, with `Given`, `When`, and `Then` kept canonical across documentation languages and inspect treating missing G/W/T as an error
 - explicit cheap checks for `constitution <-> spec`, `spec <-> plan`, and `plan <-> tasks` when those downstream artifacts exist
 - explicit references to stable IDs when reporting mismatches or gaps
@@ -243,6 +253,24 @@ Outputs:
 
 - `.draftspec/archive/<slug>/<YYYY-MM-DD>/summary.md`
 - archived copies of the feature spec and plan artifacts
+
+## Status workflow
+
+`status` is CLI-driven.
+
+Inputs:
+
+- one feature slug
+- `.draftspec/specs/<slug>.md` when present
+- `.draftspec/plans/<slug>/plan.md` when present
+- `.draftspec/plans/<slug>/tasks.md` when present
+- archive presence for the same slug when present
+
+Outputs:
+
+- a cheap current-state summary for one feature
+- machine-readable JSON via `draftspec status <slug> --json`
+- task counts when `tasks.md` exists, including total, completed, and open items
 
 ## Spec workflow
 
@@ -271,6 +299,11 @@ Draftspec should support two input modes for `/draftspec.spec`:
 - inline mode: the user provides the feature name and description in the same request
 - staged mode: the user first provides `/draftspec.spec --name ...` and then provides the feature description in the next message
 
+Staged mode continuation rules:
+
+- if the next user message begins with `/draftspec.`, staged mode is canceled and the new slash-command takes priority
+- if the next user message does not begin with `/draftspec.`, it is treated as the continuation of the staged spec request
+
 Priority rules for spec identity:
 
 1. `--slug`
@@ -290,7 +323,7 @@ If the request is file-based, Draftspec should still prefer explicit top-of-file
 - `name: <feature name>`
 - optional `slug: <feature-slug>`
 
-If `/draftspec.spec` is invoked with `--name` but without enough feature detail to write a valid specification, Draftspec should ask for the missing description or treat the next user message as the continuation of the same spec request.
+If `/draftspec.spec` is invoked with `--name` but without enough feature detail to write a valid specification, Draftspec should ask for the missing description and keep staged mode active until the next non-command user message or a new `/draftspec.` command cancels it.
 
 Output:
 
@@ -379,6 +412,7 @@ It must:
 - reject ambiguous scope such as mixing phase and task selection in the same run
 - update `tasks.md`
 - emit short phase progress updates during runtime, using the configured agent language
+- use a stable short progress format such as `[T1.1] started`, `[T1.1] done`, `[T1.1] blocked: <reason>`, and `[Phase 1] done: T1.1, T1.2`
 - report implementation coverage in terms of completed task IDs and referenced `AC-*` IDs
 - stop when the plan is insufficient or conflicts with the constitution
 

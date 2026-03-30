@@ -33,6 +33,8 @@ Stop and ask for clarification or refinement if:
 - `.draftspec/specs/<slug>.md` does not exist
 - the spec is too vague to produce architecture, contracts, or data model decisions
 - constitutional constraints conflict with the intended plan
+- the plan would need to cross an unclear integration or architectural boundary that is not justified by the spec or focused repository evidence
+- the work would only make sense if multiple feature packages were planned together
 
 Do not compensate by reading broad unrelated repository context.
 
@@ -48,7 +50,12 @@ Create only when the feature actually requires it:
 - `.draftspec/plans/<slug>/contracts/api.md` — only if the feature touches API boundaries
 - `.draftspec/plans/<slug>/contracts/events.md` — only if the feature produces or consumes events
 
-Create `.draftspec/plans/<slug>/research.md` only when real uncertainty or external investigation is needed.
+Create `.draftspec/plans/<slug>/research.md` only when at least one of these is true:
+
+- the feature depends on an external system, API, or dependency with behavior that is still unclear
+- there are multiple realistic implementation options with meaningful trade-offs that must be preserved
+- there is a non-obvious performance, security, reliability, or integration risk that affects planning
+- a repository constraint or architectural boundary must be investigated before the plan can be made concrete
 
 ## Invariants
 
@@ -59,6 +66,7 @@ Create `.draftspec/plans/<slug>/research.md` only when real uncertainty or exter
 - Do not read `/.draftspec/scripts/*` by default unless you are debugging the scripts, working on Draftspec itself, or the user explicitly asks to inspect script logic.
 - Prefer concrete implementation decisions over generic advice.
 - Optional artifacts stay optional; do not create them by habit.
+- Do not create `research.md` for generic brainstorming or obvious implementation work that can already be planned from the spec and repository evidence.
 - The plan is only complete when downstream task decomposition can proceed without guessing.
 
 ## Language Rules

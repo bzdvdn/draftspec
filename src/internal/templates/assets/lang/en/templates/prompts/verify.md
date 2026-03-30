@@ -38,6 +38,8 @@ Stop and ask for clarification only if:
 - the slug is ambiguous
 - the tasks file is missing
 - the verification would otherwise invent implementation facts
+- the requested conclusion would require a broad repository sweep instead of focused evidence for this feature package
+- the implementation claim cannot be confirmed from the current tasks, plan artifacts, and targeted code inspection
 
 ## Rules
 

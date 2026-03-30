@@ -131,6 +131,63 @@ func TestDoctorCommandJSONOutput(t *testing.T) {
 	}
 }
 
+func TestStatusCommandJSONOutput(t *testing.T) {
+	root := t.TempDir()
+
+	if _, _, err := executeRoot(t, "init", root, "--git=false", "--lang", "en", "--shell", "sh"); err != nil {
+		t.Fatalf("init command returned error: %v", err)
+	}
+
+	specPath := filepath.Join(root, ".draftspec", "specs", "demo.md")
+	if err := os.WriteFile(specPath, []byte("# Demo\n"), 0o644); err != nil {
+		t.Fatalf("WriteFile(spec) returned error: %v", err)
+	}
+
+	planDir := filepath.Join(root, ".draftspec", "plans", "demo")
+	if err := os.MkdirAll(planDir, 0o755); err != nil {
+		t.Fatalf("MkdirAll(planDir) returned error: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(planDir, "plan.md"), []byte("# Demo Plan\n"), 0o644); err != nil {
+		t.Fatalf("WriteFile(plan) returned error: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(planDir, "tasks.md"), []byte("- [x] T1.1 Done\n- [ ] T1.2 Open\n"), 0o644); err != nil {
+		t.Fatalf("WriteFile(tasks) returned error: %v", err)
+	}
+
+	stdout, _, err := executeRoot(t, "status", "demo", root, "--json")
+	if err != nil {
+		t.Fatalf("status --json returned error: %v", err)
+	}
+
+	var payload struct {
+		Slug           string `json:"slug"`
+		Phase          string `json:"phase"`
+		SpecExists     bool   `json:"spec_exists"`
+		PlanExists     bool   `json:"plan_exists"`
+		TasksExists    bool   `json:"tasks_exists"`
+		TasksTotal     int    `json:"tasks_total"`
+		TasksCompleted int    `json:"tasks_completed"`
+		TasksOpen      int    `json:"tasks_open"`
+		ReadyFor       string `json:"ready_for"`
+		Blocked        bool   `json:"blocked"`
+	}
+	if err := json.Unmarshal([]byte(stdout), &payload); err != nil {
+		t.Fatalf("failed to parse status json output %q: %v", stdout, err)
+	}
+	if payload.Slug != "demo" || payload.Phase != "implement" {
+		t.Fatalf("unexpected status payload: %+v", payload)
+	}
+	if !payload.SpecExists || !payload.PlanExists || !payload.TasksExists {
+		t.Fatalf("expected spec/plan/tasks to exist, got %+v", payload)
+	}
+	if payload.TasksTotal != 2 || payload.TasksCompleted != 1 || payload.TasksOpen != 1 {
+		t.Fatalf("unexpected task counts: %+v", payload)
+	}
+	if payload.ReadyFor != "implement" || payload.Blocked {
+		t.Fatalf("unexpected ready/block state: %+v", payload)
+	}
+}
+
 func TestCleanupAgentsCommandRemovesOrphanedArtifacts(t *testing.T) {
 	root := t.TempDir()
 

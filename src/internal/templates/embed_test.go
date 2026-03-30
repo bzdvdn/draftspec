@@ -148,6 +148,8 @@ func TestInspectPromptDefinesCheapScopeAndVerdictRules(t *testing.T) {
 		"Read these only when they exist and materially affect the inspection:",
 		"Do Not Read By Default",
 		"Prefer the cheapest inspection scope first",
+		"Default to a compact report in conversation output",
+		"Produce the full sectioned report only when the user explicitly asks for a full report",
 		"Verify `constitution <-> spec`",
 		"Verify `spec <-> plan`",
 		"verify `plan <-> tasks`",
@@ -180,10 +182,145 @@ func TestImplementPromptSupportsFullRunAndScopedExecution(t *testing.T) {
 		"Scoped behavior: if the user explicitly provides `--tasks <task-id-list>`, execute only those task IDs.",
 		"Do not accept `--phase` and `--tasks` together in the same run.",
 		"If scoped execution skips unfinished earlier work, warn about the ordering risk",
+		"the selected work would force changes across another feature package or slug",
+		"the next safe step would require inventing new tasks or acceptance coverage",
+		"[T1.1] started",
+		"[T1.1] done",
+		"[T1.1] blocked: <reason>",
+		"[Phase 1] done: T1.1, T1.2",
 	}
 	for _, snippet := range requiredSnippets {
 		if !strings.Contains(content, snippet) {
 			t.Fatalf("expected implement prompt to contain %q", snippet)
+		}
+	}
+}
+
+func TestSpecPromptDefinesDeterministicStagedMode(t *testing.T) {
+	files, err := Files(LanguageSettings{
+		Default:  "en",
+		Docs:     "en",
+		Agent:    "en",
+		Comments: "en",
+		Shell:    "sh",
+	})
+	if err != nil {
+		t.Fatalf("Files() returned error: %v", err)
+	}
+
+	content := fileContentByTarget(t, files, "templates/prompts/spec.md")
+	requiredSnippets := []string{
+		"keep staged mode active for the next non-command user message",
+		"If the next user message begins with `/draftspec.`, staged mode is canceled",
+		"If the next user message does not begin with `/draftspec.`, treat it as the continuation of the staged spec request.",
+	}
+	for _, snippet := range requiredSnippets {
+		if !strings.Contains(content, snippet) {
+			t.Fatalf("expected spec prompt to contain %q", snippet)
+		}
+	}
+}
+
+func TestPlanPromptDefinesConcreteResearchTriggers(t *testing.T) {
+	files, err := Files(LanguageSettings{
+		Default:  "en",
+		Docs:     "en",
+		Agent:    "en",
+		Comments: "en",
+		Shell:    "sh",
+	})
+	if err != nil {
+		t.Fatalf("Files() returned error: %v", err)
+	}
+
+	content := fileContentByTarget(t, files, "templates/prompts/plan.md")
+	requiredSnippets := []string{
+		"Create `.draftspec/plans/<slug>/research.md` only when at least one of these is true:",
+		"external system, API, or dependency",
+		"multiple realistic implementation options",
+		"Do not create `research.md` for generic brainstorming",
+	}
+	for _, snippet := range requiredSnippets {
+		if !strings.Contains(content, snippet) {
+			t.Fatalf("expected plan prompt to contain %q", snippet)
+		}
+	}
+}
+
+func TestTasksAndImplementPromptsDoNotAssumeResearchArtifact(t *testing.T) {
+	files, err := Files(LanguageSettings{
+		Default:  "en",
+		Docs:     "en",
+		Agent:    "en",
+		Comments: "en",
+		Shell:    "sh",
+	})
+	if err != nil {
+		t.Fatalf("Files() returned error: %v", err)
+	}
+
+	for _, target := range []string{
+		"templates/prompts/tasks.md",
+		"templates/prompts/implement.md",
+	} {
+		content := fileContentByTarget(t, files, target)
+		if !strings.Contains(content, "Do not assume `research.md` should exist;") {
+			t.Fatalf("expected %s to explain that research.md is not assumed by default", target)
+		}
+	}
+}
+
+func TestPromptsDefineScopeTripwiresForRefinement(t *testing.T) {
+	files, err := Files(LanguageSettings{
+		Default:  "en",
+		Docs:     "en",
+		Agent:    "en",
+		Comments: "en",
+		Shell:    "sh",
+	})
+	if err != nil {
+		t.Fatalf("Files() returned error: %v", err)
+	}
+
+	testCases := []struct {
+		target string
+		want   []string
+	}{
+		{
+			target: "templates/prompts/spec.md",
+			want: []string{
+				"multiple feature slugs or multiple independent specs",
+			},
+		},
+		{
+			target: "templates/prompts/plan.md",
+			want: []string{
+				"cross an unclear integration or architectural boundary",
+				"multiple feature packages were planned together",
+			},
+		},
+		{
+			target: "templates/prompts/tasks.md",
+			want: []string{
+				"span multiple feature slugs or unrelated change sets",
+				"cannot be mapped to executable work without guessing",
+			},
+		},
+		{
+			target: "templates/prompts/verify.md",
+			want: []string{
+				"broad repository sweep instead of focused evidence",
+				"cannot be confirmed from the current tasks, plan artifacts, and targeted code inspection",
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		content := fileContentByTarget(t, files, tc.target)
+		for _, snippet := range tc.want {
+			if !strings.Contains(content, snippet) {
+				t.Fatalf("expected %s to contain %q", tc.target, snippet)
+			}
 		}
 	}
 }

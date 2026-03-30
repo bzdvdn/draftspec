@@ -35,12 +35,13 @@ Stop and ask a minimal follow-up question if:
 - the feature goal is ambiguous
 - the request asks to derive one spec from multiple constitutional changes without naming a single concrete feature or change
 - the request combines multiple features or unrelated changes into one spec
+- the request would require multiple feature slugs or multiple independent specs to stay honest about scope
 - the input is a prompt file with a generic filename and no explicit `name:` or `slug:` metadata, and the user did not provide `--name` or `--slug`
 - the input looks like a URL rather than a concrete feature title
 - acceptance criteria would be invented rather than derived
 - the requested feature appears to conflict with the constitution
 
-If the user provided `--name` but has not yet given enough feature detail, do not lose the request context: ask for the missing description or accept the next user message as the continuation of the same spec request.
+If the user provided `--name` but has not yet given enough feature detail, do not lose the request context: ask for the missing description and treat the next non-command user message as the continuation of the same spec request.
 
 Do not continue into planning or implementation thinking when the spec itself is still unclear.
 
@@ -74,7 +75,9 @@ If the spec already exists and is current, say so and do not modify the file.
 - Fall back to the file basename only when it is specific enough to produce a safe slug.
 - If the user explicitly provides `--branch <name>`, use that branch name as-is instead of the default `feature/<slug>`.
 - An explicit `--branch` override does not change the spec slug unless the user also requests a different slug.
-- If the user provided only `--name` and the detailed description is still missing, ask for the description or accept the next user message as the continuation of the same spec request.
+- If the user provided only `--name` and the detailed description is still missing, ask for the description and keep staged mode active for the next non-command user message.
+- If the next user message begins with `/draftspec.`, staged mode is canceled and the new slash-command takes priority.
+- If the next user message does not begin with `/draftspec.`, treat it as the continuation of the staged spec request.
 
 ## Language Rules
 

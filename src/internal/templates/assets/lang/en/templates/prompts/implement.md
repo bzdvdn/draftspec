@@ -31,6 +31,8 @@ Read these only when the active task requires them:
 - `.draftspec/plans/<slug>/research.md` only when it exists and the current task depends on it
 - only the code files needed for the active tasks
 
+Do not assume `research.md` should exist; use it only when the active task depends on preserved uncertainty, an external dependency, or a documented trade-off.
+
 ## Do Not Read By Default
 
 - unrelated specs
@@ -48,6 +50,8 @@ Stop and request refinement if:
 - the current task requires spec, plan, data model, or contracts that are missing
 - the plan conflicts with the constitution
 - implementation requires scope beyond the current task list
+- the selected work would force changes across another feature package or slug that is not part of the current task scope
+- the next safe step would require inventing new tasks or acceptance coverage
 
 If all tasks in `tasks.md` are already marked complete, say so and do not continue.
 
@@ -81,6 +85,11 @@ Do not broaden scope to solve these problems.
 - Always make it clear which phase is currently in progress when the active work crosses a phase boundary.
 - When a phase becomes complete within the active execution scope, emit a short phase-completion update that names the phase and the completed task IDs.
 - Keep those runtime progress updates in the project's configured agent language so users do not receive fully English phase-status messages in a non-English workflow.
+- Use short progress lines in a stable format:
+  - `[T1.1] started`
+  - `[T1.1] done`
+  - `[T1.1] blocked: <reason>`
+  - `[Phase 1] done: T1.1, T1.2`
 - Load deeper artifacts only when the current task requires them.
 
 ## Language Rules

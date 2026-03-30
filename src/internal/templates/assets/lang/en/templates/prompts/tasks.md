@@ -29,6 +29,8 @@ Read these only when the decomposition requires them:
 - `.draftspec/plans/<slug>/contracts/` when tasks involve APIs, events, or integration boundaries
 - `.draftspec/plans/<slug>/research.md` only when it exists and affects implementation sequencing or risk
 
+Do not assume `research.md` should exist; use it only when the plan clearly depends on preserved uncertainty, an external dependency, or a documented trade-off.
+
 ## Do Not Read By Default
 
 - unrelated specs
@@ -44,6 +46,8 @@ Stop and ask for refinement if:
 - tasks would be vague because the plan is underspecified
 - the current decomposition requires spec, data model, contracts, or research that are missing
 - the constitution blocks the proposed decomposition
+- the decomposition would span multiple feature slugs or unrelated change sets
+- one or more acceptance criteria cannot be mapped to executable work without guessing
 
 Do not jump ahead into implementation.
 

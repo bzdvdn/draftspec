@@ -15,6 +15,7 @@ func NewRootCmd() *cobra.Command {
 	cmd.AddCommand(newRemoveAgentCmd())
 	cmd.AddCommand(newCleanupAgentsCmd())
 	cmd.AddCommand(newDoctorCmd())
+	cmd.AddCommand(newStatusCmd())
 	cmd.AddCommand(newListSpecsCmd())
 	cmd.AddCommand(newShowSpecCmd())
 

@@ -69,6 +69,8 @@ Stop and ask a minimal follow-up question only if:
 - Do not turn this into a broad design review. Prefer catching obvious drift over scoring architecture quality.
 - Keep the inspection report in the project's configured documentation language when writing it to disk.
 - Prefer concrete findings over generic advice.
+- Default to a compact report in conversation output: always include `Verdict`, include `Errors`, `Warnings`, and `Next Step` when non-empty, and include `Questions`, `Suggestions`, or `Traceability` only when they add real signal.
+- Produce the full sectioned report only when the user explicitly asks for a full report or when the report is being persisted to a file.
 - Use this report structure:
   - `# Inspect Report: <slug>`
   - `## Scope`
@@ -92,4 +94,5 @@ Stop and ask a minimal follow-up question only if:
 - Output the report to the conversation unless the user asks to persist it.
 - If the user asks to persist the report without specifying a file path, use `.draftspec/plans/<slug>/inspect.md` when the plan package exists. Otherwise use `.draftspec/specs/<slug>.inspect.md`.
 - If the user provides an explicit file path, use that path.
+- In default conversation mode, prefer a compact report with only non-empty sections.
 - Summarize errors, warnings, open questions, suggestions, and the final verdict.
