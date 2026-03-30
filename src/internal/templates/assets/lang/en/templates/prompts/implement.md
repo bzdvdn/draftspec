@@ -69,6 +69,8 @@ Do not broaden scope to solve these problems.
 - Respect the order and phase structure in `tasks.md`.
 - Never redesign or re-plan the feature silently during implementation.
 - Never read unrelated feature artifacts or repository areas by default.
+- When helper scripts for readiness or cheap validation are available and relevant to the current phase, prefer running them over reading their source.
+- Do not read `/.draftspec/scripts/*` by default unless you are debugging the scripts, working on Draftspec itself, or the user explicitly asks to inspect script logic.
 - If a task cannot be implemented safely from current artifacts, stop and request refinement.
 - Mark completed tasks in `tasks.md`.
 - Keep runtime updates short and tied to the current phase and task IDs.

@@ -41,6 +41,9 @@ Stop and ask a minimal follow-up question only if:
 ## Rules
 
 - Check constitutional consistency first.
+- If `/.draftspec/scripts/check-inspect-ready.*` or `/.draftspec/scripts/inspect-spec.*` are available, use them as a cheap first pass before deepening into artifacts.
+- Prefer helper script output over reading helper script source.
+- Do not read `/.draftspec/scripts/*` by default unless you are debugging the script, working on Draftspec itself, or the user explicitly asks to inspect script logic.
 - Inspect spec completeness and clarity.
 - Verify `constitution <-> spec`: the spec must not conflict with explicit constitutional constraints, workflow rules, or language policy.
 - Every acceptance criterion in the spec MUST have an explicit Given/When/Then format. The `Given`, `When`, and `Then` markers remain canonical regardless of the documentation language. Missing G/W/T is an `Error`, not a `Suggestion`.

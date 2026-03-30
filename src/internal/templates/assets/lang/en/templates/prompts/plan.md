@@ -55,6 +55,8 @@ Create `.draftspec/plans/<slug>/research.md` only when real uncertainty or exter
 - The plan MUST comply with the constitution.
 - Keep planning tied to the current spec, not idealized architecture.
 - Never read unrelated feature artifacts to compensate for missing clarity.
+- When helper scripts for readiness or cheap validation are available and relevant to the current phase, prefer running them over reading their source.
+- Do not read `/.draftspec/scripts/*` by default unless you are debugging the scripts, working on Draftspec itself, or the user explicitly asks to inspect script logic.
 - Prefer concrete implementation decisions over generic advice.
 - Optional artifacts stay optional; do not create them by habit.
 - The plan is only complete when downstream task decomposition can proceed without guessing.
