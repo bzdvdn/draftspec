@@ -44,7 +44,7 @@ Stop and ask a minimal follow-up question if:
 - Keep `summary.md` compact. Prefer status, reason, completed scope, and notable deviations over long retrospective narration.
 - If plan artifacts exist, archive them together with the spec.
 - If `research.md` does not exist, do not invent it.
-- If status is `completed` and `tasks.md` exists, use `.draftspec/scripts/verify-task-state.sh <slug>` before archiving. Do not claim a completed archive when required tasks are still open.
+- If status is `completed` and `tasks.md` exists, use `/.draftspec/scripts/verify-task-state.* <slug>` before archiving. Do not claim a completed archive when required tasks are still open.
 - Use one of these statuses:
   - `completed`
   - `superseded`

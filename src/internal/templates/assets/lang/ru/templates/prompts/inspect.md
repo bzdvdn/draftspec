@@ -41,7 +41,8 @@
 ## Rules
 
 - Сначала проверяйте соответствие конституции.
-- Если доступны `/.draftspec/scripts/check-inspect-ready.*` или `/.draftspec/scripts/inspect-spec.*`, используйте их как cheap first pass перед углублением в артефакты.
+- Если доступен `/.draftspec/scripts/check-inspect-ready.*`, предпочитайте его как cheap first pass перед углублением в артефакты.
+- Используйте `/.draftspec/scripts/inspect-spec.*` только как fallback, когда phase readiness wrapper недоступен.
 - Предпочитайте вывод helper scripts чтению их исходников.
 - Не читайте `/.draftspec/scripts/*` по умолчанию, если только не отлаживаете сам script, не работаете над самим Draftspec или пользователь явно не просит проанализировать script logic.
 - Проверяйте полноту и ясность спецификации.

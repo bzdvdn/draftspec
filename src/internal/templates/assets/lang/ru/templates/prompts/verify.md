@@ -42,7 +42,8 @@
 ## Rules
 
 - Начинайте с `tasks.md` как verification entrypoint.
-- Если доступны `/.draftspec/scripts/check-verify-ready.*` или `/.draftspec/scripts/verify-task-state.*`, используйте их как cheap first pass перед чтением более глубоких артефактов.
+- Если доступен `/.draftspec/scripts/check-verify-ready.*`, предпочитайте его как cheap first pass перед чтением более глубоких артефактов.
+- Используйте `/.draftspec/scripts/verify-task-state.*` только как fallback, когда phase readiness wrapper недоступен.
 - Предпочитайте вывод helper scripts чтению их исходников.
 - Не читайте `/.draftspec/scripts/*` по умолчанию, если только не отлаживаете сам script, не работаете над самим Draftspec или пользователь явно не просит проанализировать script logic.
 - Предпочитайте подтверждение конкретных implementation claims вместо широкого субъективного review.
@@ -57,7 +58,7 @@
 - Используйте `concerns`, если по workflow можно двигаться дальше, но warnings или открытые вопросы желательно закрыть в ближайшее время.
 - Используйте `blocked`, если отсутствие завершенных задач или противоречивое состояние реализации делают архивирование или заявление о завершенности небезопасным.
 - Если записываете результат в файл, держите его на настроенном языке документации проекта.
-- Используйте `/.draftspec/scripts/verify-task-state.* <slug>` как дешевую первую проверку перед чтением более глубоких артефактов.
+- Используйте `/.draftspec/scripts/verify-task-state.* <slug>` как fallback-first-pass только когда `check-verify-ready.*` недоступен.
 - Используйте `.draftspec/templates/verify-report.md` как канонический шаблон, если отчет записывается в файл.
 - Используйте такую структуру отчета:
   - `# Verify Report: <slug>`

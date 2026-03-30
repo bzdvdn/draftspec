@@ -42,7 +42,8 @@ Stop and ask for clarification only if:
 ## Rules
 
 - Start from `tasks.md` as the verification entrypoint.
-- If `/.draftspec/scripts/check-verify-ready.*` or `/.draftspec/scripts/verify-task-state.*` are available, use them as a cheap first pass before reading deeper artifacts.
+- If `/.draftspec/scripts/check-verify-ready.*` is available, prefer it as the cheap first pass before reading deeper artifacts.
+- Use `/.draftspec/scripts/verify-task-state.*` only as a fallback when the phase-readiness wrapper is unavailable.
 - Prefer helper script output over reading helper script source.
 - Do not read `/.draftspec/scripts/*` by default unless you are debugging the script, working on Draftspec itself, or the user explicitly asks to inspect script logic.
 - Prefer confirming concrete implementation claims over broad subjective review.
@@ -57,7 +58,7 @@ Stop and ask for clarification only if:
 - Use `concerns` when the feature can move forward, but warnings or open questions should be resolved soon.
 - Use `blocked` when missing task completion or contradictory implementation state would make archive or completion claims unsafe.
 - Keep the verification output in the project's configured documentation language when writing it to disk.
-- Use `/.draftspec/scripts/verify-task-state.* <slug>` as a cheap first pass before reading deeper artifacts.
+- Use `/.draftspec/scripts/verify-task-state.* <slug>` as the fallback first pass only when `check-verify-ready.*` is unavailable.
 - Use `.draftspec/templates/verify-report.md` as the canonical template when writing the report to disk.
 - Use this report structure:
   - `# Verify Report: <slug>`

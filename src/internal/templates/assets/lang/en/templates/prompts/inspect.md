@@ -41,7 +41,8 @@ Stop and ask a minimal follow-up question only if:
 ## Rules
 
 - Check constitutional consistency first.
-- If `/.draftspec/scripts/check-inspect-ready.*` or `/.draftspec/scripts/inspect-spec.*` are available, use them as a cheap first pass before deepening into artifacts.
+- If `/.draftspec/scripts/check-inspect-ready.*` is available, prefer it as the cheap first pass before deepening into artifacts.
+- Use `/.draftspec/scripts/inspect-spec.*` only as a fallback when the phase-readiness wrapper is unavailable.
 - Prefer helper script output over reading helper script source.
 - Do not read `/.draftspec/scripts/*` by default unless you are debugging the script, working on Draftspec itself, or the user explicitly asks to inspect script logic.
 - Inspect spec completeness and clarity.

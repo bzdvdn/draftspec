@@ -52,7 +52,7 @@ Do not jump ahead into implementation.
 - Tasks MUST align with the plan and constitution.
 - Use `plan.md` as the decomposition entrypoint.
 - Never read unrelated feature artifacts to compensate for underspecified planning.
-- When helper scripts for readiness or cheap validation are available and relevant to the current phase, prefer running them over reading their source.
+- When `/.draftspec/scripts/check-tasks-ready.*` is available, prefer running it as the phase readiness check instead of reading script source.
 - Do not read `/.draftspec/scripts/*` by default unless you are debugging the scripts, working on Draftspec itself, or the user explicitly asks to inspect script logic.
 - The task list must be executable in order.
 - Every acceptance criterion must be covered by at least one task.
