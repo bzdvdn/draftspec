@@ -74,9 +74,12 @@ If the constitution is already current and does not conflict with the request, s
   - `## Purpose`
   - `## Core Principles`
   - `## Constraints`
+  - `## Decision Priorities`
+  - `## Key Quality Dimensions`
   - `## Language Policy`
   - `## Development Workflow`
   - `## Governance`
+  - `## Exceptions Protocol`
   - `## Last Updated`
 - Ensure there are at least 5 principle subsections under `## Core Principles` using `### Principle Name` headings.
 - You may add extra sections when they materially improve project governance.
@@ -85,9 +88,13 @@ If the constitution is already current and does not conflict with the request, s
 - If the user explicitly requests new development rules, encode them in `## Development Workflow` and `## Governance` as mandatory rules for future work.
 - The `## Development Workflow` section MUST define how feature branches, specs, inspect, plans, tasks, and implementation relate to constitutional compliance.
 - The `## Development Workflow` section MUST explicitly state the conditions under which a spec, inspect, plan, tasks, or implementation violates the constitution and cannot proceed.
+- The `## Decision Priorities` section MUST capture 3-5 short, rule-like priorities for resolving trade-offs such as simplicity vs extensibility, correctness vs delivery speed, or maintainability vs cleverness.
+- The `## Key Quality Dimensions` section MUST include only project-relevant quality dimensions. Do not write a generic quality essay; keep it to 3-5 short, testable bullets.
+- The `## Exceptions Protocol` section MUST explain how acceptable deviations from the constitution are recorded and when downstream phases should treat a conflict as a blocker.
 - Do not declare DDD boundaries, event-contract ownership, release policy, or branch strategy as mandatory unless they are repository-grounded or explicitly requested by the user.
 - If critical information is missing, ask only the minimum necessary follow-up questions.
 - Use strict, testable language. Avoid vague wording. Each principle must make it possible to answer concretely: "does this decision conform to the constitution?"
+- Do not turn `## Decision Priorities`, `## Key Quality Dimensions`, or `## Exceptions Protocol` into a long handbook. Prefer compact bullets that are useful for downstream phase checks.
 - The constitution is the highest-priority project document. Specs, inspection reports, plans, tasks, and implementation must conform to it.
 
 ## Update rules

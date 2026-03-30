@@ -32,6 +32,18 @@
 
 [CONSTRAINTS]
 
+## Decision Priorities
+
+- [DECISION_PRIORITY_1]
+- [DECISION_PRIORITY_2]
+- [DECISION_PRIORITY_3]
+
+## Key Quality Dimensions
+
+- [QUALITY_DIMENSION_1]
+- [QUALITY_DIMENSION_2]
+- [QUALITY_DIMENSION_3]
+
 ## Language Policy
 
 - Documentation language: [DOCS_LANGUAGE]
@@ -55,6 +67,12 @@
 - Changes to architecture, specs, plans, and tasks MUST comply with these principles.
 - If implementation conflicts with this constitution, the constitution wins unless it is explicitly amended first.
 - Amend by patching this file, preserving mandatory sections and keeping guidance concrete and testable.
+
+## Exceptions Protocol
+
+- Any deviation from this constitution MUST be explicitly recorded as an exception with a reason and scope.
+- An exception MUST NOT be implied silently from implementation, planning, or task breakdown.
+- Until an exception is explicitly recorded, downstream phases MUST treat the conflict as a blocker.
 
 ## Last Updated
 
