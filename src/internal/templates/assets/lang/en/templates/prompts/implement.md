@@ -8,9 +8,9 @@ Implement the feature by following the existing task list without expanding scop
 
 ## Phase Contract
 
-Inputs: see Load First and Load Only If Needed.
-Outputs: see Output expectations.
-Stop if: see Stop Conditions.
+Inputs: `.draftspec/constitution.md`, `.draftspec/plans/<slug>/tasks.md`; deeper artifacts only when the active task requires them.
+Outputs: implementation code, updated task checkboxes in `tasks.md`.
+Stop if: tasks.md missing, next task not concrete, scope requires inventing new tasks, or all tasks already done.
 
 ## Operating Mode
 
@@ -67,7 +67,7 @@ Do not broaden scope to solve these problems.
 
 ## Scope Rules
 
-- Default behavior: if the user does not restrict scope, execute all unfinished tasks in order.
+- Default behavior: if the user does not restrict scope, execute only the first unfinished phase or the smallest contiguous unfinished task cluster needed for forward progress.
 - Scoped behavior: if the user explicitly provides `--phase <number>`, execute only that phase.
 - Scoped behavior: if the user explicitly provides `--tasks <task-id-list>`, execute only those task IDs.
 - Do not accept `--phase` and `--tasks` together in the same run.
@@ -89,6 +89,7 @@ Do not broaden scope to solve these problems.
 - Keep runtime updates short and tied to the current phase and task IDs.
 - Do not violate the constitution.
 - Leave the feature in a state that the next verify pass can inspect without guessing what changed, what remains, and why a task is done.
+- Do not re-plan the feature, emit a verify verdict, or silently complete neighboring tasks that were outside the active execution scope.
 
 ## Progress Rules
 
@@ -114,7 +115,6 @@ Do not broaden scope to solve these problems.
 
 ## Language Rules
 
-- If a selected task cannot be implemented safely from the current spec, plan, tasks, and supporting artifacts, stop and send the workflow back to spec, plan, or tasks refinement instead of inventing new scope.
 - Follow the project's preferred code comment language as recorded in `.draftspec/draftspec.yaml` and `.draftspec/constitution.md`.
 - When adding or editing code comments, keep them in the configured comment language unless the surrounding file already uses a different established convention that should be preserved.
 - Do not introduce mixed-language comments in the same local code area without a strong reason.
@@ -128,6 +128,8 @@ Do not broaden scope to solve these problems.
 - Summarize completed tasks, remaining tasks, and any blockers
 - Explicitly state which acceptance criteria from the spec are now covered by the implementation
 - Negative examples: do not mark a task done after partial scaffolding, do not slip unrelated cleanup or refactors into the same run, and do not claim acceptance coverage that was not actually implemented
+- When referring to changed files in the conversation, list their exact project-relative paths, not only bare filenames
+- End the conversation with a short stable summary block that includes `Slug`, `Status`, `Artifacts`, `Blockers`, and `Next command` when that handoff is truly safe
 - When the requested implementation scope is complete and ready for validation, end the conversation summary with `Next command: /draftspec.verify <slug>`
 - If implementation is blocked or unfinished, say that directly instead of suggesting `/draftspec.verify`
 

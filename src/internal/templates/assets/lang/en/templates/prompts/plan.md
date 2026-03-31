@@ -8,9 +8,9 @@ Produce the technical planning artifacts for a spec under `.draftspec/plans/<slu
 
 ## Phase Contract
 
-Inputs: see Load Only.
-Outputs: see Required outputs and Output expectations.
-Stop if: see Stop Conditions.
+Inputs: `.draftspec/constitution.md`, `.draftspec/specs/<slug>.md`, `.draftspec/specs/<slug>.inspect.md`, narrow repo code.
+Outputs: `.draftspec/plans/<slug>/plan.md`, `.draftspec/plans/<slug>/data-model.md`; optional `contracts/`, `research.md`.
+Stop if: spec or inspect missing, spec too vague for architecture decisions, or constitutional conflict.
 
 ## Operating Mode
 
@@ -83,11 +83,15 @@ Before creating `research.md`, write down the concrete unknowns first:
 - When `/.draftspec/scripts/check-plan-ready.*` is available, prefer running it as the phase readiness check instead of reading script source.
 - Do not read `/.draftspec/scripts/*` by default unless you are debugging the scripts, working on Draftspec itself, or the user explicitly asks to inspect script logic.
 - Prefer concrete implementation decisions over generic advice.
+- Record technologies, libraries, framework choices, or version constraints only when they materially affect implementation shape, integration boundaries, validation, or risk.
+- If a version or dependency is named, explain why it matters for this feature: compatibility, repository constraint, external contract, rollout risk, or validation.
+- Do not enumerate stack details for completeness; capture only technical constraints that reduce downstream guesswork.
 - Optional artifacts stay optional; do not create them by habit.
 - Do not create `research.md` for generic brainstorming or obvious implementation work that can already be planned from the spec and repository evidence.
 - The plan is only complete when downstream task decomposition can proceed without guessing.
 - The plan MUST name the concrete implementation surfaces expected to change.
 - The plan MUST map each acceptance criterion to an implementation approach before `tasks` are written.
+- Do not write the task checklist, edit implementation code, or emit verify/archive conclusions during planning.
 - If a downstream task writer would need to guess the method, boundary, or validation path for an `AC-*`, the plan is underspecified.
 - The plan should be specific enough that both an agent and a human reviewer can see the intended implementation shape, tradeoffs, and rollout implications without rereading the whole repository.
 - Targeted code reading during planning is encouraged when it reduces downstream guesswork; broad repository exploration is not.
@@ -136,8 +140,11 @@ Before creating `research.md`, write down the concrete unknowns first:
 
 - Write or patch the plan artifacts
 - State which optional artifacts were created and why
+- If optional artifacts such as `research.md` or `contracts/` were not created, say why they are not needed for this feature
 - Summarize the key technical decisions that will affect task decomposition and implementation
 - Explicitly call out risks and unresolved questions that block downstream phases
+- When referring to created or updated artifacts in the conversation, list their exact project-relative paths, not only bare filenames
+- End the conversation with a short stable summary block that includes `Slug`, `Status`, `Artifacts`, `Blockers`, and `Next command` when that handoff is truly safe
 - When planning is complete and downstream work is unblocked, end the conversation summary with `Next command: /draftspec.tasks <slug>`
 - If planning is blocked or needs refinement, say that directly instead of suggesting `/draftspec.tasks`
 

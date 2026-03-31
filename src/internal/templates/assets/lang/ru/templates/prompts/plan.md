@@ -8,9 +8,9 @@
 
 ## Phase Contract
 
-Inputs: смотрите Load Only.
-Outputs: смотрите Required outputs и Output expectations.
-Stop if: смотрите Stop Conditions.
+Inputs: `.draftspec/constitution.md`, `.draftspec/specs/<slug>.md`, `.draftspec/specs/<slug>.inspect.md`, узкий контекст репозитория.
+Outputs: `.draftspec/plans/<slug>/plan.md`, `.draftspec/plans/<slug>/data-model.md`; опционально `contracts/`, `research.md`.
+Stop if: spec или inspect отсутствуют, spec слишком расплывчата для архитектурных решений, или конфликт с конституцией.
 
 ## Режим работы
 
@@ -83,11 +83,15 @@ Stop if: смотрите Stop Conditions.
 - Когда доступен `/.draftspec/scripts/check-plan-ready.*`, предпочитайте запускать его как phase readiness check, а не читать исходники scripts.
 - Не читайте `/.draftspec/scripts/*` по умолчанию, если только не отлаживаете сами скрипты, не работаете над самим Draftspec или пользователь явно не просит разобрать script logic.
 - Предпочитайте конкретные implementation decisions, а не общие советы.
+- Фиксируйте технологии, библиотеки, framework choices и version constraints только когда они реально влияют на implementation shape, integration boundaries, validation или risk.
+- Если называете версию или зависимость, объясняйте, почему это важно для этой фичи: compatibility, repository constraint, внешний contract, rollout risk или validation.
+- Не перечисляйте stack details ради полноты; фиксируйте только те technical constraints, которые уменьшают downstream guesswork.
 - Опциональные артефакты должны оставаться опциональными; не создавайте их по привычке.
 - Не создавайте `research.md` ради общего brainstorming или очевидной реализации, которую уже можно спланировать из spec и repository evidence.
 - План считается достаточным только тогда, когда downstream tasks можно декомпозировать без догадок.
 - План ДОЛЖЕН явно называть concrete implementation surfaces, которые предполагается изменить.
 - План ДОЛЖЕН сопоставлять каждый acceptance criterion с подходом к реализации до того, как будут писаться `tasks`.
+- Не записывайте во время planning сам task checklist, не редактируйте implementation code и не выдавайте verify/archive conclusions.
 - Если автору следующей фазы пришлось бы гадать о методе, границе или пути валидации для `AC-*`, план недостаточно конкретен.
 - План должен быть достаточно конкретным, чтобы и агент, и reviewer видели форму реализации, tradeoff'ы и rollout implications без повторного чтения всего репозитория.
 - Targeted code reading на этапе planning приветствуется, если он уменьшает downstream guesswork; широкое исследование репозитория не допускается.
@@ -136,8 +140,11 @@ Stop if: смотрите Stop Conditions.
 
 - Запишите или patch-обновите артефакты плана
 - Укажите, какие из опциональных артефактов созданы и почему
+- Если optional artifacts вроде `research.md` или `contracts/` не создавались, явно укажите, почему они не нужны для этой фичи
 - Кратко опишите ключевые технические решения, которые повлияют на декомпозицию задач и реализацию
 - Явно укажите риски и нерешённые вопросы, блокирующие следующие фазы
+- Когда упоминаете созданные или обновленные артефакты в разговоре, указывайте их точные project-relative пути, а не только короткие имена файлов
+- Завершайте разговор коротким стабильным summary block с полями `Slug`, `Status`, `Artifacts`, `Blockers` и `Next command`, если такой handoff действительно безопасен
 - Когда планирование завершено и следующая фаза не заблокирована, завершайте разговорную сводку строкой `Следующая команда: /draftspec.tasks <slug>`
 - Если планирование заблокировано или требует refinement, говорите об этом прямо вместо подсказки `/draftspec.tasks`
 

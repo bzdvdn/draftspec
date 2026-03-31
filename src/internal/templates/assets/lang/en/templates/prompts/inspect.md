@@ -8,9 +8,9 @@ Produce a focused inspection report for one feature without expanding scope.
 
 ## Phase Contract
 
-Inputs: see Load First and Load Only If Needed.
-Outputs: persisted inspection report plus a compact conversation summary.
-Stop if: see Stop Conditions.
+Inputs: `.draftspec/constitution.md`, `.draftspec/specs/<slug>.md`; optionally `plan.md`, `tasks.md` when they exist.
+Outputs: `.draftspec/specs/<slug>.inspect.md` with verdict `pass`, `concerns`, or `blocked`.
+Stop if: slug ambiguous, spec missing, or report would require inventing product intent.
 
 ## Load First
 
@@ -53,6 +53,7 @@ Stop and ask a minimal follow-up question only if:
 - Do not read `/.draftspec/scripts/*` by default unless you are debugging the script, working on Draftspec itself, or the user explicitly asks to inspect script logic.
 - Inspect spec completeness and clarity.
 - Verify `constitution <-> spec`: the spec must not conflict with explicit constitutional constraints, workflow rules, or language policy.
+- Treat technology names, framework choices, library lists, or version pins in the spec as a `Warning` unless they clearly represent a user requirement, repository constraint, or external compatibility contract.
 - Every acceptance criterion in the spec MUST have an explicit Given/When/Then format. The `Given`, `When`, and `Then` markers remain canonical regardless of the documentation language. Missing G/W/T is an `Error`, not a `Suggestion`.
 - If `tasks.md` exists, verify that every acceptance criterion from the spec is covered by at least one task. An uncovered criterion is an `Error`.
 - If `tasks.md` uses task IDs such as `T1.1`, prefer traceability statements that reference those task IDs directly.
@@ -69,9 +70,6 @@ Stop and ask a minimal follow-up question only if:
 - Check `Acceptance Coverage at Plan Level`: major acceptance-critical behavior from the spec should be reflected in the plan intent, even before tasks exist.
 - Check `Constitution Consistency`: the plan must not violate constitutional rules or architectural constraints.
 - Check `Artifact Justification`: if the plan introduces `data-model.md` or `contracts/`, the need for those artifacts should be justified by the spec.
-- Use `blocked` when constitutional conflicts, missing product intent, missing Given/When/Then markers, uncovered acceptance criteria, or major `spec <-> plan` contradictions would make the next phase unsafe.
-- Use `concerns` when the feature is still broadly aligned but has weak scope boundaries, under-justified artifacts, incomplete traceability, or open questions that should be resolved soon.
-- Use `pass` when no blocking contradictions are present and only minor or no warnings remain.
 - Do not turn this into a broad design review. Prefer catching obvious drift over scoring architecture quality.
 - Keep the inspection report in the project's configured documentation language when writing it to disk.
 - Prefer concrete findings over generic advice.
@@ -96,6 +94,9 @@ Stop and ask a minimal follow-up question only if:
 - `## Traceability` should summarize how acceptance criteria map to tasks when `tasks.md` exists.
 - Prefer traceability statements that reference stable acceptance IDs and task IDs such as `AC-001 -> T1.1, T2.1`.
 - `## Next Step` should say whether it is safe to continue to `plan`, `tasks`, or whether refinement is required first.
+- For `pass`, name the exact next slash command.
+- For `concerns`, say whether the workflow may continue; if it may, include the exact next slash command.
+- For `blocked`, do not suggest the next phase command; state which refinement is required first.
 
 ## Output expectations
 
@@ -104,5 +105,15 @@ Stop and ask a minimal follow-up question only if:
 - Also summarize the verdict in the conversation.
 - In default conversation mode, prefer a compact report with only non-empty sections.
 - Summarize errors, warnings, open questions, suggestions, and the final verdict.
+- End the conversation with a short stable summary block that includes `Slug`, `Status`, `Artifacts`, `Blockers`, and `Next command` only when that handoff is truly safe
 - When the feature is ready to continue, make `## Next Step` and the conversation summary include the exact slash command for the next phase, such as `/draftspec.plan <slug>` or `/draftspec.tasks <slug>`.
 - If refinement is required first, say that directly instead of suggesting the next phase command.
+
+## Self-Check
+
+- Did I load only the artifacts needed for this slug?
+- Did I check every AC for Given/When/Then format?
+- Is the verdict (`pass`, `concerns`, `blocked`) supported by concrete findings, not general impressions?
+- If `tasks.md` exists, did I verify every AC is covered by at least one task?
+- Did I avoid turning this into a design review?
+- Is the next step command appropriate for the verdict?

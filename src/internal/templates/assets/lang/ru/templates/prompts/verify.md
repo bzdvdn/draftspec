@@ -8,9 +8,9 @@
 
 ## Phase Contract
 
-Inputs: смотрите Load First и Load Only If Needed.
-Outputs: отчет проверки в чате или файле по запросу.
-Stop if: смотрите Stop Conditions.
+Inputs: `.draftspec/constitution.md`, `.draftspec/plans/<slug>/tasks.md`; spec, plan, код — только для подтверждения конкретных выводов.
+Outputs: отчет с verdict (`pass`, `concerns` или `blocked`) в чате; сохраняется в `.draftspec/plans/<slug>/verify.md` по запросу.
+Stop if: slug неоднозначен, tasks.md отсутствует, или verdict потребовал бы выдумывать факты о реализации.
 
 ## Load First
 
@@ -27,6 +27,7 @@ Stop if: смотрите Stop Conditions.
 - `.draftspec/plans/<slug>/plan.md`
 - `.draftspec/plans/<slug>/data-model.md`
 - `.draftspec/plans/<slug>/contracts/`
+- `.draftspec/plans/<slug>/research.md` только если файл существует и текущая проверка зависит от зафиксированного trade-off или внешней зависимости
 - только те code files, которые действительно нужны, чтобы подтвердить, была ли задача или acceptance claim реализована
 
 ## Do Not Read By Default
@@ -69,7 +70,6 @@ Stop if: смотрите Stop Conditions.
 - Используйте `blocked`, если отсутствие завершенных задач или противоречивое состояние реализации делают архивирование или заявление о завершенности небезопасным.
 - Не используйте `pass`, если состояние завершенных задач не подтверждено, если остается blocking contradiction или если acceptance / implementation claims не подкреплены реально проверенными evidence.
 - Если записываете результат в файл, держите его на настроенном языке документации проекта.
-- Используйте `/.draftspec/scripts/verify-task-state.* <slug>` как fallback-first-pass только когда `check-verify-ready.*` недоступен.
 - Используйте `.draftspec/templates/verify-report.md` как канонический шаблон, если отчет записывается в файл.
 - Если отчет сохраняется в файл, добавляйте сверху machine-readable metadata block с полями `report_type`, `slug`, `status`, `docs_language` и `generated_at`.
 - Используйте такую структуру отчета:
@@ -95,6 +95,9 @@ Stop if: смотрите Stop Conditions.
   - `implement` для отсутствующей или противоречивой реализации
   - `tasks` для неполной, вводящей в заблуждение или отсутствующей декомпозиции
   - `plan`, когда intent реализации нельзя честно оценить из-за недостаточно конкретного дизайна
+- Для `pass` указывайте точную archive-команду.
+- Для `concerns` явно говорите, можно ли двигаться дальше; если нельзя, используйте явную return-команду для более ранней фазы.
+- Для `blocked` не подсказывайте archive; завершайте сводку строкой `Return to: /draftspec.<phase> <slug>` для самой узкой честной recovery-фазы.
 
 ## Output expectations
 
@@ -103,5 +106,16 @@ Stop if: смотрите Stop Conditions.
 - Кратко суммируйте verdict, выполненные проверки, оставшиеся concerns и можно ли безопасно архивировать фичу
 - В `## Checks` явно отразите завершенность задач, acceptance evidence и согласованность реализации в тех местах, которые реально проверялись
 - Negative examples: не ставьте `pass` только по чекбоксам, не намекайте на полную проверку фичи по одному просмотренному файлу и не пишите, что archive safe, если в `Not Verified` еще остались material gaps
+- Когда упоминаете проверенные или измененные файлы в разговоре, указывайте их точные project-relative пути, а не только короткие имена файлов
+- Завершайте разговор коротким стабильным summary block с полями `Slug`, `Status`, `Artifacts`, `Blockers` и либо `Next command`, либо `Return to`
 - Когда фичу можно безопасно архивировать, завершайте разговорную сводку строкой `Следующая команда: /draftspec.archive <slug>`
 - Когда verdict возвращает работу на более раннюю фазу, явно называйте эту фазу и указывайте ее точную slash-команду вместо подсказки archive
+
+## Self-Check
+
+- Я начал с `tasks.md` как verification entrypoint?
+- Каждый вывод verdict подкреплен реально проверенными evidence, а не только состоянием чекбоксов?
+- Я предпочел `concerns` вместо `pass`, если evidence были частичны?
+- Секция `Not Verified` честно отражает всё, что я не проверял?
+- Было бы архивирование безопасным только на основе того, что я реально проверил?
+- Следующая команда или return-фаза соответствует verdict?

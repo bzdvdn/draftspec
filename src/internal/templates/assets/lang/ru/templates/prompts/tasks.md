@@ -8,9 +8,9 @@
 
 ## Phase Contract
 
-Inputs: смотрите Load First и Load Only If Needed.
-Outputs: смотрите Output expectations.
-Stop if: смотрите Stop Conditions.
+Inputs: `.draftspec/constitution.md`, `.draftspec/plans/<slug>/plan.md`; опционально spec, data-model, contracts, если декомпозиция их требует.
+Outputs: `.draftspec/plans/<slug>/tasks.md` с фазовым списком задач и секцией Acceptance Coverage.
+Stop if: plan.md отсутствует, план слишком расплывчат, или хотя бы один AC нельзя привязать к выполнимой задаче.
 
 ## Режим работы
 
@@ -73,6 +73,7 @@ Stop if: смотрите Stop Conditions.
 - Не создавайте расплывчатые umbrella tasks.
 - Task list должен быть читаемым и для implementation-агента, и для reviewer без дополнительной интерпретации.
 - Targeted code reading во время декомпозиции полезен, если он уменьшает повторное чтение на этапе implementation.
+- Не начинайте implementation work, не редактируйте исходный код и не заявляйте, что задачи уже выполнены, на фазе tasks.
 
 ## Правила языка
 
@@ -112,6 +113,8 @@ Stop if: смотрите Stop Conditions.
 - Запишите или patch-обновите `.draftspec/plans/<slug>/tasks.md`
 - Убедитесь, что задачи можно выполнять по порядку
 - Явно укажите блокеры или недостающие входы, если декомпозиция пока невозможна
+- Когда упоминаете созданные или обновленные файлы в разговоре, указывайте их точные project-relative пути, а не только короткие имена файлов
+- Завершайте разговор коротким стабильным summary block с полями `Slug`, `Status`, `Artifacts`, `Blockers` и `Next command`, если такой handoff действительно безопасен
 - Когда декомпозиция завершена и можно переходить к реализации, завершайте разговорную сводку строкой `Следующая команда: /draftspec.implement <slug>`
 - Если задачи заблокированы или еще требуют refinement, говорите об этом прямо вместо подсказки `/draftspec.implement`
 

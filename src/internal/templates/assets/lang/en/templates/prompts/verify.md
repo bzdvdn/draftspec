@@ -8,9 +8,9 @@ Confirm whether the implemented work is aligned enough with tasks and project ru
 
 ## Phase Contract
 
-Inputs: see Load First and Load Only If Needed.
-Outputs: verification report in conversation or file when requested.
-Stop if: see Stop Conditions.
+Inputs: `.draftspec/constitution.md`, `.draftspec/plans/<slug>/tasks.md`; spec, plan, code only to confirm concrete claims.
+Outputs: verdict report (`pass`, `concerns`, or `blocked`) in conversation; persisted to `.draftspec/plans/<slug>/verify.md` on request.
+Stop if: slug ambiguous, tasks.md missing, or verdict would require inventing implementation facts.
 
 ## Load First
 
@@ -27,6 +27,7 @@ Read these only when needed to confirm a concrete claim:
 - `.draftspec/plans/<slug>/plan.md`
 - `.draftspec/plans/<slug>/data-model.md`
 - `.draftspec/plans/<slug>/contracts/`
+- `.draftspec/plans/<slug>/research.md` only when it exists and the active verification depends on a documented trade-off or external dependency
 - only the code files needed to confirm whether a task or acceptance claim was actually implemented
 
 ## Do Not Read By Default
@@ -69,7 +70,6 @@ Stop and ask for clarification only if:
 - Use `blocked` when missing task completion or contradictory implementation state would make archive or completion claims unsafe.
 - Do not use `pass` unless the completed task state is confirmed, no blocking contradiction remains, and every acceptance or implementation claim you mention is backed by inspected evidence.
 - Keep the verification output in the project's configured documentation language when writing it to disk.
-- Use `/.draftspec/scripts/verify-task-state.* <slug>` as the fallback first pass only when `check-verify-ready.*` is unavailable.
 - Use `.draftspec/templates/verify-report.md` as the canonical template when writing the report to disk.
 - When writing the report to disk, include a machine-readable metadata block at the top with `report_type`, `slug`, `status`, `docs_language`, and `generated_at`.
 - Use this report structure:
@@ -95,6 +95,9 @@ Stop and ask for clarification only if:
   - `implement` for missing or contradictory implementation
   - `tasks` for missing, misleading, or incomplete task decomposition
   - `plan` when the implementation cannot be judged honestly because the design intent is underspecified
+- For `pass`, name the exact archive command.
+- For `concerns`, say whether the workflow may continue; if it may not, use an explicit return command for the earlier phase.
+- For `blocked`, do not suggest archive; end with `Return to: /draftspec.<phase> <slug>` for the narrowest honest recovery phase.
 
 ## Output expectations
 
@@ -103,5 +106,16 @@ Stop and ask for clarification only if:
 - Summarize the verdict, completed checks, remaining concerns, and whether the feature is safe to archive
 - In `## Checks`, explicitly cover task completion, acceptance evidence, and implementation alignment where inspected
 - Negative examples: do not return `pass` from checkbox state alone, do not imply full-feature verification from one inspected file, and do not call archive safe when `Not Verified` still lists material gaps
+- When referring to inspected or changed files in the conversation, list their exact project-relative paths, not only bare filenames
+- End the conversation with a short stable summary block that includes `Slug`, `Status`, `Artifacts`, `Blockers`, and either `Next command` or `Return to`
 - When the feature is safe to archive, end the conversation summary with `Next command: /draftspec.archive <slug>`
 - When the verdict sends work back to an earlier phase, name that earlier phase explicitly and include its exact slash command instead of suggesting archive
+
+## Self-Check
+
+- Did I start from `tasks.md` as the verification entrypoint?
+- Is every claim in the verdict backed by inspected evidence, not just checkbox state?
+- Did I prefer `concerns` over `pass` when evidence was partial?
+- Is the `Not Verified` section honest about what I did not check?
+- Would `archive` be safe based only on what I actually verified?
+- Is the next step or return phase appropriate for the verdict?

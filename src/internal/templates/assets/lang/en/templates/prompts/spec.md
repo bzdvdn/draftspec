@@ -10,9 +10,9 @@ Before writing or updating the spec, ensure work is happening on the feature bra
 
 ## Phase Contract
 
-Inputs: see Load Only.
-Outputs: see Output expectations.
-Stop if: see Stop Conditions.
+Inputs: `.draftspec/constitution.md`, user request, minimal repo context.
+Outputs: `.draftspec/specs/<slug>.md` (created or patched).
+Stop if: goal ambiguous, multiple features in one request, or AC would be invented rather than derived.
 
 ## Operating Mode
 
@@ -69,6 +69,10 @@ If the spec already exists and is current, say so and do not modify the file.
 - Derive acceptance criteria from the request and repository reality; do not invent them.
 - Use explicit scope boundaries. The out-of-scope section is mandatory.
 - The spec should be detailed enough that both an agent and a human reviewer can understand the user flow and scope boundaries without reading planning artifacts.
+- Do not write planning decisions, task decomposition, or implementation steps in the spec itself.
+- Do not lock in technologies, libraries, framework choices, or version details by default.
+- Mention stack or version constraints only when they are explicitly required by the user, needed to reflect an existing repository constraint, or required by an external or compatibility contract that changes acceptance scope.
+- If a technology choice matters only as an implementation preference, record it in `plan`, not in `spec`.
 - Do not mix languages inside the same spec without a strong project reason.
 - Follow `.draftspec/templates/spec.md` when creating a new file.
 - Every acceptance criterion MUST use Given/When/Then format.
@@ -124,6 +128,7 @@ If the spec already exists and is current, say so and do not modify the file.
 - `## Edge Cases` should include only behavior that materially changes implementation or validation, not a brainstorming dump.
 - `## Open Questions` should say `none` when no real question remains.
 - Negative examples: do not merge multiple features into one spec, do not hide scope expansion inside edge cases, and do not use `TBD` acceptance criteria.
+- Negative examples: do not add library lists, framework choices, SDK names, or version pins to the spec unless they are product or repository constraints.
 - Prefer density over length: every section should help planning or review, and filler text is a defect.
 
 ## Output expectations
@@ -131,6 +136,8 @@ If the spec already exists and is current, say so and do not modify the file.
 - Create or switch to `feature/<slug>` before editing the spec when branch creation is available in the current environment, unless the user explicitly provides `--branch`.
 - Write or patch `.draftspec/specs/<slug>.md`, where `<slug>` is the lowercase kebab-case of the feature name
 - Summarize goal, scope, acceptance criteria, and open questions
+- When referring to created or updated files in the conversation, list their exact project-relative paths, not only bare filenames
+- End the conversation with a short stable summary block that includes `Slug`, `Status`, `Artifacts`, `Blockers`, and `Next command` when that handoff is truly safe
 - When the spec is ready for the next phase, end the conversation summary with `Next command: /draftspec.inspect <slug>`
 - If the spec is still incomplete or staged mode is waiting for more detail, say that directly instead of suggesting the next phase command
 

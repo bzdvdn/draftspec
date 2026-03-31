@@ -8,9 +8,9 @@ Break an approved plan into executable implementation tasks.
 
 ## Phase Contract
 
-Inputs: see Load First and Load Only If Needed.
-Outputs: see Output expectations.
-Stop if: see Stop Conditions.
+Inputs: `.draftspec/constitution.md`, `.draftspec/plans/<slug>/plan.md`; optionally spec, data-model, contracts when decomposition requires them.
+Outputs: `.draftspec/plans/<slug>/tasks.md` with phased task list and Acceptance Coverage section.
+Stop if: plan.md missing, plan underspecified, or any AC cannot be mapped to executable work.
 
 ## Operating Mode
 
@@ -73,6 +73,7 @@ Do not jump ahead into implementation.
 - Do not generate vague umbrella tasks.
 - The task list should be readable to both an implementation agent and a human reviewer without extra interpretation.
 - Targeted code reading during task decomposition is useful when it reduces re-reading during implementation.
+- Do not start implementation work, edit source code, or claim tasks are already done during the tasks phase.
 
 ## Language Rules
 
@@ -112,6 +113,8 @@ Do not jump ahead into implementation.
 - Write or patch `.draftspec/plans/<slug>/tasks.md`
 - Ensure tasks can be executed in order
 - Call out blockers or missing inputs if decomposition is not yet possible
+- When referring to created or updated files in the conversation, list their exact project-relative paths, not only bare filenames
+- End the conversation with a short stable summary block that includes `Slug`, `Status`, `Artifacts`, `Blockers`, and `Next command` when that handoff is truly safe
 - When task decomposition is complete and implementation can begin, end the conversation summary with `Next command: /draftspec.implement <slug>`
 - If tasks are blocked or still need refinement, say that directly instead of suggesting `/draftspec.implement`
 
