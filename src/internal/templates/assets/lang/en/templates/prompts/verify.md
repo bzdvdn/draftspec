@@ -103,3 +103,5 @@ Stop and ask for clarification only if:
 - Summarize the verdict, completed checks, remaining concerns, and whether the feature is safe to archive
 - In `## Checks`, explicitly cover task completion, acceptance evidence, and implementation alignment where inspected
 - Negative examples: do not return `pass` from checkbox state alone, do not imply full-feature verification from one inspected file, and do not call archive safe when `Not Verified` still lists material gaps
+- When the feature is safe to archive, end the conversation summary with `Next command: /draftspec.archive <slug>`
+- When the verdict sends work back to an earlier phase, name that earlier phase explicitly and include its exact slash command instead of suggesting archive

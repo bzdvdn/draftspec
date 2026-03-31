@@ -138,6 +138,8 @@ Before creating `research.md`, write down the concrete unknowns first:
 - State which optional artifacts were created and why
 - Summarize the key technical decisions that will affect task decomposition and implementation
 - Explicitly call out risks and unresolved questions that block downstream phases
+- When planning is complete and downstream work is unblocked, end the conversation summary with `Next command: /draftspec.tasks <slug>`
+- If planning is blocked or needs refinement, say that directly instead of suggesting `/draftspec.tasks`
 
 ## Self-Check
 

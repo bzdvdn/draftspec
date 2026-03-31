@@ -554,6 +554,75 @@ func TestVerifyTemplateAndPromptPreferEvidenceScopedVerification(t *testing.T) {
 	}
 }
 
+func TestPhasePromptsIncludeExplicitNextCommandGuidance(t *testing.T) {
+	files, err := Files(LanguageSettings{
+		Default:  "en",
+		Docs:     "en",
+		Agent:    "en",
+		Comments: "en",
+		Shell:    "sh",
+	})
+	if err != nil {
+		t.Fatalf("Files() returned error: %v", err)
+	}
+
+	testCases := []struct {
+		target string
+		want   []string
+	}{
+		{
+			target: "templates/prompts/spec.md",
+			want: []string{
+				"Next command: /draftspec.inspect <slug>",
+				"instead of suggesting the next phase command",
+			},
+		},
+		{
+			target: "templates/prompts/plan.md",
+			want: []string{
+				"Next command: /draftspec.tasks <slug>",
+				"instead of suggesting `/draftspec.tasks`",
+			},
+		},
+		{
+			target: "templates/prompts/tasks.md",
+			want: []string{
+				"Next command: /draftspec.implement <slug>",
+				"instead of suggesting `/draftspec.implement`",
+			},
+		},
+		{
+			target: "templates/prompts/implement.md",
+			want: []string{
+				"Next command: /draftspec.verify <slug>",
+				"instead of suggesting `/draftspec.verify`",
+			},
+		},
+		{
+			target: "templates/prompts/verify.md",
+			want: []string{
+				"Next command: /draftspec.archive <slug>",
+				"include its exact slash command instead of suggesting archive",
+			},
+		},
+		{
+			target: "templates/prompts/archive.md",
+			want: []string{
+				"terminal workflow step for this feature",
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		content := fileContentByTarget(t, files, tc.target)
+		for _, snippet := range tc.want {
+			if !strings.Contains(content, snippet) {
+				t.Fatalf("expected %s to contain %q", tc.target, snippet)
+			}
+		}
+	}
+}
+
 func TestInspectHelperScriptsDelegateToInternalCLI(t *testing.T) {
 	testCases := []struct {
 		name   string

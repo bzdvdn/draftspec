@@ -131,6 +131,8 @@ If the spec already exists and is current, say so and do not modify the file.
 - Create or switch to `feature/<slug>` before editing the spec when branch creation is available in the current environment, unless the user explicitly provides `--branch`.
 - Write or patch `.draftspec/specs/<slug>.md`, where `<slug>` is the lowercase kebab-case of the feature name
 - Summarize goal, scope, acceptance criteria, and open questions
+- When the spec is ready for the next phase, end the conversation summary with `Next command: /draftspec.inspect <slug>`
+- If the spec is still incomplete or staged mode is waiting for more detail, say that directly instead of suggesting the next phase command
 
 ## Self-Check
 

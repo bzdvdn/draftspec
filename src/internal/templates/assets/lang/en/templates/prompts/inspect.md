@@ -104,3 +104,5 @@ Stop and ask a minimal follow-up question only if:
 - Also summarize the verdict in the conversation.
 - In default conversation mode, prefer a compact report with only non-empty sections.
 - Summarize errors, warnings, open questions, suggestions, and the final verdict.
+- When the feature is ready to continue, make `## Next Step` and the conversation summary include the exact slash command for the next phase, such as `/draftspec.plan <slug>` or `/draftspec.tasks <slug>`.
+- If refinement is required first, say that directly instead of suggesting the next phase command.

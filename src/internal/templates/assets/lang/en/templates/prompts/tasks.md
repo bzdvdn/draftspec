@@ -112,6 +112,8 @@ Do not jump ahead into implementation.
 - Write or patch `.draftspec/plans/<slug>/tasks.md`
 - Ensure tasks can be executed in order
 - Call out blockers or missing inputs if decomposition is not yet possible
+- When task decomposition is complete and implementation can begin, end the conversation summary with `Next command: /draftspec.implement <slug>`
+- If tasks are blocked or still need refinement, say that directly instead of suggesting `/draftspec.implement`
 
 ## Self-Check
 

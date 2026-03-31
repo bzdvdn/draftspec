@@ -128,6 +128,8 @@ Do not broaden scope to solve these problems.
 - Summarize completed tasks, remaining tasks, and any blockers
 - Explicitly state which acceptance criteria from the spec are now covered by the implementation
 - Negative examples: do not mark a task done after partial scaffolding, do not slip unrelated cleanup or refactors into the same run, and do not claim acceptance coverage that was not actually implemented
+- When the requested implementation scope is complete and ready for validation, end the conversation summary with `Next command: /draftspec.verify <slug>`
+- If implementation is blocked or unfinished, say that directly instead of suggesting `/draftspec.verify`
 
 ## Self-Check
 

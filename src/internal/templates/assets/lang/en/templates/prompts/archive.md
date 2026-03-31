@@ -63,3 +63,4 @@ Stop and ask a minimal follow-up question if:
 - Create the archive snapshot
 - Write or patch `summary.md`
 - Summarize archived files, status, and reason
+- State explicitly that archive is the terminal workflow step for this feature unless the user asks for follow-up work

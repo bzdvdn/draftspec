@@ -183,6 +183,20 @@ func normalizeShell(shell string) string {
 	return "sh"
 }
 
+func commandHint(name, lang string) string {
+	if lang == "ru" {
+		return fmt.Sprintf("Команда: `/draftspec.%s [request]`", name)
+	}
+	return fmt.Sprintf("Command: `/draftspec.%s [request]`", name)
+}
+
+func toolInvocationHint(lang string) string {
+	if lang == "ru" {
+		return "Используйте инструменты напрямую через runtime агента; не печатайте raw JSON/XML/tool-call payloads и не выводите внутренние рассуждения о выборе инструмента."
+	}
+	return "Use tools directly through the agent runtime; do not print raw JSON/XML/tool-call payloads or expose internal reasoning about tool choice."
+}
+
 func renderClaude(spec commandSpec, lang string) string {
 	if lang == "ru" {
 		return fmt.Sprintf(`---
@@ -192,16 +206,18 @@ argument-hint: [request]
 
 Следуйте файлу %q.
 
+%s
+
 Аргументы пользователя:
 $ARGUMENTS
 
 Требования:
 - сначала прочитайте .draftspec/constitution.md, если это требуется prompt-файлом
 - используйте только минимально нужный контекст репозитория
-- если доступны, учитывайте связанные scripts:
+- если доступны, сначала запускайте связанные scripts и опирайтесь на их вывод; не читайте исходники scripts по умолчанию:
 %s
 - обновляйте только релевантные артефакты и кратко сообщайте об итогах и блокерах
-`, spec.Description, spec.PromptPath, bulletList(spec.Extras))
+`, spec.Description, spec.PromptPath, commandHint(spec.Name, lang), bulletList(spec.Extras))
 	}
 
 	return fmt.Sprintf(`---
@@ -211,16 +227,18 @@ argument-hint: [request]
 
 Follow %q.
 
+%s
+
 User arguments:
 $ARGUMENTS
 
 Requirements:
 - read .draftspec/constitution.md first when the prompt requires it
 - use only the minimum repository context needed
-- when available, account for related scripts:
+- when available, run related scripts first and rely on their output; do not read script source by default:
 %s
 - update only the relevant artifacts and report outcomes and blockers briefly
-`, spec.Description, spec.PromptPath, bulletList(spec.Extras))
+`, spec.Description, spec.PromptPath, commandHint(spec.Name, lang), bulletList(spec.Extras))
 }
 
 func renderCodex(spec commandSpec, lang string) string {
@@ -230,22 +248,30 @@ func renderCodex(spec commandSpec, lang string) string {
 
 Следуйте файлу %q.
 
+%s
+
 Вход пользователя: {{arguments}}
 
 Дополнительно:
+- если доступны связанные scripts, сначала запускайте их и опирайтесь на их вывод; не читайте исходники scripts по умолчанию
+- %s
 %s
-`, title, spec.PromptPath, bulletList(spec.Extras))
+`, title, spec.PromptPath, commandHint(spec.Name, lang), toolInvocationHint(lang), bulletList(spec.Extras))
 	}
 
 	return fmt.Sprintf(`# Draftspec %s
 
 Follow %q.
 
+%s
+
 User input: {{arguments}}
 
 Additional context:
+- when related scripts are available, run them first and rely on their output; do not read script source by default
+- %s
 %s
-`, title, spec.PromptPath, bulletList(spec.Extras))
+`, title, spec.PromptPath, commandHint(spec.Name, lang), toolInvocationHint(lang), bulletList(spec.Extras))
 }
 
 func renderCopilot(spec commandSpec, lang string) string {
@@ -254,26 +280,30 @@ func renderCopilot(spec commandSpec, lang string) string {
 
 Используйте %q как основной workflow prompt.
 
+%s
+
 Что нужно сделать:
 - обработать запрос пользователя для одной фазы %q
 - применять только минимально нужный контекст репозитория
-- использовать связанные scripts при необходимости:
+- при необходимости сначала запускайте связанные scripts и опирайтесь на их вывод; не читайте исходники scripts по умолчанию:
 %s
 - кратко сообщить о результатах и блокерах
-`, spec.Name, spec.PromptPath, spec.Name, bulletList(spec.Extras))
+`, spec.Name, spec.PromptPath, commandHint(spec.Name, lang), spec.Name, bulletList(spec.Extras))
 	}
 
 	return fmt.Sprintf(`# Draftspec %s
 
 Use %q as the primary workflow prompt.
 
+%s
+
 What to do:
 - handle the user request for the %q phase
 - use only the minimum repository context required
-- use related scripts when needed:
+- when needed, run related scripts first and rely on their output; do not read script source by default:
 %s
 - report outcomes and blockers briefly
-`, spec.Name, spec.PromptPath, spec.Name, bulletList(spec.Extras))
+`, spec.Name, spec.PromptPath, commandHint(spec.Name, lang), spec.Name, bulletList(spec.Extras))
 }
 
 func renderCursor(spec commandSpec, lang string) string {
@@ -285,11 +315,15 @@ alwaysApply: false
 
 Следуйте файлу %q.
 
+%s
+
 Используйте эту rule, когда запрос явно относится к фазе %q или к команде /draftspec.%s.
+
+Если доступны связанные scripts, сначала запускайте их и опирайтесь на их вывод. Не читайте исходники scripts по умолчанию.
 
 Связанные scripts:
 %s
-`, spec.Name, spec.PromptPath, spec.Name, spec.Name, bulletList(spec.Extras))
+`, spec.Name, spec.PromptPath, commandHint(spec.Name, lang), spec.Name, spec.Name, bulletList(spec.Extras))
 	}
 
 	return fmt.Sprintf(`---
@@ -299,11 +333,15 @@ alwaysApply: false
 
 Follow %q.
 
+%s
+
 Use this rule when the request clearly maps to the %q phase or the /draftspec.%s command.
+
+When related scripts are available, run them first and rely on their output. Do not read script source by default.
 
 Related scripts:
 %s
-`, spec.Name, spec.PromptPath, spec.Name, spec.Name, bulletList(spec.Extras))
+`, spec.Name, spec.PromptPath, commandHint(spec.Name, lang), spec.Name, spec.Name, bulletList(spec.Extras))
 }
 
 func renderKilo(spec commandSpec, lang string) string {
@@ -312,22 +350,30 @@ func renderKilo(spec commandSpec, lang string) string {
 
 Следуйте файлу %q.
 
+%s
+
 Используйте это project rule, когда запрос относится к фазе %q.
+
+Если доступны связанные scripts, сначала запускайте их и опирайтесь на их вывод. Не читайте исходники scripts по умолчанию.
 
 Связанные scripts:
 %s
-`, spec.Name, spec.PromptPath, spec.Name, bulletList(spec.Extras))
+`, spec.Name, spec.PromptPath, commandHint(spec.Name, lang), spec.Name, bulletList(spec.Extras))
 	}
 
 	return fmt.Sprintf(`# Draftspec %s
 
 Follow %q.
 
+%s
+
 Use this project rule when the request maps to the %q phase.
+
+When related scripts are available, run them first and rely on their output. Do not read script source by default.
 
 Related scripts:
 %s
-`, spec.Name, spec.PromptPath, spec.Name, bulletList(spec.Extras))
+`, spec.Name, spec.PromptPath, commandHint(spec.Name, lang), spec.Name, bulletList(spec.Extras))
 }
 
 func renderTrae(language, shell string) string {
@@ -341,7 +387,10 @@ func renderTrae(language, shell string) string {
 			sections = append(sections, "")
 			sections = append(sections, fmt.Sprintf("## /draftspec.%s", spec.Name))
 			sections = append(sections, fmt.Sprintf("- Основной prompt: %s", spec.PromptPath))
+			sections = append(sections, fmt.Sprintf("- %s", commandHint(spec.Name, lang)))
 			sections = append(sections, "- Используйте только минимально нужный контекст репозитория")
+			sections = append(sections, "- Если доступны связанные scripts, сначала запускайте их и опирайтесь на их вывод")
+			sections = append(sections, "- Не читайте исходники scripts по умолчанию")
 			sections = append(sections, "- Связанные scripts:")
 			sections = append(sections, bulletList(spec.Extras))
 		}
@@ -356,7 +405,10 @@ func renderTrae(language, shell string) string {
 		sections = append(sections, "")
 		sections = append(sections, fmt.Sprintf("## /draftspec.%s", spec.Name))
 		sections = append(sections, fmt.Sprintf("- Primary prompt: %s", spec.PromptPath))
+		sections = append(sections, fmt.Sprintf("- %s", commandHint(spec.Name, lang)))
 		sections = append(sections, "- Use only the minimum repository context required")
+		sections = append(sections, "- When related scripts are available, run them first and rely on their output")
+		sections = append(sections, "- Do not read script source by default")
 		sections = append(sections, "- Related scripts:")
 		sections = append(sections, bulletList(spec.Extras))
 	}
