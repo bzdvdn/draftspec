@@ -152,6 +152,7 @@ func TestInspectPromptDefinesCheapScopeAndVerdictRules(t *testing.T) {
 		"Default to a compact report in conversation output",
 		"Produce the full sectioned report only when the user explicitly asks for a full report",
 		"Verify `constitution <-> spec`",
+		"Treat technology names, framework choices, library lists, or version pins in the spec as a `Warning` unless they clearly represent a user requirement, repository constraint, or external compatibility contract.",
 		"Verify `spec <-> plan`",
 		"verify `plan <-> tasks`",
 		"The `## Verdict` section MUST use one of: `pass`, `concerns`, `blocked`.",
@@ -310,7 +311,7 @@ func TestImplementPromptSupportsFullRunAndScopedExecution(t *testing.T) {
 
 	content := fileContentByTarget(t, files, "templates/prompts/implement.md")
 	requiredSnippets := []string{
-		"Default behavior: if the user does not restrict scope, execute all unfinished tasks in order.",
+		"Default behavior: if the user does not restrict scope, execute only the first unfinished phase or the smallest contiguous unfinished task cluster needed for forward progress.",
 		"Scoped behavior: if the user explicitly provides `--phase <number>`, execute only that phase.",
 		"Scoped behavior: if the user explicitly provides `--tasks <task-id-list>`, execute only those task IDs.",
 		"Do not accept `--phase` and `--tasks` together in the same run.",
@@ -435,6 +436,7 @@ func TestPlanAndTasksPromptsReinforceDetailedButTightArtifacts(t *testing.T) {
 				"Each significant `DEC-*` should capture `Why`, `Tradeoff`, `Affects`, and `Validation`.",
 				"Add a short `Unknowns First` pass before finalizing the plan",
 				"`## Rollout and Compatibility` should be explicit",
+				"Record technologies, libraries, framework choices, or version constraints only when they materially affect",
 			},
 		},
 		{
@@ -454,6 +456,41 @@ func TestPlanAndTasksPromptsReinforceDetailedButTightArtifacts(t *testing.T) {
 			if !strings.Contains(content, snippet) {
 				t.Fatalf("expected %s to contain %q", tc.target, snippet)
 			}
+		}
+	}
+}
+
+func TestSpecAndPlanSeparateProductIntentFromTechChoices(t *testing.T) {
+	files, err := Files(LanguageSettings{
+		Default:  "en",
+		Docs:     "en",
+		Agent:    "en",
+		Comments: "en",
+		Shell:    "sh",
+	})
+	if err != nil {
+		t.Fatalf("Files() returned error: %v", err)
+	}
+
+	specContent := fileContentByTarget(t, files, "templates/prompts/spec.md")
+	for _, snippet := range []string{
+		"Do not lock in technologies, libraries, framework choices, or version details by default.",
+		"If a technology choice matters only as an implementation preference, record it in `plan`, not in `spec`.",
+		"do not add library lists, framework choices, SDK names, or version pins to the spec unless they are product or repository constraints",
+	} {
+		if !strings.Contains(specContent, snippet) {
+			t.Fatalf("expected spec prompt to contain %q", snippet)
+		}
+	}
+
+	planContent := fileContentByTarget(t, files, "templates/prompts/plan.md")
+	for _, snippet := range []string{
+		"Record technologies, libraries, framework choices, or version constraints only when they materially affect implementation shape, integration boundaries, validation, or risk.",
+		"If a version or dependency is named, explain why it matters for this feature",
+		"Do not enumerate stack details for completeness; capture only technical constraints that reduce downstream guesswork.",
+	} {
+		if !strings.Contains(planContent, snippet) {
+			t.Fatalf("expected plan prompt to contain %q", snippet)
 		}
 	}
 }
@@ -574,6 +611,8 @@ func TestPhasePromptsIncludeExplicitNextCommandGuidance(t *testing.T) {
 			target: "templates/prompts/spec.md",
 			want: []string{
 				"Next command: /draftspec.inspect <slug>",
+				"exact project-relative paths",
+				"`Slug`, `Status`, `Artifacts`, `Blockers`, and `Next command`",
 				"instead of suggesting the next phase command",
 			},
 		},
@@ -581,6 +620,9 @@ func TestPhasePromptsIncludeExplicitNextCommandGuidance(t *testing.T) {
 			target: "templates/prompts/plan.md",
 			want: []string{
 				"Next command: /draftspec.tasks <slug>",
+				"exact project-relative paths",
+				"`Slug`, `Status`, `Artifacts`, `Blockers`, and `Next command`",
+				"not created, say why they are not needed for this feature",
 				"instead of suggesting `/draftspec.tasks`",
 			},
 		},
@@ -588,12 +630,16 @@ func TestPhasePromptsIncludeExplicitNextCommandGuidance(t *testing.T) {
 			target: "templates/prompts/tasks.md",
 			want: []string{
 				"Next command: /draftspec.implement <slug>",
+				"exact project-relative paths",
+				"`Slug`, `Status`, `Artifacts`, `Blockers`, and `Next command`",
 				"instead of suggesting `/draftspec.implement`",
 			},
 		},
 		{
 			target: "templates/prompts/implement.md",
 			want: []string{
+				"smallest contiguous unfinished task cluster needed for forward progress",
+				"`Slug`, `Status`, `Artifacts`, `Blockers`, and `Next command`",
 				"Next command: /draftspec.verify <slug>",
 				"instead of suggesting `/draftspec.verify`",
 			},
@@ -601,6 +647,8 @@ func TestPhasePromptsIncludeExplicitNextCommandGuidance(t *testing.T) {
 		{
 			target: "templates/prompts/verify.md",
 			want: []string{
+				"`Slug`, `Status`, `Artifacts`, `Blockers`, and either `Next command` or `Return to`",
+				"Return to: /draftspec.<phase> <slug>",
 				"Next command: /draftspec.archive <slug>",
 				"include its exact slash command instead of suggesting archive",
 			},
@@ -609,6 +657,70 @@ func TestPhasePromptsIncludeExplicitNextCommandGuidance(t *testing.T) {
 			target: "templates/prompts/archive.md",
 			want: []string{
 				"terminal workflow step for this feature",
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		content := fileContentByTarget(t, files, tc.target)
+		for _, snippet := range tc.want {
+			if !strings.Contains(content, snippet) {
+				t.Fatalf("expected %s to contain %q", tc.target, snippet)
+			}
+		}
+	}
+}
+
+func TestPromptsEnforcePhaseBoundaries(t *testing.T) {
+	files, err := Files(LanguageSettings{
+		Default:  "en",
+		Docs:     "en",
+		Agent:    "en",
+		Comments: "en",
+		Shell:    "sh",
+	})
+	if err != nil {
+		t.Fatalf("Files() returned error: %v", err)
+	}
+
+	testCases := []struct {
+		target string
+		want   []string
+	}{
+		{
+			target: "templates/prompts/spec.md",
+			want: []string{
+				"Do not write planning decisions, task decomposition, or implementation steps in the spec itself.",
+			},
+		},
+		{
+			target: "templates/prompts/plan.md",
+			want: []string{
+				"Do not write the task checklist, edit implementation code, or emit verify/archive conclusions during planning.",
+			},
+		},
+		{
+			target: "templates/prompts/tasks.md",
+			want: []string{
+				"Do not start implementation work, edit source code, or claim tasks are already done during the tasks phase.",
+			},
+		},
+		{
+			target: "templates/prompts/implement.md",
+			want: []string{
+				"Do not re-plan the feature, emit a verify verdict, or silently complete neighboring tasks",
+			},
+		},
+		{
+			target: "templates/prompts/inspect.md",
+			want: []string{
+				"For `blocked`, do not suggest the next phase command; state which refinement is required first.",
+			},
+		},
+		{
+			target: "templates/prompts/verify.md",
+			want: []string{
+				"For `blocked`, do not suggest archive; end with `Return to: /draftspec.<phase> <slug>`",
 			},
 		},
 	}
