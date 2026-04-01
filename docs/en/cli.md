@@ -1,5 +1,29 @@
 # CLI Reference
 
+## Install
+
+Draftspec is distributed as a single binary via GitHub Releases.
+
+Linux:
+
+```bash
+VERSION=v0.1.0
+curl -fsSL "https://raw.githubusercontent.com/bzdvdn/draftspec/${VERSION}/scripts/install.sh" | bash -s -- --version "${VERSION}"
+```
+
+Windows (PowerShell):
+
+```powershell
+$version="v0.1.0"
+$env:DRAFTSPEC_VERSION=$version
+powershell -ExecutionPolicy Bypass -c "iwr -useb https://raw.githubusercontent.com/bzdvdn/draftspec/$version/scripts/install.ps1 | iex"
+```
+
+To also add the install directory to `PATH`:
+
+- Linux: add `--add-to-path` or set `DRAFTSPEC_ADD_TO_PATH=1`
+- Windows: set `$env:DRAFTSPEC_ADD_TO_PATH=1` or run the script with `-AddToPath`
+
 ## Commands
 
 ### `draftspec init [path]`

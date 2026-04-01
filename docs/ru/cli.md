@@ -1,5 +1,29 @@
 # CLI
 
+## Установка
+
+Draftspec распространяется как один бинарник через GitHub Releases.
+
+Linux:
+
+```bash
+VERSION=v0.1.0
+curl -fsSL "https://raw.githubusercontent.com/bzdvdn/draftspec/${VERSION}/scripts/install.sh" | bash -s -- --version "${VERSION}"
+```
+
+Windows (PowerShell):
+
+```powershell
+$version="v0.1.0"
+$env:DRAFTSPEC_VERSION=$version
+powershell -ExecutionPolicy Bypass -c "iwr -useb https://raw.githubusercontent.com/bzdvdn/draftspec/$version/scripts/install.ps1 | iex"
+```
+
+Чтобы также добавить папку установки в `PATH`:
+
+- Linux: добавь `--add-to-path` или установи `DRAFTSPEC_ADD_TO_PATH=1`
+- Windows: установи `$env:DRAFTSPEC_ADD_TO_PATH=1` или запускай скрипт с `-AddToPath`
+
 ## Команды
 
 ### `draftspec init [path]`
