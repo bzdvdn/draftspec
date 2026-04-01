@@ -45,8 +45,8 @@ func TestFiles(t *testing.T) {
 		".github/prompts/draftspec-verify.prompt.md": false,
 		".cursor/rules/draftspec-implement.mdc":      false,
 		".cursor/rules/draftspec-verify.mdc":         false,
-		".kilocode/rules/draftspec-archive.md":       false,
-		".kilocode/rules/draftspec-verify.md":        false,
+		".kilocode/workflows/draftspec-archive.md":   false,
+		".kilocode/workflows/draftspec-verify.md":    false,
 		".trae/project_rules.md":                     false,
 	}
 
