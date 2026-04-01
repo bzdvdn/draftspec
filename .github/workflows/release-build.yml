@@ -67,7 +67,7 @@ jobs:
         run: |
           mkdir -p dist
           output="dist/draftspec${{ matrix.binary_ext }}"
-          go build -trimpath -o "${output}" ./src/cmd/draftspec
+          go build -trimpath -ldflags "-X draftspec/src/internal/cli.Version=${GITHUB_REF_NAME}" -o "${output}" ./src/cmd/draftspec
 
       - name: Package Linux archive
         if: matrix.goos == 'linux'

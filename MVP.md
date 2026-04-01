@@ -65,23 +65,35 @@ Managed generated artifacts should remain refreshable without touching authored 
     plan.md
     tasks.md
     data-model.md
+    inspect-report.md
+    verify-report.md
     contracts/
       api.md
       events.md
+    archive/
+      summary.md
     agents-snippet.md
     prompts/
       constitution.md
       spec.md
+      inspect.md
       plan.md
       tasks.md
       implement.md
+      verify.md
+      archive.md
   scripts/
+    run-draftspec.sh
     inspect-spec.sh
     check-constitution.sh
     check-spec-ready.sh
+    check-inspect-ready.sh
     check-plan-ready.sh
     check-tasks-ready.sh
     check-implement-ready.sh
+    check-verify-ready.sh
+    check-archive-ready.sh
+    verify-task-state.sh
     list-open-tasks.sh
     link-agents.sh
     list-specs.sh
@@ -99,16 +111,18 @@ The intended agent workflow is strict:
 4. `plan`
 5. `tasks`
 6. `implement`
-7. `archive`
+7. `verify`
+8. `archive`
 
 Dependency rules:
 
 - `constitution` can be created first
 - `spec` depends on the constitution
 - `inspect` depends on the constitution and one spec, then conditionally loads deeper artifacts only when required
-- `plan` depends on the constitution and one spec
+- `plan` depends on the constitution, one spec, and the persisted inspect report for that spec
 - `tasks` depends on the constitution and one plan package, then conditionally loads deeper artifacts only when required
 - `implement` depends on the constitution and one task list, then conditionally loads deeper artifacts only when required
+- `verify` depends on the constitution and one task list, then loads spec, plan, and targeted code only to confirm concrete claims
 - `archive` depends on one existing spec and archives the related plan package when present
 
 ## Language model
@@ -194,10 +208,11 @@ Required artifacts:
 - `plan.md`
 - `tasks.md`
 - `data-model.md`
-- `contracts/`
 
-Optional artifact:
+Optional artifacts:
 
+- `contracts/api.md` — only when the feature touches API boundaries
+- `contracts/events.md` — only when the feature produces or consumes events
 - `research.md`
 
 `research.md` should only be created when there is genuine uncertainty, external investigation, or architectural tradeoff analysis that needs to be preserved.
@@ -248,6 +263,32 @@ Outputs:
 - explicit Given/When/Then acceptance criteria, with `Given`, `When`, and `Then` kept canonical across documentation languages and inspect treating missing G/W/T as an error
 - explicit cheap checks for `constitution <-> spec`, `spec <-> plan`, and `plan <-> tasks` when those downstream artifacts exist
 - explicit references to stable IDs when reporting mismatches or gaps
+
+## Verify workflow
+
+`verify` is agent-driven.
+
+Inputs:
+
+- `.draftspec/constitution.md`
+- `.draftspec/plans/<slug>/tasks.md`
+- optional spec, plan, data-model, contracts, and targeted code — only to confirm concrete claims
+
+Outputs:
+
+- a verdict report with one of: `pass`, `concerns`, `blocked`
+- compact by default in conversation output
+- persisted to `.draftspec/plans/<slug>/verify.md` when explicitly requested
+- a machine-readable metadata block when written to disk with `report_type`, `slug`, `status`, `docs_language`, and `generated_at`
+
+The verify phase must:
+
+- treat the task list as the verification entrypoint, not the full repository
+- confirm completed task state against actual implementation evidence
+- prefer `concerns` over `pass` when evidence is partial but no contradiction is found
+- not return `pass` from checkbox state alone
+- include `archive_readiness` in the verdict
+- send the feature back to the narrowest earlier phase when a workflow gap is discovered
 
 ## Archive workflow
 
@@ -382,14 +423,15 @@ Inputs:
 
 - `.draftspec/constitution.md`
 - `.draftspec/specs/<slug>.md`
+- `.draftspec/specs/<slug>.inspect.md` (required — plan must not proceed without a persisted inspect report)
 - repository code and docs when relevant
 
 Outputs:
 
 - `.draftspec/plans/<slug>/plan.md`
 - `.draftspec/plans/<slug>/data-model.md`
-- `.draftspec/plans/<slug>/contracts/api.md`
-- `.draftspec/plans/<slug>/contracts/events.md`
+- `.draftspec/plans/<slug>/contracts/api.md` (optional — only when the feature touches API boundaries)
+- `.draftspec/plans/<slug>/contracts/events.md` (optional — only when the feature produces or consumes events)
 - optional `.draftspec/plans/<slug>/research.md`
 
 The default plan package should support downstream work with minimal rereading:
@@ -440,7 +482,7 @@ It must:
 
 - execute only unfinished tasks
 - respect task order and phase structure
-- keep full-run execution as the default when no scope restriction is provided
+- execute the first unfinished phase or the smallest contiguous unfinished task cluster as the default when no scope restriction is provided
 - allow explicit scope restriction by one phase or specific task IDs
 - reject ambiguous scope such as mixing phase and task selection in the same run
 - update `tasks.md`
@@ -485,20 +527,32 @@ templates:
   data_model: data-model.md
   contracts_api: contracts/api.md
   contracts_events: contracts/events.md
+  archive_summary: archive/summary.md
+  inspect_report: inspect-report.md
+  verify_report: verify-report.md
   constitution: constitution.md
+  agents_snippet: agents-snippet.md
   constitution_prompt: prompts/constitution.md
   spec_prompt: prompts/spec.md
+  inspect_prompt: prompts/inspect.md
   plan_prompt: prompts/plan.md
   tasks_prompt: prompts/tasks.md
   implement_prompt: prompts/implement.md
+  verify_prompt: prompts/verify.md
+  archive_prompt: prompts/archive.md
 
 scripts:
+  run_draftspec: run-draftspec.sh
   inspect_spec: inspect-spec.sh
   check_constitution: check-constitution.sh
   check_spec_ready: check-spec-ready.sh
+  check_inspect_ready: check-inspect-ready.sh
   check_plan_ready: check-plan-ready.sh
   check_tasks_ready: check-tasks-ready.sh
   check_implement_ready: check-implement-ready.sh
+  check_verify_ready: check-verify-ready.sh
+  check_archive_ready: check-archive-ready.sh
+  verify_task_state: verify-task-state.sh
   list_open_tasks: list-open-tasks.sh
   link_agents: link-agents.sh
   list_specs: list-specs.sh

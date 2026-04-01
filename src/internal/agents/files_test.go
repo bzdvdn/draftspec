@@ -109,7 +109,7 @@ func TestRenderEmphasizesRunningScriptsFirst(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, content := render(tt.target, tt.lang, spec)
+			_, content, _ := render(tt.target, tt.lang, spec)
 			if !strings.Contains(content, tt.want) {
 				t.Fatalf("expected rendered content for %s/%s to contain %q\ncontent:\n%s", tt.target, tt.lang, tt.want, content)
 			}
@@ -167,7 +167,7 @@ func TestRenderIncludesCommandHints(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, content := render(tt.target, tt.lang, specs[tt.spec])
+			_, content, _ := render(tt.target, tt.lang, specs[tt.spec])
 			if !strings.Contains(content, tt.want) {
 				t.Fatalf("expected rendered content for %s/%s/%s to contain %q\ncontent:\n%s", tt.target, tt.lang, tt.spec, tt.want, content)
 			}
@@ -220,7 +220,7 @@ func TestRenderCodexDisallowsRawToolPayloads(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, content := render("codex", tt.lang, specs["plan"])
+			_, content, _ := render("codex", tt.lang, specs["plan"])
 			if !strings.Contains(content, tt.want) {
 				t.Fatalf("expected codex rendered content for %s to contain %q\ncontent:\n%s", tt.lang, tt.want, content)
 			}

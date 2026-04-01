@@ -73,9 +73,11 @@ func Files(targets []string, language string, shell string) ([]File, error) {
 
 	var files []File
 	for _, target := range normalized {
-		for _, file := range filesForTarget(target, language, shell) {
-			files = append(files, file)
+		targetFiles, err := filesForTarget(target, language, shell)
+		if err != nil {
+			return nil, err
 		}
+		files = append(files, targetFiles...)
 	}
 
 	sort.Slice(files, func(i, j int) bool { return files[i].Path < files[j].Path })
@@ -90,7 +92,7 @@ func FilesForTarget(target, language, shell string) ([]File, error) {
 	if len(normalized) == 0 {
 		return nil, nil
 	}
-	return filesForTarget(normalized[0], language, shell), nil
+	return filesForTarget(normalized[0], language, shell)
 }
 
 func PathsForTarget(target string) ([]string, error) {
@@ -106,17 +108,20 @@ func PathsForTarget(target string) ([]string, error) {
 	return paths, nil
 }
 
-func filesForTarget(target, language, shell string) []File {
+func filesForTarget(target, language, shell string) ([]File, error) {
 	if target == "trae" {
-		return []File{{Path: ".trae/project_rules.md", Content: renderTrae(language, shell), Mode: 0o644}}
+		return []File{{Path: ".trae/project_rules.md", Content: renderTrae(language, shell), Mode: 0o644}}, nil
 	}
 
 	var files []File
 	for _, command := range commandSpecs(shell) {
-		path, content := render(target, language, command)
+		path, content, err := render(target, language, command)
+		if err != nil {
+			return nil, err
+		}
 		files = append(files, File{Path: path, Content: content, Mode: 0o644})
 	}
-	return files
+	return files, nil
 }
 
 type commandSpec struct {
@@ -149,22 +154,22 @@ func scriptPath(name, shell string) string {
 	return ".draftspec/scripts/" + name + ext
 }
 
-func render(target, language string, spec commandSpec) (string, string) {
+func render(target, language string, spec commandSpec) (string, string, error) {
 	lang := normalizeLanguage(language)
 
 	switch target {
 	case "claude":
-		return filepath.ToSlash(filepath.Join(".claude", "commands", fmt.Sprintf("draftspec.%s.md", spec.Name))), renderClaude(spec, lang)
+		return filepath.ToSlash(filepath.Join(".claude", "commands", fmt.Sprintf("draftspec.%s.md", spec.Name))), renderClaude(spec, lang), nil
 	case "codex":
-		return filepath.ToSlash(filepath.Join(".codex", "prompts", fmt.Sprintf("draftspec.%s.md", spec.Name))), renderCodex(spec, lang)
+		return filepath.ToSlash(filepath.Join(".codex", "prompts", fmt.Sprintf("draftspec.%s.md", spec.Name))), renderCodex(spec, lang), nil
 	case "copilot":
-		return filepath.ToSlash(filepath.Join(".github", "prompts", fmt.Sprintf("draftspec-%s.prompt.md", spec.Name))), renderCopilot(spec, lang)
+		return filepath.ToSlash(filepath.Join(".github", "prompts", fmt.Sprintf("draftspec-%s.prompt.md", spec.Name))), renderCopilot(spec, lang), nil
 	case "cursor":
-		return filepath.ToSlash(filepath.Join(".cursor", "rules", fmt.Sprintf("draftspec-%s.mdc", spec.Name))), renderCursor(spec, lang)
+		return filepath.ToSlash(filepath.Join(".cursor", "rules", fmt.Sprintf("draftspec-%s.mdc", spec.Name))), renderCursor(spec, lang), nil
 	case "kilocode":
-		return filepath.ToSlash(filepath.Join(".kilocode", "rules", fmt.Sprintf("draftspec-%s.md", spec.Name))), renderKilo(spec, lang)
+		return filepath.ToSlash(filepath.Join(".kilocode", "workflows", fmt.Sprintf("draftspec-%s.md", spec.Name))), renderKilo(spec, lang), nil
 	default:
-		panic("unsupported target")
+		return "", "", fmt.Errorf("unsupported agent target %q", target)
 	}
 }
 

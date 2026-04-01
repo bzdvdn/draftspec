@@ -119,6 +119,9 @@ draftspec doctor my-project --json
 ```bash
 go test ./...
 go build -o bin/draftspec ./src/cmd/draftspec
+
+# с указанием версии
+go build -ldflags "-X draftspec/src/internal/cli.Version=v0.1.0" -o bin/draftspec ./src/cmd/draftspec
 ```
 
 Репозиторий содержит unit tests для config, project lifecycle, doctor checks, specs, templates, agents и CLI-level behavior.

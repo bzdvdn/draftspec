@@ -120,6 +120,9 @@ For deeper guidance, use:
 ```bash
 go test ./...
 go build -o bin/draftspec ./src/cmd/draftspec
+
+# with version stamp
+go build -ldflags "-X draftspec/src/internal/cli.Version=v0.1.0" -o bin/draftspec ./src/cmd/draftspec
 ```
 
 The repository includes unit tests for config, project lifecycle, doctor checks, specs, templates, agents, and CLI-level behavior.

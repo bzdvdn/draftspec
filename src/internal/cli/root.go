@@ -4,8 +4,9 @@ import "github.com/spf13/cobra"
 
 func NewRootCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "draftspec",
-		Short: "A lightweight project context kit for development agents and humans",
+		Use:     "draftspec",
+		Short:   "A lightweight project context kit for development agents and humans",
+		Version: Version,
 	}
 
 	cmd.AddCommand(newInitCmd())

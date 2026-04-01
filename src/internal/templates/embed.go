@@ -87,7 +87,11 @@ func Files(settings LanguageSettings) ([]File, error) {
 		{RelativePath: "templates/prompts/verify.md", TargetPath: "templates/prompts/verify.md", Mode: 0o644, Language: settings.Agent},
 	}
 	files := make([]File, 0, len(definitions)+9)
-	files = append(files, File{TargetPath: "draftspec.yaml", Content: generateConfig(settings), Mode: 0o644})
+	configContent, err := generateConfig(settings)
+	if err != nil {
+		return nil, err
+	}
+	files = append(files, File{TargetPath: "draftspec.yaml", Content: configContent, Mode: 0o644})
 	for _, definition := range definitions {
 		content, err := localizedFileContent(definition.Language, definition.RelativePath)
 		if err != nil {
@@ -262,7 +266,7 @@ func languageLabel(code, outputLanguage string) string {
 	return code
 }
 
-func generateConfig(settings LanguageSettings) string {
+func generateConfig(settings LanguageSettings) (string, error) {
 	cfg := config.Default()
 	cfg.Runtime.Shell = normalizeShellValue(settings.Shell)
 	cfg.Scripts = config.ScriptDefaultsForShell(cfg.Runtime.Shell)
@@ -273,7 +277,7 @@ func generateConfig(settings LanguageSettings) string {
 	cfg.Agents.Targets = settings.AgentTargets
 	content, err := yaml.Marshal(cfg)
 	if err != nil {
-		panic(fmt.Sprintf("marshal generated draftspec config: %v", err))
+		return "", fmt.Errorf("marshal generated draftspec config: %w", err)
 	}
-	return string(content)
+	return string(content), nil
 }
