@@ -10,14 +10,17 @@ The first release is intentionally optimized for low overhead and real-world usa
 
 ## Positioning
 
-Draftspec is a lean SDD kit for real codebases.
+Draftspec is a strict lightweight SDD kit for real codebases.
+
+It is designed for teams that want more discipline than a loose planning layer, but do not want the workflow surface, artifact overhead, or orchestration weight of a heavier SDD system.
 
 - stricter than OpenSpec in phase discipline and artifact alignment
 - lighter than Spec Kit in default context, workflow surface, and artifact overhead
 - optimized for agent-first workflows with narrow context loading
 - designed to keep strictness in templates, entrypoints, and readiness checks rather than heavyweight orchestration
+- built for brownfield repositories where context must stay narrow, local, and reviewable
 
-In short: Draftspec aims to be as strict as practical while staying lightweight enough for everyday use.
+In short: Draftspec aims to maximize discipline per token: strong phase boundaries, low artifact drag, and enough structure to keep agents and humans aligned in everyday work.
 
 ## Draftspec vs OpenSpec vs Spec Kit
 
@@ -39,6 +42,7 @@ In short, Draftspec aims to sit between OpenSpec and Spec Kit: stricter than Ope
 - Narrow context by default. Each phase is designed to load the smallest useful scope.
 - Code reading should stay phase-local and targeted: enough to remove guesswork, not enough to recreate full-repository context.
 - Strict workflow chain. Constitution, spec, inspect, plan, tasks, and implementation stay aligned.
+- `inspect` is a real quality gate, not a loose suggestion before planning.
 - Lightweight traceability. Stable IDs and cheap readiness checks reduce prompt bloat.
 - Brownfield-friendly workflow. Draftspec works well in existing repositories without forcing a heavyweight process layer.
 - Branch-first collaboration. Active feature state stays local to the feature instead of spreading through shared mutable memory.
@@ -48,7 +52,7 @@ OpenSpec is more flexible by design and works well when teams want a looser arti
 
 Spec Kit provides a broader and more thorough workflow surface, but usually at the cost of more artifacts, more context, and more process overhead.
 
-Draftspec is optimized for discipline per token: strong workflow boundaries, minimal default context, and enough structure to keep agents aligned without making the workflow heavy.
+Draftspec is optimized for discipline per token: strong workflow boundaries, minimal default context, explicit quality gates, and enough structure to keep agents aligned without making the workflow heavy.
 
 ## Documentation
 
