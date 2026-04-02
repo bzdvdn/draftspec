@@ -110,6 +110,25 @@ draftspec doctor my-project
 draftspec doctor my-project --json
 ```
 
+## Demo
+
+A reproducible terminal demo kit lives under [`demo/`](demo/README.md).
+
+Build the local binary and render the quick terminal demo:
+
+```bash
+go build -o bin/draftspec ./src/cmd/draftspec
+vhs demo/quick.tape
+```
+
+Demo assets:
+
+- [Quick terminal demo](demo/README.md)
+- [Brownfield walkthrough](demo/brownfield.md)
+- [Self-hosting walkthrough](demo/self-hosting.md)
+
+The quick tape produces `demo/draftspec-demo.gif` and demonstrates `init`, generated agent files, `AGENTS.md`, and launcher-based `doctor` / `refresh --dry-run`.
+
 ## Install
 
 Draftspec is distributed as a single binary via GitHub Releases.
@@ -141,6 +160,12 @@ For deeper guidance, use:
 - [Workflow Model](docs/en/workflow.md)
 - [Examples](docs/en/examples.md)
 - [Roadmap](docs/en/roadmap.md)
+
+Project contribution and trust docs:
+
+- [Contributing](CONTRIBUTING.md)
+- [Code of Conduct](CODE_OF_CONDUCT.md)
+- [Security Policy](SECURITY.md)
 
 
 ## Development
