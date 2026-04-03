@@ -30,7 +30,7 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - All agent prompts now use a unified two-level load structure: `## Load First` (always read) and `## Load If Present` (read when the file exists and is relevant); previously inconsistent across prompts (`## Load Only`, `## Load Only If Needed`, `## Load Only If Present`)
 - `constitution.md` prompt: `README.md`, `AGENTS.md`, and project manifests moved from `## Load First` to `## Load If Present`
-- `agents-snippet.md` (injected into `AGENTS.md`) now lists four optional commands with one-line descriptions: `challenge`, `handoff`, `scope`, `recap`
+- `agents-snippet.md` (injected into `AGENTS.md`) now lists five optional commands with one-line descriptions: `challenge`, `handoff`, `hotfix`, `scope`, `recap`
 
 ## [0.1.0] - 2026-03-31
 

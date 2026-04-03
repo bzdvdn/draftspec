@@ -113,7 +113,7 @@ constitution -> spec -> inspect -> plan -> tasks -> implement -> verify -> archi
 - `/draftspec.plan` поддерживает флаг `--research`: входит в режим research-first — агент фиксирует конкретные неизвестные, пишет `research.md`, затем спрашивает "Research complete — proceed to full plan?" перед созданием `plan.md`.
 - `/draftspec.spec` поддерживает флаг `--amend`: режим точечного редактирования — добавить критерий или исправить секцию без переписывания спека и без инвалидации inspect-отчёта.
 - `/draftspec.handoff` без slug генерирует handoff-документы для всех активных фич одновременно.
-- `/draftspec.hotfix` поддерживает экстренные исправления вне стандартного workflow — минимальный спек, inline-проверка и прямая подготовка к archive.
+- `/draftspec.hotfix`: экстренный workflow исправления — пишет минимальный hotfix-спек (fix, root cause, risk, verification, touches) до любого изменения кода, реализует, проверяет inline и архивирует; пропускает фазы inspect, plan и tasks; используйте только когда причина известна и исправление затрагивает ≤ 3 файлов.
 - `doctor` предупреждает, когда один и тот же стабильный ID (`AC-*`, `RQ-*`) встречается сразу в нескольких спеках.
 - Генерируемые docs и prompts поддерживают английский и русский.
 

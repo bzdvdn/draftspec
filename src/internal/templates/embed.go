@@ -89,6 +89,7 @@ func Files(settings LanguageSettings) ([]File, error) {
 		{RelativePath: "templates/prompts/challenge.md", TargetPath: "templates/prompts/challenge.md", Mode: 0o644, Language: settings.Agent},
 		{RelativePath: "templates/prompts/scope.md", TargetPath: "templates/prompts/scope.md", Mode: 0o644, Language: settings.Agent},
 		{RelativePath: "templates/prompts/recap.md", TargetPath: "templates/prompts/recap.md", Mode: 0o644, Language: settings.Agent},
+		{RelativePath: "templates/prompts/hotfix.md", TargetPath: "templates/prompts/hotfix.md", Mode: 0o644, Language: settings.Agent},
 	}
 	files := make([]File, 0, len(definitions)+9)
 	configContent, err := generateConfig(settings)

@@ -113,7 +113,7 @@ constitution -> spec -> inspect -> plan -> tasks -> implement -> verify -> archi
 - `/draftspec.plan` supports `--research`: enters research-first mode — agent identifies concrete unknowns, writes `research.md`, then asks "Research complete — proceed to full plan?" before producing `plan.md`.
 - `/draftspec.spec` supports `--amend`: targeted edit mode — update one section or add one criterion without rewriting the spec or invalidating an existing inspect report.
 - `/draftspec.handoff` without a slug generates handoff documents for all active features at once.
-- `/draftspec.hotfix` supports emergency fixes outside the standard workflow — minimal spec, inline verification, and direct archive preparation.
+- `/draftspec.hotfix`: emergency fix workflow — writes a minimal hotfix spec (fix, root cause, risk, verification, touches) before any code change, implements, verifies inline, then archives; skips inspect, plan, and tasks phases; use only when the root cause is known and the fix touches ≤ 3 files.
 - `doctor` warns when the same stable ID (`AC-*`, `RQ-*`) appears across multiple specs.
 - Generated docs and prompts support English and Russian.
 
