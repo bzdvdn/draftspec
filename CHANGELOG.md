@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [v0.2.0]
 
 ### Added
 
@@ -32,7 +32,7 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `constitution.md` prompt: `README.md`, `AGENTS.md`, and project manifests moved from `## Load First` to `## Load If Present`
 - `agents-snippet.md` (injected into `AGENTS.md`) now lists five optional commands with one-line descriptions: `challenge`, `handoff`, `hotfix`, `scope`, `recap`
 
-## [0.1.0] - 2026-03-31
+## [v0.1.0] - 2026-03-31
 
 ### Added
 
