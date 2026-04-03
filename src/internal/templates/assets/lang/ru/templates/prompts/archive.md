@@ -18,7 +18,7 @@ Stop if: смотрите Stop Conditions.
 
 - `.draftspec/specs/<slug>.md`
 
-## Load Only If Needed
+## Load If Present
 
 Читайте plan artifacts только чтобы сформировать `summary.md`. Если summary достаточно написать по spec — не читайте их:
 
@@ -30,7 +30,6 @@ Stop if: смотрите Stop Conditions.
 
 ## Do Not Read By Default
 
-- нерелевантные спецификации
 - нерелевантные archive entries
 - нерелевантные файлы репозитория
 

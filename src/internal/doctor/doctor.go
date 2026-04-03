@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"sort"
 	"strings"
@@ -13,6 +14,8 @@ import (
 	"draftspec/src/internal/config"
 	"draftspec/src/internal/workflow"
 )
+
+var placeholderPattern = regexp.MustCompile(`\[[A-Z][A-Z0-9_]*\]`)
 
 type Finding struct {
 	Level   string
@@ -96,6 +99,16 @@ func Check(root string) (Result, error) {
 		filepath.Join(scriptsDir, cfg.Scripts.VerifyTaskState),
 	} {
 		checkPath(&findings, path, false)
+	}
+
+	constitutionPath := filepath.Join(root, cfg.Project.ConstitutionFile)
+	if content, err := os.ReadFile(constitutionPath); err == nil {
+		if placeholderPattern.Match(content) {
+			findings = append(findings, Finding{
+				Level:   "warning",
+				Message: "constitution.md contains unfilled placeholder content — run /draftspec.constitution to complete setup",
+			})
+		}
 	}
 
 	if cfg.Language.Default != "en" && cfg.Language.Default != "ru" {

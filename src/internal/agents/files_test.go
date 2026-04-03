@@ -22,22 +22,23 @@ func TestNormalizeTargetsAll(t *testing.T) {
 		t.Fatalf("NormalizeTargets returned error: %v", err)
 	}
 
-	if len(targets) != 6 {
-		t.Fatalf("expected 6 targets for all, got %#v", targets)
+	if len(targets) != 9 {
+		t.Fatalf("expected 9 targets for all, got %#v", targets)
 	}
 }
 
 func TestFiles(t *testing.T) {
-	files, err := Files([]string{"claude", "codex", "copilot", "cursor", "kilocode", "trae"}, "en", "sh")
+	files, err := Files([]string{"aider", "claude", "codex", "copilot", "cursor", "kilocode", "roocode", "trae", "windsurf"}, "en", "sh")
 	if err != nil {
 		t.Fatalf("Files returned error: %v", err)
 	}
 
-	if len(files) != 41 {
-		t.Fatalf("expected 41 generated agent files, got %d", len(files))
+	if len(files) != 93 {
+		t.Fatalf("expected 93 generated agent files, got %d", len(files))
 	}
 
 	required := map[string]bool{
+		".aider/CONVENTIONS.md":                      false,
 		".claude/commands/draftspec.inspect.md":      false,
 		".claude/commands/draftspec.verify.md":       false,
 		".codex/prompts/draftspec.plan.md":           false,
@@ -47,7 +48,14 @@ func TestFiles(t *testing.T) {
 		".cursor/rules/draftspec-verify.mdc":         false,
 		".kilocode/workflows/draftspec-archive.md":   false,
 		".kilocode/workflows/draftspec-verify.md":    false,
+		".roo/rules/draftspec-spec.md":               false,
+		".roo/rules/draftspec-plan.md":               false,
 		".trae/project_rules.md":                     false,
+		".windsurf/rules/draftspec-implement.md":     false,
+		".windsurf/rules/draftspec-verify.md":        false,
+		".claude/commands/draftspec.recap.md":        false,
+		".claude/commands/draftspec.hotfix.md":       false,
+		".cursor/rules/draftspec-recap.mdc":          false,
 	}
 
 	for _, file := range files {

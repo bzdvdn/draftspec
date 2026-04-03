@@ -324,7 +324,7 @@ func TestImplementPromptSupportsFullRunAndScopedExecution(t *testing.T) {
 		"[T1.1] done",
 		"[T1.1] blocked: <reason>",
 		"[Phase 1] done: T1.1, T1.2",
-		"do not mark a task done after partial scaffolding",
+		"do not claim coverage that was not implemented",
 	}
 	for _, snippet := range requiredSnippets {
 		if !strings.Contains(content, snippet) {
@@ -444,7 +444,7 @@ func TestPlanAndTasksPromptsReinforceDetailedButTightArtifacts(t *testing.T) {
 			want: []string{
 				"The task list should be readable to both an implementation agent and a human reviewer",
 				"Each phase should have a short goal",
-				"add a short `Touches:` hint",
+				"Touches:`",
 				"Could another developer execute these tasks in order without guessing what `done` means",
 			},
 		},
@@ -583,7 +583,7 @@ func TestVerifyTemplateAndPromptPreferEvidenceScopedVerification(t *testing.T) {
 		"`## Not Verified`",
 		"Keep claims scoped.",
 		"send the feature back to the narrowest earlier phase that can honestly fix it",
-		"do not return `pass` from checkbox state alone",
+		"Do not use `pass` unless the completed task state is confirmed",
 	} {
 		if !strings.Contains(promptContent, snippet) {
 			t.Fatalf("expected verify prompt to contain %q", snippet)
@@ -611,37 +611,30 @@ func TestPhasePromptsIncludeExplicitNextCommandGuidance(t *testing.T) {
 			target: "templates/prompts/spec.md",
 			want: []string{
 				"Next command: /draftspec.inspect <slug>",
-				"exact project-relative paths",
-				"`Slug`, `Status`, `Artifacts`, `Blockers`, and `Next command`",
-				"instead of suggesting the next phase command",
+				"`Slug`, `Status`, `Artifacts`, `Blockers`, `Next command`",
 			},
 		},
 		{
 			target: "templates/prompts/plan.md",
 			want: []string{
 				"Next command: /draftspec.tasks <slug>",
-				"exact project-relative paths",
-				"`Slug`, `Status`, `Artifacts`, `Blockers`, and `Next command`",
-				"not created, say why they are not needed for this feature",
-				"instead of suggesting `/draftspec.tasks`",
+				"`Slug`, `Status`, `Artifacts`, `Blockers`, `Next command`",
 			},
 		},
 		{
 			target: "templates/prompts/tasks.md",
 			want: []string{
 				"Next command: /draftspec.implement <slug>",
-				"exact project-relative paths",
-				"`Slug`, `Status`, `Artifacts`, `Blockers`, and `Next command`",
-				"instead of suggesting `/draftspec.implement`",
+				"`Slug`, `Status`, `Artifacts`, `Blockers`, `Next command`",
 			},
 		},
 		{
 			target: "templates/prompts/implement.md",
 			want: []string{
 				"smallest contiguous unfinished task cluster needed for forward progress",
-				"`Slug`, `Status`, `Artifacts`, `Blockers`, and `Next command`",
+				"`Slug`, `Status`, `Artifacts`, `Blockers`, `Next command`",
 				"Next command: /draftspec.verify <slug>",
-				"instead of suggesting `/draftspec.verify`",
+				"do not claim coverage that was not implemented",
 			},
 		},
 		{
@@ -650,7 +643,7 @@ func TestPhasePromptsIncludeExplicitNextCommandGuidance(t *testing.T) {
 				"`Slug`, `Status`, `Artifacts`, `Blockers`, and either `Next command` or `Return to`",
 				"Return to: /draftspec.<phase> <slug>",
 				"Next command: /draftspec.archive <slug>",
-				"include its exact slash command instead of suggesting archive",
+				"name it explicitly with its slash command",
 			},
 		},
 		{

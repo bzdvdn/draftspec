@@ -19,7 +19,7 @@ Always read these first:
 - `.draftspec/constitution.md`
 - `.draftspec/specs/<slug>.md`
 
-## Load Only If Needed
+## Load If Present
 
 Read these only when they exist and materially affect the inspection:
 
@@ -31,8 +31,6 @@ Read these only when they exist and materially affect the inspection:
 - `.draftspec/plans/<slug>/data-model.md`
 - `.draftspec/plans/<slug>/contracts/`
 - `.draftspec/plans/<slug>/research.md`
-- unrelated specs
-- unrelated plan packages
 - broad repository history
 - implementation files unless they are needed to verify a concrete consistency claim
 
@@ -98,22 +96,28 @@ Stop and ask a minimal follow-up question only if:
 - For `concerns`, say whether the workflow may continue; if it may, include the exact next slash command.
 - For `blocked`, do not suggest the next phase command; state which refinement is required first.
 
+## Spec Summary Artifact
+
+After writing the inspect report, also write `.draftspec/specs/<slug>.summary.md`.
+
+The summary MUST contain only:
+
+- A YAML frontmatter block with `slug` and `generated_at`
+- `## Goal` — one sentence
+- `## Acceptance Criteria` — a table: `ID | Summary | Proof Signal`; summary ≤ 8 words; proof signal = the observable check from the `Then` clause
+- `## Out of Scope` — 3-5 bullets
+
+Keep the summary under 25 lines. It is loaded by `tasks`, `implement`, and `verify` instead of the full spec to reduce context overhead. The summary is not a substitute for the full spec in phases that require complete acceptance-criterion inspection (inspect, plan).
+
 ## Output expectations
 
-- Persist the report by default to `.draftspec/specs/<slug>.inspect.md` unless the user explicitly requests another path.
-- If the user provides an explicit file path, use that path.
-- Also summarize the verdict in the conversation.
-- In default conversation mode, prefer a compact report with only non-empty sections.
-- Summarize errors, warnings, open questions, suggestions, and the final verdict.
-- End the conversation with a short stable summary block that includes `Slug`, `Status`, `Artifacts`, `Blockers`, and `Next command` only when that handoff is truly safe
-- When the feature is ready to continue, make `## Next Step` and the conversation summary include the exact slash command for the next phase, such as `/draftspec.plan <slug>` or `/draftspec.tasks <slug>`.
-- If refinement is required first, say that directly instead of suggesting the next phase command.
+- Persist to `.draftspec/specs/<slug>.inspect.md` and write `.draftspec/specs/<slug>.summary.md`
+- Summarize verdict in the conversation; prefer compact report with only non-empty sections.
+- End with a summary block: `Slug`, `Status`, `Artifacts`, `Blockers`, `Next command`
+- When ready: `Next command: /draftspec.plan <slug>` (or `/draftspec.tasks <slug>` when plan already exists)
 
 ## Self-Check
 
-- Did I load only the artifacts needed for this slug?
 - Did I check every AC for Given/When/Then format?
 - Is the verdict (`pass`, `concerns`, `blocked`) supported by concrete findings, not general impressions?
 - If `tasks.md` exists, did I verify every AC is covered by at least one task?
-- Did I avoid turning this into a design review?
-- Is the next step command appropriate for the verdict?

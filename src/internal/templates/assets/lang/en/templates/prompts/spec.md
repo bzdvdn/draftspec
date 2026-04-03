@@ -14,6 +14,15 @@ Inputs: `.draftspec/constitution.md`, user request, minimal repo context.
 Outputs: `.draftspec/specs/<slug>.md` (created or patched).
 Stop if: goal ambiguous, multiple features in one request, or AC would be invented rather than derived.
 
+## Flags
+
+`--amend`: targeted edit mode — update one section, add a single requirement or acceptance criterion, or adjust scope without rewriting the entire spec.
+When `--amend` is present in `$ARGUMENTS`:
+- Read the existing spec first
+- Apply only the change described in the remaining arguments
+- Do not restructure or rewrite sections that are not being changed
+- Do not invalidate an existing inspect report unless the amendment materially changes acceptance criteria, scope, or the feature goal
+
 ## Operating Mode
 
 - Work on exactly one feature.
@@ -21,7 +30,7 @@ Stop if: goal ambiguous, multiple features in one request, or AC would be invent
 - Load only the minimum context needed to remove ambiguity.
 - Do not drift into planning or implementation.
 
-## Load Only
+## Load First
 
 - `.draftspec/constitution.md`
 - the current user request and conversation
@@ -29,8 +38,6 @@ Stop if: goal ambiguous, multiple features in one request, or AC would be invent
 
 ## Do Not Read By Default
 
-- unrelated specs
-- unrelated plan packages
 - implementation-heavy code areas unless they are needed to define scope correctly
 - contracts or data models for other features
 
@@ -133,18 +140,14 @@ If the spec already exists and is current, say so and do not modify the file.
 
 ## Output expectations
 
-- Create or switch to `feature/<slug>` before editing the spec when branch creation is available in the current environment, unless the user explicitly provides `--branch`.
-- Write or patch `.draftspec/specs/<slug>.md`, where `<slug>` is the lowercase kebab-case of the feature name
+- Create or switch to `feature/<slug>` before editing the spec when branch creation is available, unless the user explicitly provides `--branch`.
+- Write or patch `.draftspec/specs/<slug>.md`
 - Summarize goal, scope, acceptance criteria, and open questions
-- When referring to created or updated files in the conversation, list their exact project-relative paths, not only bare filenames
-- End the conversation with a short stable summary block that includes `Slug`, `Status`, `Artifacts`, `Blockers`, and `Next command` when that handoff is truly safe
-- When the spec is ready for the next phase, end the conversation summary with `Next command: /draftspec.inspect <slug>`
-- If the spec is still incomplete or staged mode is waiting for more detail, say that directly instead of suggesting the next phase command
+- End with a summary block: `Slug`, `Status`, `Artifacts`, `Blockers`, `Next command`
+- When ready: `Next command: /draftspec.inspect <slug>`
 
 ## Self-Check
 
 - Did I stay within one feature?
-- Did I avoid planning and implementation detail?
 - Did every acceptance criterion get a stable ID and Given/When/Then form?
 - Would a human reviewer understand the primary user flow and scope boundary without additional explanation?
-- Did I avoid loading unrelated artifacts?

@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strings"
 
 	"draftspec/src/internal/config"
@@ -96,6 +97,8 @@ func ValidateProject(root string) ([]Finding, error) {
 			findings = append(findings, validatePlan(state.Slug, specPath, planPath)...)
 		}
 	}
+
+	findings = append(findings, validateCrossSpecIDs(states, specsDir)...)
 
 	return findings, nil
 }
@@ -455,6 +458,58 @@ func acceptanceCoverageSection(tasksText string) string {
 		return markdownSection(tasksText, "Acceptance Coverage")
 	}
 	return markdownSection(tasksText, "Покрытие критериев приемки")
+}
+
+func validateCrossSpecIDs(states []FeatureState, specsDir string) []Finding {
+	type occurrence struct{ slugs []string }
+	acRegistry := map[string]*occurrence{}
+	rqRegistry := map[string]*occurrence{}
+
+	for _, state := range states {
+		if !state.SpecExists {
+			continue
+		}
+		specPath := filepath.Join(specsDir, state.Slug+".md")
+		content, err := os.ReadFile(specPath)
+		if err != nil {
+			continue
+		}
+		text := string(content)
+		for _, id := range ExtractUniqueMatches(text, `AC-[0-9][0-9][0-9]`) {
+			if acRegistry[id] == nil {
+				acRegistry[id] = &occurrence{}
+			}
+			acRegistry[id].slugs = append(acRegistry[id].slugs, state.Slug)
+		}
+		for _, id := range ExtractUniqueMatches(text, `RQ-[0-9][0-9][0-9]`) {
+			if rqRegistry[id] == nil {
+				rqRegistry[id] = &occurrence{}
+			}
+			rqRegistry[id].slugs = append(rqRegistry[id].slugs, state.Slug)
+		}
+	}
+
+	var findings []Finding
+	for id, occ := range acRegistry {
+		if len(occ.slugs) > 1 {
+			sort.Strings(occ.slugs)
+			findings = append(findings, Finding{
+				Level:   "warning",
+				Message: fmt.Sprintf("stable ID %s appears in multiple specs: %s", id, strings.Join(occ.slugs, ", ")),
+			})
+		}
+	}
+	for id, occ := range rqRegistry {
+		if len(occ.slugs) > 1 {
+			sort.Strings(occ.slugs)
+			findings = append(findings, Finding{
+				Level:   "warning",
+				Message: fmt.Sprintf("stable ID %s appears in multiple specs: %s", id, strings.Join(occ.slugs, ", ")),
+			})
+		}
+	}
+	sort.Slice(findings, func(i, j int) bool { return findings[i].Message < findings[j].Message })
+	return findings
 }
 
 func hasDuplicateMatches(content, pattern string) bool {

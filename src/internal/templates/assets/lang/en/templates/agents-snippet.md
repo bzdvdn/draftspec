@@ -17,6 +17,12 @@ Workflow commands:
 - `/draftspec.verify`: verify one implemented feature package before archive
 - `/draftspec.archive`: archive one feature package under `.draftspec/archive/`
 
+Optional commands (call at any point, outside the required chain):
+- `/draftspec.challenge`: adversarial review of a spec or plan — finds weak assumptions, scope problems, and logic gaps before implementation; use `--spec` or `--plan` to narrow the target
+- `/draftspec.handoff`: generate a compact session handoff document — captures current phase, open work, key decisions, and next command so a new session can resume without re-reading everything
+- `/draftspec.scope`: quick scope boundary check — answers whether current plan or tasks stay within spec boundaries; use `--plan` or `--tasks` to narrow the target; produces no file
+- `/draftspec.recap`: project-level overview — lists all active features with current phase and inspect verdict; no slug required; produces no file; useful at the start of a new session
+
 Read discipline:
 - Follow `constitution -> spec -> inspect -> plan -> tasks -> implement -> verify -> archive`
 - Do not skip prerequisites
@@ -34,6 +40,7 @@ Never load by default:
 - unrelated specs or plan packages
 - broad repository scans
 - script source files (use readiness scripts instead)
+- a file you already read in the current session unless you edited it yourself
 
 Implementation language discipline:
 - Treat the configured code comment language as the default for new or edited code comments

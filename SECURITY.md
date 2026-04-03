@@ -4,10 +4,10 @@
 
 Security fixes are provided on a best-effort basis for the latest released version and the current development branch.
 
-| Version | Supported |
-| --- | --- |
-| Latest release | Yes |
-| `master` | Yes |
+| Version        | Supported        |
+| -------------- | ---------------- |
+| Latest release | Yes              |
+| `master`       | Yes              |
 | Older releases | Best effort only |
 
 ## Reporting A Vulnerability

@@ -16,14 +16,14 @@ Stop if: slug неоднозначен, tasks.md отсутствует, или 
 
 Всегда сначала прочитайте:
 
-- `.draftspec/constitution.md`
+- `.draftspec/constitution.summary.md` если присутствует; иначе `.draftspec/constitution.md`
 - `.draftspec/plans/<slug>/tasks.md`
 
-## Load Only If Needed
+## Load If Present
 
 Читайте это только когда нужно подтвердить конкретный вывод:
 
-- `.draftspec/specs/<slug>.md`
+- `.draftspec/specs/<slug>.summary.md` если присутствует; иначе `.draftspec/specs/<slug>.md`
 - `.draftspec/plans/<slug>/plan.md`
 - `.draftspec/plans/<slug>/data-model.md`
 - `.draftspec/plans/<slug>/contracts/`
@@ -32,8 +32,6 @@ Stop if: slug неоднозначен, tasks.md отсутствует, или 
 
 ## Do Not Read By Default
 
-- нерелевантные спецификации
-- нерелевантные plan packages
 - нерелевантные области кода
 - широкую историю репозитория
 - архивы, если текущая проверка явно от них не зависит
@@ -101,21 +99,13 @@ Stop if: slug неоднозначен, tasks.md отсутствует, или 
 
 ## Output expectations
 
-- Выведите отчет в разговор, если пользователь не просит сохранить его в файл
-- Если отчет нужно сохранить без явного пути, используйте `.draftspec/plans/<slug>/verify.md`
+- Выведите отчет в разговор, если пользователь не просит сохранить его в файл; если нужно сохранить без явного пути — `.draftspec/plans/<slug>/verify.md`
 - Кратко суммируйте verdict, выполненные проверки, оставшиеся concerns и можно ли безопасно архивировать фичу
-- В `## Checks` явно отразите завершенность задач, acceptance evidence и согласованность реализации в тех местах, которые реально проверялись
-- Negative examples: не ставьте `pass` только по чекбоксам, не намекайте на полную проверку фичи по одному просмотренному файлу и не пишите, что archive safe, если в `Not Verified` еще остались material gaps
-- Когда упоминаете проверенные или измененные файлы в разговоре, указывайте их точные project-relative пути, а не только короткие имена файлов
-- Завершайте разговор коротким стабильным summary block с полями `Slug`, `Status`, `Artifacts`, `Blockers` и либо `Next command`, либо `Return to`
-- Когда фичу можно безопасно архивировать, завершайте разговорную сводку строкой `Следующая команда: /draftspec.archive <slug>`
-- Когда verdict возвращает работу на более раннюю фазу, явно называйте эту фазу и указывайте ее точную slash-команду вместо подсказки archive
+- Завершайте разговор summary block: `Slug`, `Status`, `Artifacts`, `Blockers` и `Next command` / `Return to`
+- Если фичу можно архивировать: `Следующая команда: /draftspec.archive <slug>`; при возврате на раннюю фазу — называйте её явно со slash-командой
 
 ## Self-Check
 
-- Я начал с `tasks.md` как verification entrypoint?
 - Каждый вывод verdict подкреплен реально проверенными evidence, а не только состоянием чекбоксов?
-- Я предпочел `concerns` вместо `pass`, если evidence были частичны?
 - Секция `Not Verified` честно отражает всё, что я не проверял?
-- Было бы архивирование безопасным только на основе того, что я реально проверил?
 - Следующая команда или return-фаза соответствует verdict?

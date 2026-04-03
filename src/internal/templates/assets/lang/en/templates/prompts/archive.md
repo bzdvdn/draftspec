@@ -18,7 +18,7 @@ Always read these first:
 
 - `.draftspec/specs/<slug>.md`
 
-## Load Only If Needed
+## Load If Present
 
 Read plan artifacts only to inform `summary.md`. If the summary can be written from the spec alone, do not read them:
 
@@ -30,7 +30,6 @@ Read plan artifacts only to inform `summary.md`. If the summary can be written f
 
 ## Do Not Read By Default
 
-- unrelated specs
 - unrelated archive entries
 - unrelated repository files
 

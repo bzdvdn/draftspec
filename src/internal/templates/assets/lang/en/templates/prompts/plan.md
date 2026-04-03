@@ -19,7 +19,21 @@ Stop if: spec or inspect missing, spec too vague for architecture decisions, or 
 - Keep context narrow and repository-grounded.
 - Produce only the artifacts justified by the feature.
 
-## Load Only
+## Flags
+
+`--research`: enter research-first mode before producing the plan.
+
+When `--research` is present in `$ARGUMENTS`:
+- Read the spec and inspect report, then identify the 1–5 concrete unknowns that currently block planning.
+- Write them to `.draftspec/plans/<slug>/research.md`.
+- Stop after writing `research.md` and ask: "Research complete — proceed to full plan?"
+- Wait for an explicit confirmation before producing `plan.md`, `data-model.md`, or any other planning artifact.
+- If the user confirms, continue with the normal planning flow using the research findings as grounding.
+- If the user says to stop, end the session with `research.md` as the only new artifact.
+
+Do not produce `plan.md` in the same pass as `--research` unless the user explicitly confirms.
+
+## Load First
 
 - `.draftspec/constitution.md`
 - `.draftspec/specs/<slug>.md`
@@ -29,8 +43,6 @@ Stop if: spec or inspect missing, spec too vague for architecture decisions, or 
 
 ## Do Not Read By Default
 
-- unrelated specs
-- unrelated plan packages
 - large repository areas with no impact on this feature
 - optional `research.md` unless uncertainty already exists
 
@@ -138,22 +150,13 @@ Before creating `research.md`, write down the concrete unknowns first:
 
 ## Output expectations
 
-- Write or patch the plan artifacts
-- State which optional artifacts were created and why
-- If optional artifacts such as `research.md` or `contracts/` were not created, say why they are not needed for this feature
-- Summarize the key technical decisions that will affect task decomposition and implementation
-- Explicitly call out risks and unresolved questions that block downstream phases
-- When referring to created or updated artifacts in the conversation, list their exact project-relative paths, not only bare filenames
-- End the conversation with a short stable summary block that includes `Slug`, `Status`, `Artifacts`, `Blockers`, and `Next command` when that handoff is truly safe
-- When planning is complete and downstream work is unblocked, end the conversation summary with `Next command: /draftspec.tasks <slug>`
-- If planning is blocked or needs refinement, say that directly instead of suggesting `/draftspec.tasks`
+- Write or patch the plan artifacts; state which optional artifacts were created and why
+- Summarize key technical decisions and call out risks blocking downstream phases
+- End with a summary block: `Slug`, `Status`, `Artifacts`, `Blockers`, `Next command`
+- When ready: `Next command: /draftspec.tasks <slug>`
 
 ## Self-Check
 
-- Did I plan only one feature?
 - Did I keep optional artifacts justified?
-- Did I name the specific unknowns before deciding whether research is needed?
-- Did I reference acceptance-critical behavior with stable IDs where needed?
 - Can `tasks` be written from this package without guesswork?
-- Can the first implementation tasks be derived from this plan without guessing touched surfaces or validation?
 - Would a human reviewer understand the main implementation shape, risks, and rollout story quickly?

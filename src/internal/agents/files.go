@@ -37,7 +37,7 @@ func NormalizeTargets(values []string) ([]string, error) {
 				continue
 			}
 			if _, ok := adapterRegistry[target]; !ok {
-				return nil, fmt.Errorf("unsupported agent target %q, expected one of: claude, codex, copilot, cursor, kilocode, trae, all", target)
+				return nil, fmt.Errorf("unsupported agent target %q, expected one of: aider, claude, codex, copilot, cursor, kilocode, roocode, trae, windsurf, all", target)
 			}
 			if _, ok := seen[target]; ok {
 				continue

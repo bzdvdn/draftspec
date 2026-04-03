@@ -191,6 +191,98 @@ func TestCheckErrorsOnUnsupportedShell(t *testing.T) {
 	}
 }
 
+func TestCheckWarnsWhenConstitutionHasPlaceholders(t *testing.T) {
+	root := t.TempDir()
+
+	_, err := project.Initialize(root, project.InitOptions{InitGit: false, DefaultLang: "en", Shell: "sh"})
+	if err != nil {
+		t.Fatalf("Initialize returned error: %v", err)
+	}
+
+	result, err := Check(root)
+	if err != nil {
+		t.Fatalf("Check returned error: %v", err)
+	}
+
+	var found bool
+	for _, finding := range result.Findings {
+		if finding.Level == "warning" && strings.Contains(finding.Message, "unfilled placeholder") {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Fatalf("expected unfilled placeholder warning after init, got %+v", result.Findings)
+	}
+}
+
+func TestCheckNoPlaceholderWarnWhenConstitutionIsFilled(t *testing.T) {
+	root := t.TempDir()
+
+	_, err := project.Initialize(root, project.InitOptions{InitGit: false, DefaultLang: "en", Shell: "sh"})
+	if err != nil {
+		t.Fatalf("Initialize returned error: %v", err)
+	}
+
+	constitutionPath := filepath.Join(root, ".draftspec", "constitution.md")
+	filled := "# My Project Constitution\n\n## Purpose\nBuild a great product.\n\n## Core Principles\n\n### Simplicity\nKeep it simple.\n\n## Constraints\nNo magic.\n\n## Decision Priorities\n- Correctness first\n\n## Key Quality Dimensions\n- Tested\n\n## Language Policy\n- Documentation language: English\n- Agent interaction language: English\n- Code comment language: English\n\n## Development Workflow\nUse feature branches.\n\n## Governance\nConstitution is authoritative.\n\n## Exceptions Protocol\nRecord deviations explicitly.\n\n## Last Updated\n2026-04-03\n"
+	if err := os.WriteFile(constitutionPath, []byte(filled), 0o644); err != nil {
+		t.Fatalf("WriteFile returned error: %v", err)
+	}
+
+	result, err := Check(root)
+	if err != nil {
+		t.Fatalf("Check returned error: %v", err)
+	}
+
+	for _, finding := range result.Findings {
+		if finding.Level == "warning" && strings.Contains(finding.Message, "unfilled placeholder") {
+			t.Fatalf("unexpected unfilled placeholder warning when constitution is filled: %+v", result.Findings)
+		}
+	}
+}
+
+func TestCheckWarnsDuplicateStableIDsAcrossSpecs(t *testing.T) {
+	root := t.TempDir()
+
+	_, err := project.Initialize(root, project.InitOptions{InitGit: false, DefaultLang: "en", Shell: "sh"})
+	if err != nil {
+		t.Fatalf("Initialize returned error: %v", err)
+	}
+
+	specsDir := filepath.Join(root, ".draftspec", "specs")
+	specA := "# Feature A\n\n## Goal\nDo A.\n\n## Requirements\n- RQ-001 x\n\n## Acceptance Criteria\n### AC-001 A\n- **Given** x\n- **When** y\n- **Then** z\n"
+	specB := "# Feature B\n\n## Goal\nDo B.\n\n## Requirements\n- RQ-001 y\n\n## Acceptance Criteria\n### AC-001 B\n- **Given** a\n- **When** b\n- **Then** c\n"
+
+	if err := os.WriteFile(filepath.Join(specsDir, "feature-a.md"), []byte(specA), 0o644); err != nil {
+		t.Fatalf("WriteFile(feature-a) returned error: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(specsDir, "feature-b.md"), []byte(specB), 0o644); err != nil {
+		t.Fatalf("WriteFile(feature-b) returned error: %v", err)
+	}
+
+	result, err := Check(root)
+	if err != nil {
+		t.Fatalf("Check returned error: %v", err)
+	}
+
+	var foundAC, foundRQ bool
+	for _, finding := range result.Findings {
+		if finding.Level == "warning" && strings.Contains(finding.Message, "AC-001") && strings.Contains(finding.Message, "multiple specs") {
+			foundAC = true
+		}
+		if finding.Level == "warning" && strings.Contains(finding.Message, "RQ-001") && strings.Contains(finding.Message, "multiple specs") {
+			foundRQ = true
+		}
+	}
+	if !foundAC {
+		t.Fatalf("expected AC-001 duplicate warning, got %+v", result.Findings)
+	}
+	if !foundRQ {
+		t.Fatalf("expected RQ-001 duplicate warning, got %+v", result.Findings)
+	}
+}
+
 func TestCheckWarnsWhenDraftspecEntrypointCannotBeResolved(t *testing.T) {
 	root := t.TempDir()
 	t.Setenv("PATH", "")

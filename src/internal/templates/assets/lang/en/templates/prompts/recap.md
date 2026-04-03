@@ -1,0 +1,79 @@
+# Draftspec Recap Prompt
+
+You are producing a project-level overview for a new agent session.
+
+## Goal
+
+Give a concise, current-state summary of the project and all active features so a new session can orient itself without re-reading every artifact.
+
+This command is optional, requires no slug, and produces no file — inline response only.
+
+## Phase Contract
+
+Inputs: `.draftspec/constitution.md`; spec files and inspect reports for active features.
+Outputs: inline response only — no file is written.
+Stop if: `.draftspec/constitution.md` is missing.
+
+## Load First
+
+Always read these first:
+
+- `.draftspec/constitution.md`
+
+## Load If Present
+
+Read these only to determine per-feature phase and status:
+
+- `.draftspec/scripts/list-specs.sh` — run it to enumerate active specs; do not read its source
+- One header block per active spec (goal and phase markers only — do not read full spec content)
+- `.draftspec/specs/<slug>.inspect.md` metadata block only (verdict line) when inspect exists
+
+## Do Not Read By Default
+
+- Full spec content beyond the goal and phase indicators
+- Plan packages unless the user explicitly asks for plan-level detail
+- tasks.md, data-model.md, contracts/
+- archived features
+- implementation files
+- script source files
+
+## Stop Conditions
+
+Stop and ask only if:
+
+- `.draftspec/constitution.md` is missing
+
+## Rules
+
+- Read the constitution once; extract the project purpose, constraints, and key principles in one pass.
+- Run `list-specs` to get the active spec list. If the script is unavailable, list files in `.draftspec/specs/` instead.
+- For each active spec, read only enough to extract: slug, feature name, current phase, and inspect verdict if available.
+- Determine current phase from artifact presence: no inspect → spec phase; inspect exists, no plan → inspect phase; plan exists, no tasks or open tasks → plan or tasks or implement phase; all tasks closed → verify or archive phase.
+- Do not read the full plan package for any feature unless the user explicitly asks.
+- Keep the response compact: it must be readable in under 30 seconds.
+- If there are no active features, say so clearly after summarizing the project context.
+
+## Output Format
+
+Respond inline only. Use this structure:
+
+**Project** — one or two sentences from the constitution: what the project is and its primary constraint or goal.
+
+**Active Features** — one row per feature:
+
+```
+<slug>  <name>  [phase]  [inspect: pass|concerns|blocked — omit if no inspect]
+```
+
+**Summary** — one line: how many features are active, how many are blocked, what the dominant phase is.
+
+**Suggested next command** — the single most useful next action based on current state (e.g. the most-blocked feature's recovery command, or the feature closest to archive).
+
+Keep the entire response under 20 lines unless the project has more than 5 active features.
+
+## Self-Check
+
+- Did I read only the minimum needed to determine each feature's phase?
+- Is the response compact enough to orient a new session quickly?
+- Did I avoid reading full spec or plan content?
+- Is the suggested next command grounded in actual feature state?

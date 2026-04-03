@@ -8,15 +8,18 @@ type Adapter interface {
 	Paths(commands []CommandDefinition, language string) ([]string, error)
 }
 
-var orderedTargets = []string{"claude", "codex", "copilot", "cursor", "kilocode", "trae"}
+var orderedTargets = []string{"aider", "claude", "codex", "copilot", "cursor", "kilocode", "roocode", "trae", "windsurf"}
 
 var adapterRegistry = map[string]Adapter{
+	"aider":    aiderAdapter{},
 	"claude":   claudeAdapter{},
 	"codex":    codexAdapter{},
 	"copilot":  copilotAdapter{},
 	"cursor":   cursorAdapter{},
 	"kilocode": kilocodeAdapter{},
+	"roocode":  roocodeAdapter{},
 	"trae":     traeAdapter{},
+	"windsurf": windsurfAdapter{},
 }
 
 func SupportedTargets() []string {
