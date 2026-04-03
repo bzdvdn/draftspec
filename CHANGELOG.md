@@ -17,6 +17,7 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Optional workflow commands available to all agent targets:
   - `/draftspec.handoff`: generate a compact session handoff document so a new session can resume without re-reading all artifacts; always overwrites the previous snapshot
   - `/draftspec.challenge`: adversarial review of a spec or plan — finds weak assumptions, untestable acceptance criteria, and scope drift before implementation; supports `--spec` and `--plan` flags; verdict: `strong`, `concerns`, or `fragile`
+  - `/draftspec.hotfix`: emergency fix outside the standard phase chain — for well-understood fixes touching ≤ 3 files with identified root cause; writes minimal spec, implements fix, verifies inline, and prepares for archive
   - `/draftspec.scope`: quick scope boundary check against the spec's in-scope / out-of-scope sections; produces no file, inline response only; verdict: `in-scope`, `drift`, or `out-of-scope`
   - `/draftspec.recap`: project-level overview of all active features with current phase and inspect verdict; no slug required; produces no file; designed as the first command in a new session
 - `--research` flag for `/draftspec.plan`: enters research-first mode — agent identifies concrete unknowns, writes `research.md`, then stops and asks "Research complete — proceed to full plan?" before producing `plan.md`
