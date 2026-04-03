@@ -139,7 +139,7 @@ Current repair scope includes legacy inspect report migration from:
 
 to the canonical path:
 
-- `.draftspec/specs/<slug>.inspect.md`
+- `.draftspec/specs/<slug>/inspect.md`
 
 Use `--dry-run` to preview changes and `--json` for structured output.
 

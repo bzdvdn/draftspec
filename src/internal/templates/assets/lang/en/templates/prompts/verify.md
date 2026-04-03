@@ -23,7 +23,7 @@ Always read these first:
 
 Read these only when needed to confirm a concrete claim:
 
-- `.draftspec/specs/<slug>.summary.md` if present; otherwise `.draftspec/specs/<slug>.md`
+- `.draftspec/specs/<slug>/summary.md` if present; otherwise `.draftspec/specs/<slug>/spec.md`
 - `.draftspec/plans/<slug>/plan.md`
 - `.draftspec/plans/<slug>/data-model.md`
 - `.draftspec/plans/<slug>/contracts/`

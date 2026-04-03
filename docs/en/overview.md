@@ -20,7 +20,11 @@
   draftspec.yaml
   constitution.md
   specs/
-    <slug>.md
+    <slug>/
+      spec.md
+      inspect.md
+      summary.md
+      hotfix.md
   plans/
     <slug>/
       plan.md

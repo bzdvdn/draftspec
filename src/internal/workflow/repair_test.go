@@ -38,7 +38,7 @@ func TestRepairFeatureMovesLegacyInspectReportToCanonicalPath(t *testing.T) {
 		t.Fatalf("expected repair to change files, got %+v", result)
 	}
 
-	canonicalPath := filepath.Join(root, ".draftspec", "specs", "demo.inspect.md")
+	canonicalPath := filepath.Join(root, ".draftspec", "specs", "demo", "inspect.md")
 	if _, err := os.Stat(canonicalPath); err != nil {
 		t.Fatalf("expected canonical inspect report to exist: %v", err)
 	}
@@ -60,7 +60,10 @@ func TestRepairFeatureRemovesDuplicateLegacyInspectReport(t *testing.T) {
 	}
 
 	content := "---\nreport_type: inspect\nslug: demo\nstatus: pass\ndocs_language: en\ngenerated_at: 2026-03-31\n---\n# Inspect Report: demo\n"
-	canonicalPath := filepath.Join(root, ".draftspec", "specs", "demo.inspect.md")
+	canonicalPath := filepath.Join(root, ".draftspec", "specs", "demo", "inspect.md")
+	if err := os.MkdirAll(filepath.Dir(canonicalPath), 0o755); err != nil {
+		t.Fatalf("MkdirAll(canonical) returned error: %v", err)
+	}
 	if err := os.WriteFile(canonicalPath, []byte(content), 0o644); err != nil {
 		t.Fatalf("WriteFile(canonical) returned error: %v", err)
 	}
@@ -96,7 +99,10 @@ func TestRepairFeatureWarnsWhenCanonicalAndLegacyDiffer(t *testing.T) {
 		t.Fatalf("Initialize returned error: %v", err)
 	}
 
-	canonicalPath := filepath.Join(root, ".draftspec", "specs", "demo.inspect.md")
+	canonicalPath := filepath.Join(root, ".draftspec", "specs", "demo", "inspect.md")
+	if err := os.MkdirAll(filepath.Dir(canonicalPath), 0o755); err != nil {
+		t.Fatalf("MkdirAll(canonical) returned error: %v", err)
+	}
 	if err := os.WriteFile(canonicalPath, []byte("canonical"), 0o644); err != nil {
 		t.Fatalf("WriteFile(canonical) returned error: %v", err)
 	}

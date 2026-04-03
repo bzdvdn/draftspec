@@ -31,7 +31,7 @@ Stop if: tasks.md отсутствует, следующая задача нек
 
 Читайте это только когда этого требует активная задача:
 
-- `.draftspec/specs/<slug>.summary.md` если присутствует; иначе `.draftspec/specs/<slug>.md` — когда неясны intent задачи или границы приемки
+- `.draftspec/specs/<slug>/summary.md` если присутствует; иначе `.draftspec/specs/<slug>/spec.md` — когда неясны intent задачи или границы приемки
 - `.draftspec/plans/<slug>/plan.md`, когда нужна архитектурная стратегия или порядок работ
 - `.draftspec/plans/<slug>/data-model.md`, когда важны форма данных, инварианты или поведение жизненного цикла
 - `.draftspec/plans/<slug>/contracts/`, когда затрагиваются API, события или интеграционные контракты

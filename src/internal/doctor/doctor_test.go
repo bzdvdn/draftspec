@@ -39,7 +39,11 @@ func TestCheckErrorsWhenPlanSkipsMandatoryInspect(t *testing.T) {
 		t.Fatalf("Initialize returned error: %v", err)
 	}
 
-	specPath := filepath.Join(root, ".draftspec", "specs", "demo.md")
+	specDir := filepath.Join(root, ".draftspec", "specs", "demo")
+	if err := os.MkdirAll(specDir, 0o755); err != nil {
+		t.Fatalf("MkdirAll(specDir) returned error: %v", err)
+	}
+	specPath := filepath.Join(specDir, "spec.md")
 	if err := os.WriteFile(specPath, []byte("# Demo\n\n## Goal\nx\n\n## Requirements\n- RQ-001 x\n\n## Acceptance Criteria\n### AC-001 Demo\n- **Given** x\n- **When** y\n- **Then** z\n"), 0o644); err != nil {
 		t.Fatalf("WriteFile(spec) returned error: %v", err)
 	}
@@ -254,10 +258,16 @@ func TestCheckWarnsDuplicateStableIDsAcrossSpecs(t *testing.T) {
 	specA := "# Feature A\n\n## Goal\nDo A.\n\n## Requirements\n- RQ-001 x\n\n## Acceptance Criteria\n### AC-001 A\n- **Given** x\n- **When** y\n- **Then** z\n"
 	specB := "# Feature B\n\n## Goal\nDo B.\n\n## Requirements\n- RQ-001 y\n\n## Acceptance Criteria\n### AC-001 B\n- **Given** a\n- **When** b\n- **Then** c\n"
 
-	if err := os.WriteFile(filepath.Join(specsDir, "feature-a.md"), []byte(specA), 0o644); err != nil {
+	if err := os.MkdirAll(filepath.Join(specsDir, "feature-a"), 0o755); err != nil {
+		t.Fatalf("MkdirAll(feature-a) returned error: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(specsDir, "feature-a", "spec.md"), []byte(specA), 0o644); err != nil {
 		t.Fatalf("WriteFile(feature-a) returned error: %v", err)
 	}
-	if err := os.WriteFile(filepath.Join(specsDir, "feature-b.md"), []byte(specB), 0o644); err != nil {
+	if err := os.MkdirAll(filepath.Join(specsDir, "feature-b"), 0o755); err != nil {
+		t.Fatalf("MkdirAll(feature-b) returned error: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(specsDir, "feature-b", "spec.md"), []byte(specB), 0o644); err != nil {
 		t.Fatalf("WriteFile(feature-b) returned error: %v", err)
 	}
 

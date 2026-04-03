@@ -30,7 +30,7 @@ Always read these before decomposing the work:
 
 Read these only when the decomposition requires them:
 
-- `.draftspec/specs/<slug>.summary.md` if present; otherwise `.draftspec/specs/<slug>.md` — when task intent, scope, or acceptance boundaries are unclear
+- `.draftspec/specs/<slug>/summary.md` if present; otherwise `.draftspec/specs/<slug>/spec.md` — when task intent, scope, or acceptance boundaries are unclear
 - `.draftspec/plans/<slug>/data-model.md` when task decomposition depends on entities, invariants, or lifecycle details
 - `.draftspec/plans/<slug>/contracts/` when tasks involve APIs, events, or integration boundaries
 - `.draftspec/plans/<slug>/research.md` only when it exists and affects implementation sequencing or risk

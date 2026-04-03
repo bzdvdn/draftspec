@@ -26,7 +26,7 @@ Read these only to determine per-feature phase and status:
 
 - `.draftspec/scripts/list-specs.sh` — run it to enumerate active specs; do not read its source
 - One header block per active spec (goal and phase markers only — do not read full spec content)
-- `.draftspec/specs/<slug>.inspect.md` metadata block only (verdict line) when inspect exists
+- `.draftspec/specs/<slug>/inspect.md` metadata block only (verdict line) when inspect exists
 
 ## Do Not Read By Default
 

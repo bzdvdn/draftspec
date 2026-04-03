@@ -8,7 +8,7 @@ Produce the technical planning artifacts for a spec under `.draftspec/plans/<slu
 
 ## Phase Contract
 
-Inputs: `.draftspec/constitution.md`, `.draftspec/specs/<slug>.md`, `.draftspec/specs/<slug>.inspect.md`, narrow repo code.
+Inputs: `.draftspec/constitution.md`, `.draftspec/specs/<slug>/spec.md`, `.draftspec/specs/<slug>/inspect.md`, narrow repo code.
 Outputs: `.draftspec/plans/<slug>/plan.md`, `.draftspec/plans/<slug>/data-model.md`; optional `contracts/`, `research.md`.
 Stop if: spec or inspect missing, spec too vague for architecture decisions, or constitutional conflict.
 
@@ -36,8 +36,8 @@ Do not produce `plan.md` in the same pass as `--research` unless the user explic
 ## Load First
 
 - `.draftspec/constitution.md`
-- `.draftspec/specs/<slug>.md`
-- `.draftspec/specs/<slug>.inspect.md`
+- `.draftspec/specs/<slug>/spec.md`
+- `.draftspec/specs/<slug>/inspect.md`
 - only the repository code and docs needed to plan this one feature
 - when code must be read, prefer the smallest file set needed to identify concrete implementation surfaces, boundaries, and constraints
 
@@ -50,8 +50,8 @@ Do not produce `plan.md` in the same pass as `--research` unless the user explic
 
 Stop and ask for clarification or refinement if:
 
-- `.draftspec/specs/<slug>.md` does not exist
-- `.draftspec/specs/<slug>.inspect.md` does not exist
+- `.draftspec/specs/<slug>/spec.md` does not exist
+- `.draftspec/specs/<slug>/inspect.md` does not exist
 - the spec is too vague to produce architecture, contracts, or data model decisions
 - constitutional constraints conflict with the intended plan
 - the plan would need to cross an unclear integration or architectural boundary that is not justified by the spec or focused repository evidence

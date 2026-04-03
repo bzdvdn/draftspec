@@ -26,7 +26,7 @@ Stop if: `.draftspec/constitution.md` отсутствует.
 
 - `.draftspec/scripts/list-specs.sh` — запустите для перечисления активных спеков; исходник не читайте
 - Только заголовочный блок каждого активного спека (цель и маркеры фазы — не читайте спек целиком)
-- Только metadata block из `.draftspec/specs/<slug>.inspect.md` (строка verdict), если inspect существует
+- Только metadata block из `.draftspec/specs/<slug>/inspect.md` (строка verdict), если inspect существует
 
 ## Do Not Read By Default
 

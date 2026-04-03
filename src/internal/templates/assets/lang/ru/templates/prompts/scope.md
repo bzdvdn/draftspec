@@ -10,7 +10,7 @@
 
 ## Phase Contract
 
-Inputs: `.draftspec/specs/<slug>.md` (только секции scope) + целевой артефакт для используемого флага.
+Inputs: `.draftspec/specs/<slug>/spec.md` (только секции scope) + целевой артефакт для используемого флага.
 Outputs: только inline-ответ в разговоре — файл не записывается.
 Stop if: slug неоднозначен или спек отсутствует.
 
@@ -25,7 +25,7 @@ Stop if: slug неоднозначен или спек отсутствует.
 
 Читать только секции спека, релевантные для scope:
 
-- `## Scope`, `## Non-Goals`, `## Out of Scope`, `## Scope Snapshot` или аналогичные секции в `.draftspec/specs/<slug>.md`
+- `## Scope`, `## Non-Goals`, `## Out of Scope`, `## Scope Snapshot` или аналогичные секции в `.draftspec/specs/<slug>/spec.md`
 
 Не читать спек целиком по умолчанию. Если в спеке нет отдельной секции scope, читать `## Goal` и `## Acceptance Criteria` чтобы вывести предполагаемую границу.
 

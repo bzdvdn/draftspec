@@ -16,7 +16,7 @@ Stop if: смотрите Stop Conditions.
 
 Всегда сначала прочитайте:
 
-- `.draftspec/specs/<slug>.md`
+- `.draftspec/specs/<slug>/spec.md`
 
 ## Load If Present
 
@@ -44,7 +44,7 @@ Stop if: смотрите Stop Conditions.
 ## Rules
 
 - Архивируйте в `.draftspec/archive/<slug>/<YYYY-MM-DD>/`.
-- В MVP используйте copy-based archive; не удаляйте active files (`specs/<slug>.md` и `plans/<slug>/`) без явного указания пользователя.
+- В MVP используйте copy-based archive; не удаляйте active files (`specs/<slug>/spec.md` и `plans/<slug>/`) без явного указания пользователя.
 - Записывайте `summary.md` внутри директории архива.
 - Держите `summary.md` компактным. Предпочитайте статус, причину, завершенный scope и заметные отклонения вместо длинного ретроспективного повествования.
 - Если plan artifacts существуют, архивируйте их вместе со spec.

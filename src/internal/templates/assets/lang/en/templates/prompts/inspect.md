@@ -8,8 +8,8 @@ Produce a focused inspection report for one feature without expanding scope.
 
 ## Phase Contract
 
-Inputs: `.draftspec/constitution.md`, `.draftspec/specs/<slug>.md`; optionally `plan.md`, `tasks.md` when they exist.
-Outputs: `.draftspec/specs/<slug>.inspect.md` with verdict `pass`, `concerns`, or `blocked`.
+Inputs: `.draftspec/constitution.md`, `.draftspec/specs/<slug>/spec.md`; optionally `plan.md`, `tasks.md` when they exist.
+Outputs: `.draftspec/specs/<slug>/inspect.md` with verdict `pass`, `concerns`, or `blocked`.
 Stop if: slug ambiguous, spec missing, or report would require inventing product intent.
 
 ## Load First
@@ -17,7 +17,7 @@ Stop if: slug ambiguous, spec missing, or report would require inventing product
 Always read these first:
 
 - `.draftspec/constitution.md`
-- `.draftspec/specs/<slug>.md`
+- `.draftspec/specs/<slug>/spec.md`
 
 ## Load If Present
 
@@ -98,7 +98,7 @@ Stop and ask a minimal follow-up question only if:
 
 ## Spec Summary Artifact
 
-After writing the inspect report, also write `.draftspec/specs/<slug>.summary.md`.
+After writing the inspect report, also write `.draftspec/specs/<slug>/summary.md`.
 
 The summary MUST contain only:
 
@@ -111,7 +111,7 @@ Keep the summary under 25 lines. It is loaded by `tasks`, `implement`, and `veri
 
 ## Output expectations
 
-- Persist to `.draftspec/specs/<slug>.inspect.md` and write `.draftspec/specs/<slug>.summary.md`
+- Persist to `.draftspec/specs/<slug>/inspect.md` and write `.draftspec/specs/<slug>/summary.md`
 - Summarize verdict in the conversation; prefer compact report with only non-empty sections.
 - End with a summary block: `Slug`, `Status`, `Artifacts`, `Blockers`, `Next command`
 - When ready: `Next command: /draftspec.plan <slug>` (or `/draftspec.tasks <slug>` when plan already exists)

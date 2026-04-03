@@ -20,10 +20,16 @@ func TestListReturnsSortedMarkdownSpecsOnly(t *testing.T) {
 	}
 
 	specsDir := filepath.Join(root, ".draftspec", "specs")
-	if err := os.WriteFile(filepath.Join(specsDir, "zeta.md"), []byte("# Zeta"), 0o644); err != nil {
+	if err := os.Mkdir(filepath.Join(specsDir, "zeta"), 0o755); err != nil {
+		t.Fatalf("Mkdir returned error: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(specsDir, "zeta", "spec.md"), []byte("# Zeta"), 0o644); err != nil {
 		t.Fatalf("WriteFile returned error: %v", err)
 	}
-	if err := os.WriteFile(filepath.Join(specsDir, "alpha.md"), []byte("# Alpha"), 0o644); err != nil {
+	if err := os.Mkdir(filepath.Join(specsDir, "alpha"), 0o755); err != nil {
+		t.Fatalf("Mkdir returned error: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(specsDir, "alpha", "spec.md"), []byte("# Alpha"), 0o644); err != nil {
 		t.Fatalf("WriteFile returned error: %v", err)
 	}
 	if err := os.WriteFile(filepath.Join(specsDir, "notes.txt"), []byte("ignore"), 0o644); err != nil {
@@ -52,7 +58,11 @@ func TestShowReturnsSpecContent(t *testing.T) {
 		t.Fatalf("Initialize returned error: %v", err)
 	}
 
-	specPath := filepath.Join(root, ".draftspec", "specs", "demo.md")
+	specDir := filepath.Join(root, ".draftspec", "specs", "demo")
+	if err := os.MkdirAll(specDir, 0o755); err != nil {
+		t.Fatalf("MkdirAll returned error: %v", err)
+	}
+	specPath := filepath.Join(specDir, "spec.md")
 	content := "# Demo\n\nHello"
 	if err := os.WriteFile(specPath, []byte(content), 0o644); err != nil {
 		t.Fatalf("WriteFile returned error: %v", err)
@@ -83,7 +93,7 @@ func TestCreateGeneratesSpecAndTasksFromTemplates(t *testing.T) {
 		t.Fatalf("unexpected messages: %v", result.Messages)
 	}
 
-	specPath := filepath.Join(root, ".draftspec", "specs", "partner-scheduling.md")
+	specPath := filepath.Join(root, ".draftspec", "specs", "partner-scheduling", "spec.md")
 	tasksPath := filepath.Join(root, ".draftspec", "plans", "partner-scheduling", "tasks.md")
 
 	specContent, err := os.ReadFile(specPath)

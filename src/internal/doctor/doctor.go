@@ -39,6 +39,25 @@ func Check(root string) (Result, error) {
 
 	var findings []Finding
 
+	migrationResult, err := workflow.MigrateProject(root, false)
+	if err != nil {
+		return Result{}, err
+	}
+	for _, repair := range migrationResult.Results {
+		for _, action := range repair.Actions {
+			findings = append(findings, Finding{Level: "ok", Message: action})
+		}
+		for _, warning := range repair.Warnings {
+			findings = append(findings, Finding{Level: "warning", Message: warning})
+		}
+	}
+	for _, warning := range migrationResult.Warnings {
+		if warning == "no safe migrations were needed" {
+			continue
+		}
+		findings = append(findings, Finding{Level: "warning", Message: warning})
+	}
+
 	draftspecDir, err := cfg.DraftspecDir(root)
 	if err != nil {
 		return Result{}, err

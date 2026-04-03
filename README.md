@@ -148,7 +148,7 @@ draftspec init . --lang en --shell sh --agents claude
 
 Call `/draftspec.spec --name "CSV export for reports"` in your agent.
 
-`.draftspec/specs/csv-export-for-reports.md`:
+`.draftspec/specs/csv-export-for-reports/spec.md`:
 
 ```markdown
 ## Goal
@@ -171,8 +171,8 @@ Then a .csv with headers only downloads — no error shown
 
 Call `/draftspec.inspect csv-export-for-reports`.
 
-- `.draftspec/specs/csv-export-for-reports.inspect.md` — verdict `pass`, all AC have G/W/T
-- `.draftspec/specs/csv-export-for-reports.summary.md` — compact AC table used by implement and verify instead of the full spec
+- `.draftspec/specs/csv-export-for-reports/inspect.md` — verdict `pass`, all AC have G/W/T
+- `.draftspec/specs/csv-export-for-reports/summary.md` — compact AC table used by implement and verify instead of the full spec
 
 ### 4. Plan
 

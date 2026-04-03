@@ -23,7 +23,7 @@ Stop if: slug неоднозначен, tasks.md отсутствует, или 
 
 Читайте это только когда нужно подтвердить конкретный вывод:
 
-- `.draftspec/specs/<slug>.summary.md` если присутствует; иначе `.draftspec/specs/<slug>.md`
+- `.draftspec/specs/<slug>/summary.md` если присутствует; иначе `.draftspec/specs/<slug>/spec.md`
 - `.draftspec/plans/<slug>/plan.md`
 - `.draftspec/plans/<slug>/data-model.md`
 - `.draftspec/plans/<slug>/contracts/`

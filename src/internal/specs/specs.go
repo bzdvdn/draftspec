@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"sort"
 	"strings"
 	"unicode"
 
 	"draftspec/src/internal/config"
+	"draftspec/src/internal/featurepaths"
 	"draftspec/src/internal/gitutil"
 )
 
@@ -37,28 +37,7 @@ func List(root string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	entries, err := os.ReadDir(specsDir)
-	if err != nil {
-		return nil, fmt.Errorf("read specs directory: %w", err)
-	}
-
-	var names []string
-	for _, entry := range entries {
-		if entry.IsDir() {
-			continue
-		}
-
-		name := entry.Name()
-		if filepath.Ext(name) != ".md" {
-			continue
-		}
-
-		names = append(names, strings.TrimSuffix(name, ".md"))
-	}
-
-	sort.Strings(names)
-	return names, nil
+	return featurepaths.ListSpecSlugs(specsDir)
 }
 
 func Show(root, name string) (string, error) {
@@ -72,7 +51,7 @@ func Show(root, name string) (string, error) {
 		return "", err
 	}
 
-	specPath := filepath.Join(specsDir, name+".md")
+	specPath, _ := featurepaths.ResolveSpec(specsDir, name)
 	content, err := os.ReadFile(specPath)
 	if err != nil {
 		return "", fmt.Errorf("read spec %q: %w", name, err)
@@ -128,7 +107,7 @@ func Create(root, name string, options CreateOptions) (CreateResult, error) {
 		return CreateResult{}, fmt.Errorf("read tasks template: %w", err)
 	}
 
-	specPath := filepath.Join(specsDir, resolved.Slug+".md")
+	specPath := featurepaths.Spec(specsDir, resolved.Slug)
 	tasksPath := filepath.Join(plansDir, resolved.Slug, "tasks.md")
 
 	created, err := writeFilledTemplate(specPath, string(specTemplate), title)

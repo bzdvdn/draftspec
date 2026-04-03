@@ -74,7 +74,7 @@ Add a user-selectable dark theme for the dashboard and settings pages.
 
 Это позволяет Draftspec:
 
-- вывести безопасный путь спецификации вроде `.draftspec/specs/add-dark-mode.md`
+- вывести безопасный путь спецификации вроде `.draftspec/specs/add-dark-mode/spec.md`
 - создать или переключить `feature/add-dark-mode`
 - избежать неоднозначных slug из generic filename
 
@@ -144,7 +144,7 @@ Add a user-selectable dark theme for the dashboard and settings pages.
 Ожидаемое поведение агента:
 
 - сначала прочитать constitution
-- создать `.draftspec/specs/partner-scheduling.md`
+- создать `.draftspec/specs/partner-scheduling/spec.md`
 - записать acceptance criteria в каноническом формате `Given / When / Then`
 - остальной текст держать на configured documentation language
 
@@ -177,12 +177,12 @@ Add a user-selectable dark theme for the dashboard and settings pages.
 
 Ожидаемое поведение агента:
 
-- прочитать constitution и `.draftspec/specs/partner-scheduling.md`
+- прочитать constitution и `.draftspec/specs/partner-scheduling/spec.md`
 - держать default inspect scope дешевым: сначала `constitution.md` и `spec.md`, а `plan.md` или `tasks.md` подтягивать только если они существуют и реально влияют на вывод
 - проверить полноту, соответствие конституции и качество сценариев
 - выпустить focused inspection report
 - использовать `.draftspec/scripts/inspect-spec.sh` или `.draftspec/scripts/inspect-spec.ps1` как дешевый helper первого прохода, когда нужно быстро подтвердить структурные проблемы spec или coverage
-- сохранять inspect report в `.draftspec/specs/partner-scheduling.inspect.md`
+- сохранять inspect report в `.draftspec/specs/partner-scheduling/inspect.md`
 - использовать `.draftspec/templates/inspect-report.md` как канонический шаблон отчета
 
 Типовые находки:

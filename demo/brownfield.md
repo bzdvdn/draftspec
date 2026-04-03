@@ -52,8 +52,8 @@ Example feature request:
 
 Expected artifact growth:
 
-- `.draftspec/specs/<slug>.md`
-- `.draftspec/specs/<slug>.inspect.md`
+- `.draftspec/specs/<slug>/spec.md`
+- `.draftspec/specs/<slug>/inspect.md`
 - `.draftspec/plans/<slug>/plan.md`
 - `.draftspec/plans/<slug>/tasks.md`
 - optional compact plan artifacts only when needed

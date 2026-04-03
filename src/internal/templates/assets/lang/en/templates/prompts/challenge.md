@@ -10,7 +10,7 @@ This command is optional and outside the required workflow chain. It can be call
 
 ## Phase Contract
 
-Inputs: `.draftspec/specs/<slug>.md`; optionally `.draftspec/specs/<slug>.inspect.md`, `.draftspec/plans/<slug>/plan.md`.
+Inputs: `.draftspec/specs/<slug>/spec.md`; optionally `.draftspec/specs/<slug>/inspect.md`, `.draftspec/plans/<slug>/plan.md`.
 Outputs: `.draftspec/plans/<slug>/challenge.md` with verdict `strong`, `concerns`, or `fragile`.
 Stop if: slug ambiguous or no spec exists for the slug.
 
@@ -23,13 +23,13 @@ Default (no flag): challenge whatever is present — spec, inspect report, and p
 
 ## Load First
 
-- `.draftspec/specs/<slug>.md`
+- `.draftspec/specs/<slug>/spec.md`
 
 ## Load If Present
 
 Read these only when relevant to the target flag or when the default mode applies:
 
-- `.draftspec/specs/<slug>.inspect.md`
+- `.draftspec/specs/<slug>/inspect.md`
 - `.draftspec/plans/<slug>/plan.md`
 
 ## Do Not Read By Default

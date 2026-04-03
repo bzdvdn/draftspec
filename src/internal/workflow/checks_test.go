@@ -21,7 +21,11 @@ func TestInspectSpecValidatesAcceptanceCoverageInGo(t *testing.T) {
 		t.Fatalf("Initialize returned error: %v", err)
 	}
 
-	specPath := filepath.Join(root, ".draftspec", "specs", "demo.md")
+	specDir := filepath.Join(root, ".draftspec", "specs", "demo")
+	if err := os.MkdirAll(specDir, 0o755); err != nil {
+		t.Fatalf("MkdirAll(specDir) returned error: %v", err)
+	}
+	specPath := filepath.Join(specDir, "spec.md")
 	specContent := "# Demo\n\n## Goal\nx\n\n## Requirements\n- RQ-001 x\n\n## Acceptance Criteria\n### AC-001 First\n- Given x\n- When y\n- Then z\n\n### AC-002 Second\n- Given a\n- When b\n- Then c\n"
 	if err := os.WriteFile(specPath, []byte(specContent), 0o644); err != nil {
 		t.Fatalf("WriteFile(spec) returned error: %v", err)
@@ -36,7 +40,7 @@ func TestInspectSpecValidatesAcceptanceCoverageInGo(t *testing.T) {
 		t.Fatalf("WriteFile(tasks) returned error: %v", err)
 	}
 
-	result, err := InspectSpec(root, ".draftspec/specs/demo.md", ".draftspec/plans/demo/tasks.md")
+	result, err := InspectSpec(root, ".draftspec/specs/demo/spec.md", ".draftspec/plans/demo/tasks.md")
 	if err != nil {
 		t.Fatalf("InspectSpec returned error: %v", err)
 	}
@@ -101,7 +105,11 @@ func TestCheckArchiveReadyBlocksCompletedArchiveWhenTasksRemainOpen(t *testing.T
 		t.Fatalf("Initialize returned error: %v", err)
 	}
 
-	specPath := filepath.Join(root, ".draftspec", "specs", "demo.md")
+	specDir := filepath.Join(root, ".draftspec", "specs", "demo")
+	if err := os.MkdirAll(specDir, 0o755); err != nil {
+		t.Fatalf("MkdirAll(specDir) returned error: %v", err)
+	}
+	specPath := filepath.Join(specDir, "spec.md")
 	if err := os.WriteFile(specPath, []byte("# Demo\n"), 0o644); err != nil {
 		t.Fatalf("WriteFile(spec) returned error: %v", err)
 	}

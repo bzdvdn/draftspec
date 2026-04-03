@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"draftspec/src/internal/config"
+	"draftspec/src/internal/featurepaths"
 )
 
 type Finding struct {
@@ -40,7 +41,7 @@ func ValidateProject(root string) ([]Finding, error) {
 
 	var findings []Finding
 	for _, state := range states {
-		specPath := filepath.Join(specsDir, state.Slug+".md")
+		specPath, _ := featurepaths.ResolveSpec(specsDir, state.Slug)
 		planPath := filepath.Join(plansDir, state.Slug, "plan.md")
 		tasksPath := filepath.Join(plansDir, state.Slug, "tasks.md")
 
@@ -469,7 +470,7 @@ func validateCrossSpecIDs(states []FeatureState, specsDir string) []Finding {
 		if !state.SpecExists {
 			continue
 		}
-		specPath := filepath.Join(specsDir, state.Slug+".md")
+		specPath, _ := featurepaths.ResolveSpec(specsDir, state.Slug)
 		content, err := os.ReadFile(specPath)
 		if err != nil {
 			continue

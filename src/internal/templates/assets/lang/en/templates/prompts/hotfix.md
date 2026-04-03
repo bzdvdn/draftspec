@@ -18,7 +18,7 @@ If scope is unclear, root cause unknown, or fix is cross-cutting — stop and us
 ## Phase Contract
 
 Inputs: `.draftspec/constitution.summary.md` (or `.draftspec/constitution.md`), user description of the fix.
-Outputs: `.draftspec/specs/<slug>.hotfix.md`, implementation code.
+Outputs: `.draftspec/specs/<slug>/hotfix.md`, implementation code.
 Stop if: root cause unclear, fix exceeds 3 files, or constitutional conflict detected.
 
 ## Load First
@@ -46,7 +46,7 @@ Stop and switch to the standard workflow if:
 
 ## Hotfix Spec
 
-Write `.draftspec/specs/<slug>.hotfix.md` before touching any code:
+Write `.draftspec/specs/<slug>/hotfix.md` before touching any code:
 
 ```
 ---
@@ -82,7 +82,7 @@ created_at: <date>
 
 ## Output expectations
 
-- Write `.draftspec/specs/<slug>.hotfix.md`
+- Write `.draftspec/specs/<slug>/hotfix.md`
 - Implement the fix; confirm the observable proof from the `Verification` section is met
 - End with a summary block: `Slug`, `Status`, `Fix`, `Verified`, `Next command`
 - When done: `Next command: /draftspec.archive <slug>`

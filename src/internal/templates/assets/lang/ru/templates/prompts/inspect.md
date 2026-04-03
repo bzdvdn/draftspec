@@ -8,8 +8,8 @@
 
 ## Phase Contract
 
-Inputs: `.draftspec/constitution.md`, `.draftspec/specs/<slug>.md`; опционально `plan.md`, `tasks.md`, если они существуют.
-Outputs: `.draftspec/specs/<slug>.inspect.md` с verdict `pass`, `concerns` или `blocked`.
+Inputs: `.draftspec/constitution.md`, `.draftspec/specs/<slug>/spec.md`; опционально `plan.md`, `tasks.md`, если они существуют.
+Outputs: `.draftspec/specs/<slug>/inspect.md` с verdict `pass`, `concerns` или `blocked`.
 Stop if: slug неоднозначен, spec отсутствует, или отчет потребовал бы выдумывать продуктовый intent.
 
 ## Load First
@@ -17,7 +17,7 @@ Stop if: slug неоднозначен, spec отсутствует, или от
 Всегда сначала прочитайте:
 
 - `.draftspec/constitution.md`
-- `.draftspec/specs/<slug>.md`
+- `.draftspec/specs/<slug>/spec.md`
 
 ## Load If Present
 
@@ -98,7 +98,7 @@ Stop if: slug неоднозначен, spec отсутствует, или от
 
 ## Артефакт краткого описания спецификации
 
-После записи отчёта проверки также запишите `.draftspec/specs/<slug>.summary.md`.
+После записи отчёта проверки также запишите `.draftspec/specs/<slug>/summary.md`.
 
 Summary ДОЛЖЕН содержать только:
 
@@ -111,7 +111,7 @@ Summary ДОЛЖЕН содержать только:
 
 ## Output expectations
 
-- Сохраняйте отчет в `.draftspec/specs/<slug>.inspect.md` и записывайте `.draftspec/specs/<slug>.summary.md`; кратко суммируйте verdict в разговоре compact report с непустыми секциями
+- Сохраняйте отчет в `.draftspec/specs/<slug>/inspect.md` и записывайте `.draftspec/specs/<slug>/summary.md`; кратко суммируйте verdict в разговоре compact report с непустыми секциями
 - Завершайте разговор summary block: `Slug`, `Status`, `Artifacts`, `Blockers`, `Next command`
 - Когда можно продолжать: в `## Next Step` указывайте точную slash-команду следующей фазы
 - Если сначала нужен refinement — говорите об этом прямо

@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"sort"
 	"strings"
 
 	"draftspec/src/internal/config"
+	"draftspec/src/internal/featurepaths"
 	"github.com/spf13/cobra"
 )
 
@@ -61,26 +61,16 @@ func newInternalListSpecsCmd() *cobra.Command {
 			if !filepath.IsAbs(specsDir) {
 				specsDir = filepath.Join(root, filepath.FromSlash(specsDir))
 			}
-			entries, err := os.ReadDir(specsDir)
-			if err != nil {
+			if _, err := os.Stat(specsDir); err != nil {
 				if os.IsNotExist(err) {
 					return newExitError(1, fmt.Sprintf("specs directory not found: %s", filepath.ToSlash(argsOrDefault(args, ".draftspec/specs"))))
 				}
 				return err
 			}
-
-			var names []string
-			for _, entry := range entries {
-				if entry.IsDir() {
-					continue
-				}
-				name := entry.Name()
-				if filepath.Ext(name) != ".md" {
-					continue
-				}
-				names = append(names, strings.TrimSuffix(name, ".md"))
+			names, err := featurepaths.ListSpecSlugs(specsDir)
+			if err != nil {
+				return err
 			}
-			sort.Strings(names)
 			for _, name := range names {
 				fmt.Fprintln(cmd.OutOrStdout(), name)
 			}
@@ -108,8 +98,11 @@ func newInternalShowSpecCmd() *cobra.Command {
 			if !filepath.IsAbs(specsDir) {
 				specsDir = filepath.Join(root, filepath.FromSlash(specsDir))
 			}
-			specFileDisplay := filepath.ToSlash(filepath.Join(specsDirDisplay, args[0]+".md"))
-			specFilePath := filepath.Join(specsDir, args[0]+".md")
+			specFileDisplay := filepath.ToSlash(filepath.Join(specsDirDisplay, args[0], "spec.md"))
+			specFilePath, legacy := featurepaths.ResolveSpec(specsDir, args[0])
+			if legacy {
+				specFileDisplay = filepath.ToSlash(filepath.Join(specsDirDisplay, args[0]+".md"))
+			}
 			content, err := os.ReadFile(specFilePath)
 			if err != nil {
 				if os.IsNotExist(err) {

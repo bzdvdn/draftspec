@@ -31,7 +31,7 @@ Always read these before doing any implementation work:
 
 Read these only when the active task requires them:
 
-- `.draftspec/specs/<slug>.summary.md` if present; otherwise `.draftspec/specs/<slug>.md` — when task intent or acceptance scope is unclear
+- `.draftspec/specs/<slug>/summary.md` if present; otherwise `.draftspec/specs/<slug>/spec.md` — when task intent or acceptance scope is unclear
 - `.draftspec/plans/<slug>/plan.md` when architectural strategy or sequencing is needed
 - `.draftspec/plans/<slug>/data-model.md` when data shape, invariants, or lifecycle behavior matters
 - `.draftspec/plans/<slug>/contracts/` when APIs, events, or integration contracts are involved

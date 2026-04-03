@@ -17,13 +17,13 @@ Stop if: slug is ambiguous or no feature artifacts exist for the slug.
 Always read these first if they exist:
 
 - `.draftspec/constitution.md`
-- `.draftspec/specs/<slug>.md`
+- `.draftspec/specs/<slug>/spec.md`
 
 ## Load If Present
 
 Read these only when they exist and are needed to populate open items or decisions:
 
-- `.draftspec/specs/<slug>.inspect.md`
+- `.draftspec/specs/<slug>/inspect.md`
 - `.draftspec/plans/<slug>/plan.md`
 - `.draftspec/plans/<slug>/tasks.md`
 

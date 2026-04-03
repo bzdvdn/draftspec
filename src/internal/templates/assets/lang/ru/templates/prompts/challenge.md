@@ -10,7 +10,7 @@
 
 ## Phase Contract
 
-Inputs: `.draftspec/specs/<slug>.md`; опционально `.draftspec/specs/<slug>.inspect.md`, `.draftspec/plans/<slug>/plan.md`.
+Inputs: `.draftspec/specs/<slug>/spec.md`; опционально `.draftspec/specs/<slug>/inspect.md`, `.draftspec/plans/<slug>/plan.md`.
 Outputs: `.draftspec/plans/<slug>/challenge.md` с вердиктом `strong`, `concerns` или `fragile`.
 Stop if: slug неоднозначен или спек для slug не существует.
 
@@ -23,13 +23,13 @@ Stop if: slug неоднозначен или спек для slug не суще
 
 ## Load First
 
-- `.draftspec/specs/<slug>.md`
+- `.draftspec/specs/<slug>/spec.md`
 
 ## Load If Present
 
 Читайте только при наличии и только если это соответствует флагу или режиму по умолчанию:
 
-- `.draftspec/specs/<slug>.inspect.md`
+- `.draftspec/specs/<slug>/inspect.md`
 - `.draftspec/plans/<slug>/plan.md`
 
 ## Do Not Read By Default

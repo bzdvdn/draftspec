@@ -10,7 +10,7 @@ generated_at: 2026-03-15
 
 ## Scope
 
-Reviewed: `.draftspec/constitution.md`, `.draftspec/specs/export-report.md`
+Reviewed: `.draftspec/constitution.md`, `.draftspec/specs/export-report/spec.md`
 
 ## Verdict
 

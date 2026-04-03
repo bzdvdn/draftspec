@@ -148,7 +148,7 @@ draftspec init . --lang ru --shell sh --agents claude
 
 Вызовите `/draftspec.spec --name "Экспорт отчётов в CSV"` в агенте.
 
-`.draftspec/specs/eksport-otchetov-v-csv.md`:
+`.draftspec/specs/eksport-otchetov-v-csv/spec.md`:
 
 ```markdown
 ## Цель
@@ -171,8 +171,8 @@ Then скачивается .csv только с заголовками — бе
 
 Вызовите `/draftspec.inspect eksport-otchetov-v-csv`.
 
-- `.draftspec/specs/eksport-otchetov-v-csv.inspect.md` — вердикт `pass`, все AC в формате G/W/T
-- `.draftspec/specs/eksport-otchetov-v-csv.summary.md` — компактная таблица AC, которую используют implement и verify вместо полного spec
+- `.draftspec/specs/eksport-otchetov-v-csv/inspect.md` — вердикт `pass`, все AC в формате G/W/T
+- `.draftspec/specs/eksport-otchetov-v-csv/summary.md` — компактная таблица AC, которую используют implement и verify вместо полного spec
 
 ### 4. Plan
 

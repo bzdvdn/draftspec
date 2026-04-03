@@ -10,7 +10,7 @@ This command is optional, produces no persistent artifact, and can be called at 
 
 ## Phase Contract
 
-Inputs: `.draftspec/specs/<slug>.md` (scope sections only), plus the target artifact for the flag in use.
+Inputs: `.draftspec/specs/<slug>/spec.md` (scope sections only), plus the target artifact for the flag in use.
 Outputs: inline conversation response only — no file is written.
 Stop if: slug ambiguous or spec missing.
 
@@ -25,7 +25,7 @@ Default (no flag): check whatever is present — prefer `tasks.md` if it exists,
 
 Read only the scope-relevant sections of the spec:
 
-- `## Scope`, `## Non-Goals`, `## Out of Scope`, `## Scope Snapshot`, or equivalent sections in `.draftspec/specs/<slug>.md`
+- `## Scope`, `## Non-Goals`, `## Out of Scope`, `## Scope Snapshot`, or equivalent sections in `.draftspec/specs/<slug>/spec.md`
 
 Do not read the full spec by default. If the spec has no dedicated scope section, read `## Goal` and `## Acceptance Criteria` to infer the intended boundary.
 

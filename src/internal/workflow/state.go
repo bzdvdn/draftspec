@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"draftspec/src/internal/config"
+	"draftspec/src/internal/featurepaths"
 )
 
 type FeatureState struct {
@@ -57,8 +58,8 @@ func State(root, slug string) (FeatureState, error) {
 		return FeatureState{}, err
 	}
 
-	specPath := filepath.Join(specsDir, slug+".md")
-	inspectPath := filepath.Join(specsDir, slug+".inspect.md")
+	specPath, _ := featurepaths.ResolveSpec(specsDir, slug)
+	inspectPath, inspectLegacyFlat := featurepaths.ResolveInspect(specsDir, slug)
 	legacyInspectPath := filepath.Join(plansDir, slug, "inspect.md")
 	planPath := filepath.Join(plansDir, slug, "plan.md")
 	tasksPath := filepath.Join(plansDir, slug, "tasks.md")
@@ -73,6 +74,9 @@ func State(root, slug string) (FeatureState, error) {
 		VerifyPath:  verifyPath,
 	}
 	state.InspectExists, state.InspectPath, state.InspectLegacy = existingInspectReportPath(inspectPath, legacyInspectPath)
+	if state.InspectExists && inspectLegacyFlat && state.InspectPath == inspectPath {
+		state.InspectLegacy = true
+	}
 	state.VerifyExists = fileExists(verifyPath)
 
 	if state.TasksExists {
@@ -240,13 +244,40 @@ func collectSpecSlugs(slugSet map[string]struct{}, dir string) {
 
 	for _, entry := range entries {
 		if entry.IsDir() {
+			if specDirHasArtifacts(filepath.Join(dir, entry.Name())) {
+				slugSet[entry.Name()] = struct{}{}
+			}
 			continue
 		}
 		name := entry.Name()
-		if !strings.HasSuffix(name, ".md") || strings.HasSuffix(name, ".inspect.md") {
-			continue
+		if slug, ok := legacySpecArtifactSlug(name); ok {
+			slugSet[slug] = struct{}{}
 		}
-		slugSet[strings.TrimSuffix(name, ".md")] = struct{}{}
+	}
+}
+
+func specDirHasArtifacts(dir string) bool {
+	for _, name := range []string{"spec.md", "inspect.md", "summary.md", "hotfix.md"} {
+		if fileExists(filepath.Join(dir, name)) {
+			return true
+		}
+	}
+	return false
+}
+
+func legacySpecArtifactSlug(name string) (string, bool) {
+	if !strings.HasSuffix(name, ".md") {
+		return "", false
+	}
+	switch {
+	case strings.HasSuffix(name, ".inspect.md"):
+		return strings.TrimSuffix(name, ".inspect.md"), true
+	case strings.HasSuffix(name, ".summary.md"):
+		return strings.TrimSuffix(name, ".summary.md"), true
+	case strings.HasSuffix(name, ".hotfix.md"):
+		return strings.TrimSuffix(name, ".hotfix.md"), true
+	default:
+		return strings.TrimSuffix(name, ".md"), true
 	}
 }
 

@@ -29,11 +29,15 @@ func TestStateInfersLifecycleAndReportStatuses(t *testing.T) {
 		t.Fatalf("unexpected initial state: %+v", state)
 	}
 
-	specPath := filepath.Join(root, ".draftspec", "specs", "demo.md")
+	specDir := filepath.Join(root, ".draftspec", "specs", "demo")
+	if err := os.MkdirAll(specDir, 0o755); err != nil {
+		t.Fatalf("MkdirAll(specDir) returned error: %v", err)
+	}
+	specPath := filepath.Join(specDir, "spec.md")
 	if err := os.WriteFile(specPath, []byte("# Demo\n"), 0o644); err != nil {
 		t.Fatalf("WriteFile(spec) returned error: %v", err)
 	}
-	inspectPath := filepath.Join(root, ".draftspec", "specs", "demo.inspect.md")
+	inspectPath := filepath.Join(specDir, "inspect.md")
 	inspectContent := "---\nreport_type: inspect\nslug: demo\nstatus: concerns\ndocs_language: en\ngenerated_at: 2026-03-31\n---\n# Inspect Report: demo\n\n## Verdict\n\n- status: concerns\n"
 	if err := os.WriteFile(inspectPath, []byte(inspectContent), 0o644); err != nil {
 		t.Fatalf("WriteFile(inspect) returned error: %v", err)
@@ -63,13 +67,17 @@ func TestValidateProjectFindsSemanticWorkflowProblems(t *testing.T) {
 		t.Fatalf("Initialize returned error: %v", err)
 	}
 
-	specPath := filepath.Join(root, ".draftspec", "specs", "demo.md")
+	specDir := filepath.Join(root, ".draftspec", "specs", "demo")
+	if err := os.MkdirAll(specDir, 0o755); err != nil {
+		t.Fatalf("MkdirAll(specDir) returned error: %v", err)
+	}
+	specPath := filepath.Join(specDir, "spec.md")
 	specContent := "# Demo\n\n## Goal\nx\n\n## Requirements\n- RQ-001 x\n\n## Acceptance Criteria\n### AC-001 Demo\n- **Given** x\n- **When** y\n- **Then** z\n"
 	if err := os.WriteFile(specPath, []byte(specContent), 0o644); err != nil {
 		t.Fatalf("WriteFile(spec) returned error: %v", err)
 	}
 
-	inspectPath := filepath.Join(root, ".draftspec", "specs", "demo.inspect.md")
+	inspectPath := filepath.Join(specDir, "inspect.md")
 	inspectContent := "---\nreport_type: inspect\nslug: wrong-slug\nstatus: blocked\ndocs_language: en\ngenerated_at: 2026-03-31\n---\n# Inspect Report: demo\n\n## Verdict\n\n- status: blocked\n"
 	if err := os.WriteFile(inspectPath, []byte(inspectContent), 0o644); err != nil {
 		t.Fatalf("WriteFile(inspect) returned error: %v", err)
@@ -115,13 +123,17 @@ func TestValidateProjectFindsPlanTasksAndVerifyCoherenceProblems(t *testing.T) {
 		t.Fatalf("Initialize returned error: %v", err)
 	}
 
-	specPath := filepath.Join(root, ".draftspec", "specs", "demo.md")
+	specDir := filepath.Join(root, ".draftspec", "specs", "demo")
+	if err := os.MkdirAll(specDir, 0o755); err != nil {
+		t.Fatalf("MkdirAll(specDir) returned error: %v", err)
+	}
+	specPath := filepath.Join(specDir, "spec.md")
 	specContent := "# Demo\n\n## Goal\nx\n\n## Requirements\n- RQ-001 x\n\n## Acceptance Criteria\n### AC-001 Demo\n- Given x\n- When y\n- Then z\n\n### AC-002 Demo\n- Given a\n- When b\n- Then c\n"
 	if err := os.WriteFile(specPath, []byte(specContent), 0o644); err != nil {
 		t.Fatalf("WriteFile(spec) returned error: %v", err)
 	}
 
-	inspectPath := filepath.Join(root, ".draftspec", "specs", "demo.inspect.md")
+	inspectPath := filepath.Join(specDir, "inspect.md")
 	inspectContent := "---\nreport_type: inspect\nslug: demo\nstatus: pass\ndocs_language: en\ngenerated_at: 2026-03-31\n---\n# Inspect Report: demo\n\n## Verdict\n\n- status: pass\n\n## Errors\n\n- none\n\n## Warnings\n\n- none\n\n## Questions\n\n- none\n"
 	if err := os.WriteFile(inspectPath, []byte(inspectContent), 0o644); err != nil {
 		t.Fatalf("WriteFile(inspect) returned error: %v", err)
@@ -185,13 +197,17 @@ func TestValidateProjectFindsVerifyTraceabilityAndArchiveReadinessProblems(t *te
 		t.Fatalf("Initialize returned error: %v", err)
 	}
 
-	specPath := filepath.Join(root, ".draftspec", "specs", "demo.md")
+	specDir := filepath.Join(root, ".draftspec", "specs", "demo")
+	if err := os.MkdirAll(specDir, 0o755); err != nil {
+		t.Fatalf("MkdirAll(specDir) returned error: %v", err)
+	}
+	specPath := filepath.Join(specDir, "spec.md")
 	specContent := "# Demo\n\n## Goal\nx\n\n## Requirements\n- RQ-001 x\n\n## Acceptance Criteria\n### AC-001 Demo\n- Given x\n- When y\n- Then z\n"
 	if err := os.WriteFile(specPath, []byte(specContent), 0o644); err != nil {
 		t.Fatalf("WriteFile(spec) returned error: %v", err)
 	}
 
-	inspectPath := filepath.Join(root, ".draftspec", "specs", "demo.inspect.md")
+	inspectPath := filepath.Join(specDir, "inspect.md")
 	inspectContent := "---\nreport_type: inspect\nslug: demo\nstatus: pass\ndocs_language: en\ngenerated_at: 2026-03-31\n---\n# Inspect Report: demo\n\n## Verdict\n\n- status: pass\n\n## Errors\n\n- none\n\n## Warnings\n\n- none\n\n## Questions\n\n- none\n"
 	if err := os.WriteFile(inspectPath, []byte(inspectContent), 0o644); err != nil {
 		t.Fatalf("WriteFile(inspect) returned error: %v", err)
@@ -249,10 +265,18 @@ func TestValidateFeatureReturnsOnlyFindingsForRequestedSlug(t *testing.T) {
 		t.Fatalf("Initialize returned error: %v", err)
 	}
 
-	if err := os.WriteFile(filepath.Join(root, ".draftspec", "specs", "alpha.md"), []byte("# Alpha\n"), 0o644); err != nil {
+	alphaDir := filepath.Join(root, ".draftspec", "specs", "alpha")
+	if err := os.MkdirAll(alphaDir, 0o755); err != nil {
+		t.Fatalf("MkdirAll(alphaDir) returned error: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(alphaDir, "spec.md"), []byte("# Alpha\n"), 0o644); err != nil {
 		t.Fatalf("WriteFile(alpha) returned error: %v", err)
 	}
-	if err := os.WriteFile(filepath.Join(root, ".draftspec", "specs", "beta.md"), []byte("# Beta\n"), 0o644); err != nil {
+	betaDir := filepath.Join(root, ".draftspec", "specs", "beta")
+	if err := os.MkdirAll(betaDir, 0o755); err != nil {
+		t.Fatalf("MkdirAll(betaDir) returned error: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(betaDir, "spec.md"), []byte("# Beta\n"), 0o644); err != nil {
 		t.Fatalf("WriteFile(beta) returned error: %v", err)
 	}
 

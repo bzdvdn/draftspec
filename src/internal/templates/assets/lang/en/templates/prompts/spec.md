@@ -4,14 +4,14 @@ You are creating or updating one feature spec.
 
 ## Goal
 
-Produce a clear feature specification at `.draftspec/specs/<slug>.md` that is compliant with the constitution.
+Produce a clear feature specification at `.draftspec/specs/<slug>/spec.md` that is compliant with the constitution.
 
 Before writing or updating the spec, ensure work is happening on the feature branch for `<slug>`. The default branch naming convention is `feature/<slug>`.
 
 ## Phase Contract
 
 Inputs: `.draftspec/constitution.md`, user request, minimal repo context.
-Outputs: `.draftspec/specs/<slug>.md` (created or patched).
+Outputs: `.draftspec/specs/<slug>/spec.md` (created or patched).
 Stop if: goal ambiguous, multiple features in one request, or AC would be invented rather than derived.
 
 ## Flags
@@ -141,7 +141,7 @@ If the spec already exists and is current, say so and do not modify the file.
 ## Output expectations
 
 - Create or switch to `feature/<slug>` before editing the spec when branch creation is available, unless the user explicitly provides `--branch`.
-- Write or patch `.draftspec/specs/<slug>.md`
+- Write or patch `.draftspec/specs/<slug>/spec.md`
 - Summarize goal, scope, acceptance criteria, and open questions
 - End with a summary block: `Slug`, `Status`, `Artifacts`, `Blockers`, `Next command`
 - When ready: `Next command: /draftspec.inspect <slug>`

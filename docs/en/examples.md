@@ -74,7 +74,7 @@ Add a user-selectable dark theme for the dashboard and settings pages.
 
 This lets Draftspec:
 
-- derive a safe spec path such as `.draftspec/specs/add-dark-mode.md`
+- derive a safe spec path such as `.draftspec/specs/add-dark-mode/spec.md`
 - create or switch to `feature/add-dark-mode`
 - avoid ambiguous slugs from generic filenames
 
@@ -144,7 +144,7 @@ User request:
 Expected agent behavior:
 
 - read constitution first
-- create `.draftspec/specs/partner-scheduling.md`
+- create `.draftspec/specs/partner-scheduling/spec.md`
 - write acceptance criteria using canonical `Given / When / Then`
 - keep surrounding text in the configured documentation language
 
@@ -177,12 +177,12 @@ User request:
 
 Expected agent behavior:
 
-- read constitution and `.draftspec/specs/partner-scheduling.md`
+- read constitution and `.draftspec/specs/partner-scheduling/spec.md`
 - keep the default inspect scope cheap: prefer `constitution.md` and `spec.md`, then pull `plan.md` or `tasks.md` only when they exist and materially affect the finding
 - check completeness, constitutional consistency, and scenario quality
 - create a focused inspection report
 - use `.draftspec/scripts/inspect-spec.sh` or `.draftspec/scripts/inspect-spec.ps1` as a cheap first-pass helper when structural spec or coverage issues need quick confirmation
-- persist the inspect report at `.draftspec/specs/partner-scheduling.inspect.md`
+- persist the inspect report at `.draftspec/specs/partner-scheduling/inspect.md`
 - use `.draftspec/templates/inspect-report.md` as the canonical report template
 
 Typical findings:

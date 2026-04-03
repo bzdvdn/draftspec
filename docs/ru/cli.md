@@ -139,7 +139,7 @@ draftspec add-agent my-project --agents claude --agents codex
 
 в канонический путь:
 
-- `.draftspec/specs/<slug>.inspect.md`
+- `.draftspec/specs/<slug>/inspect.md`
 
 Используй `--dry-run`, чтобы посмотреть изменения без применения, и `--json` для структурированного вывода.
 

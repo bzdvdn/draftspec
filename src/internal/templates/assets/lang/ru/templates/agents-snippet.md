@@ -9,7 +9,7 @@
 
 Workflow-команды:
 - `/draftspec.constitution`: patch-обновить `.draftspec/constitution.md`
-- `/draftspec.spec`: создать или уточнить один файл `.draftspec/specs/<slug>.md` и работать из `feature/<slug>`
+- `/draftspec.spec`: создать или уточнить один файл `.draftspec/specs/<slug>/spec.md` и работать из `feature/<slug>`
 - `/draftspec.inspect`: проанализировать одну фичу на согласованность и качество до или после планирования
 - `/draftspec.plan`: создать или обновить `.draftspec/plans/<slug>/plan.md`, `data-model.md` и `contracts/`
 - `/draftspec.tasks`: создать или обновить `.draftspec/plans/<slug>/tasks.md`
@@ -30,7 +30,7 @@ Workflow-команды:
 - По умолчанию загружайте только текущий feature slug
 - Предпочитайте readiness scripts каждой фазы перед чтением более глубоких артефактов
 - Когда нужен сам Draftspec CLI, предпочитайте `./.draftspec/scripts/run-draftspec.sh`; этот launcher сначала проверяет `DRAFTSPEC_BIN`, а затем `draftspec` из `PATH`
-- Сохраняйте обязательный inspect report в `.draftspec/specs/<slug>.inspect.md` до начала planning
+- Сохраняйте обязательный inspect report в `.draftspec/specs/<slug>/inspect.md` до начала planning
 - `/draftspec.spec` поддерживает `--name`, optional `--slug` и optional `--branch`; для chat-based ввода описание фичи может прийти следующим сообщением
 - Для file-based входа в `/draftspec.spec` предпочитайте `name:` и опциональный `slug:` в начале файла, а не fallback на filename
 - Разрешайте явный `--branch <name>` override для repository-specific branch naming conventions, например Jira keys
@@ -50,7 +50,7 @@ Workflow-команды:
 
 Перед значимыми изменениями:
 - Просмотреть `.draftspec/constitution.md`
-- Изучить релевантный `.draftspec/specs/<slug>.md`
+- Изучить релевантный `.draftspec/specs/<slug>/spec.md`
 - Изучить релевантный feature package в `.draftspec/plans/<slug>/`, если он есть
 
 После значимых решений или изменений:

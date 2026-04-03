@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"draftspec/src/internal/config"
+	"draftspec/src/internal/featurepaths"
 	"github.com/spf13/cobra"
 )
 
@@ -55,12 +56,19 @@ func exportFeature(root, slug string) (string, error) {
 		return "", err
 	}
 
+	specPath, _ := featurepaths.ResolveSpec(specsDir, slug)
+	inspectPath, _ := featurepaths.ResolveInspect(specsDir, slug)
+	summaryPath, _ := featurepaths.ResolveSummary(specsDir, slug)
+	hotfixPath, _ := featurepaths.ResolveHotfix(specsDir, slug)
+
 	artifacts := []struct {
 		path    string
 		heading string
 	}{
-		{filepath.Join(specsDir, slug+".md"), "Spec"},
-		{filepath.Join(specsDir, slug+".inspect.md"), "Inspect Report"},
+		{specPath, "Spec"},
+		{inspectPath, "Inspect Report"},
+		{summaryPath, "Spec Summary"},
+		{hotfixPath, "Hotfix"},
 		{filepath.Join(plansDir, slug, "plan.md"), "Plan"},
 		{filepath.Join(plansDir, slug, "tasks.md"), "Tasks"},
 		{filepath.Join(plansDir, slug, "data-model.md"), "Data Model"},

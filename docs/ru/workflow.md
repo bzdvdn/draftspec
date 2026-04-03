@@ -106,7 +106,7 @@ slug: add-dark-mode
 
 Если inspection report сохраняется на диск, Draftspec должен использовать канонический путь:
 
-- `.draftspec/specs/<slug>.inspect.md`
+- `.draftspec/specs/<slug>/inspect.md`
 
 Используйте `.draftspec/templates/inspect-report.md` как канонический шаблон, если отчет записывается в файл.
 Сохраненные inspect и verify reports должны начинаться с machine-readable metadata block с полями `report_type`, `slug`, `status`, `docs_language` и `generated_at`.
