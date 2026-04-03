@@ -161,12 +161,12 @@ func CheckInspectReady(root, slug string) (CheckResult, error) {
 	}
 
 	result := CheckResult{}
-	specDisplay := joinDisplay(cfg.Paths.SpecsDir, slug+".md")
+	specDisplay, specAbs := resolveSpecDisplayPath(root, cfg.Paths.SpecsDir, slug)
 	reportTemplateDisplay := joinDisplay(cfg.Paths.TemplatesDir, cfg.Templates.InspectReport)
 	promptDisplay := joinDisplay(cfg.Paths.TemplatesDir, cfg.Templates.InspectPrompt)
 
 	checkFile(&result, cfg.Project.ConstitutionFile, absFromRoot(root, cfg.Project.ConstitutionFile))
-	checkFile(&result, specDisplay, absFromRoot(root, specDisplay))
+	checkFile(&result, specDisplay, specAbs)
 	checkFile(&result, reportTemplateDisplay, absFromRoot(root, reportTemplateDisplay))
 	checkFile(&result, promptDisplay, absFromRoot(root, promptDisplay))
 
@@ -191,18 +191,16 @@ func CheckPlanReady(root, slug string) (CheckResult, error) {
 	}
 
 	result := CheckResult{}
-	specDisplay := joinDisplay(cfg.Paths.SpecsDir, slug+".md")
-	inspectDisplay := joinDisplay(cfg.Paths.SpecsDir, slug+".inspect.md")
+	specDisplay, specAbs := resolveSpecDisplayPath(root, cfg.Paths.SpecsDir, slug)
+	inspectDisplay, inspectAbs := resolveInspectDisplayPath(root, cfg.Paths.SpecsDir, slug)
 	legacyInspectDisplay := joinDisplay(cfg.Paths.PlansDir, slug, "inspect.md")
 	templateDisplay := joinDisplay(cfg.Paths.TemplatesDir, cfg.Templates.Plan)
 	promptDisplay := joinDisplay(cfg.Paths.TemplatesDir, cfg.Templates.PlanPrompt)
 
 	checkFile(&result, cfg.Project.ConstitutionFile, absFromRoot(root, cfg.Project.ConstitutionFile))
-	checkFile(&result, specDisplay, absFromRoot(root, specDisplay))
+	checkFile(&result, specDisplay, specAbs)
 	checkFile(&result, templateDisplay, absFromRoot(root, templateDisplay))
 	checkFile(&result, promptDisplay, absFromRoot(root, promptDisplay))
-
-	specAbs := absFromRoot(root, specDisplay)
 	if fileExists(specAbs) {
 		content, err := os.ReadFile(specAbs)
 		if err != nil {
@@ -213,7 +211,6 @@ func CheckPlanReady(root, slug string) (CheckResult, error) {
 	}
 
 	inspectDisplayPath := inspectDisplay
-	inspectAbs := absFromRoot(root, inspectDisplay)
 	if !fileExists(inspectAbs) {
 		legacyAbs := absFromRoot(root, legacyInspectDisplay)
 		if fileExists(legacyAbs) {
@@ -259,7 +256,7 @@ func CheckTasksReady(root, slug string) (CheckResult, error) {
 	}
 
 	result := CheckResult{}
-	specDisplay := joinDisplay(cfg.Paths.SpecsDir, slug+".md")
+	specDisplay, specAbs := resolveSpecDisplayPath(root, cfg.Paths.SpecsDir, slug)
 	planDisplay := joinDisplay(cfg.Paths.PlansDir, slug, "plan.md")
 	dataModelDisplay := joinDisplay(cfg.Paths.PlansDir, slug, "data-model.md")
 	tasksTemplateDisplay := joinDisplay(cfg.Paths.TemplatesDir, cfg.Templates.Tasks)
@@ -267,7 +264,7 @@ func CheckTasksReady(root, slug string) (CheckResult, error) {
 	contractsDisplay := joinDisplay(cfg.Paths.PlansDir, slug, "contracts")
 
 	checkFile(&result, cfg.Project.ConstitutionFile, absFromRoot(root, cfg.Project.ConstitutionFile))
-	checkFile(&result, specDisplay, absFromRoot(root, specDisplay))
+	checkFile(&result, specDisplay, specAbs)
 	checkFile(&result, planDisplay, absFromRoot(root, planDisplay))
 	checkFile(&result, dataModelDisplay, absFromRoot(root, dataModelDisplay))
 	checkFile(&result, tasksTemplateDisplay, absFromRoot(root, tasksTemplateDisplay))
@@ -279,7 +276,6 @@ func CheckTasksReady(root, slug string) (CheckResult, error) {
 		result.AddOK("optional contracts directory not present")
 	}
 
-	specAbs := absFromRoot(root, specDisplay)
 	if fileExists(specAbs) {
 		content, err := os.ReadFile(specAbs)
 		if err != nil {
@@ -313,7 +309,7 @@ func CheckImplementReady(root, slug string) (CheckResult, error) {
 	}
 
 	result := CheckResult{}
-	specDisplay := joinDisplay(cfg.Paths.SpecsDir, slug+".md")
+	specDisplay, specAbs := resolveSpecDisplayPath(root, cfg.Paths.SpecsDir, slug)
 	planDisplay := joinDisplay(cfg.Paths.PlansDir, slug, "plan.md")
 	tasksDisplay := joinDisplay(cfg.Paths.PlansDir, slug, "tasks.md")
 	dataModelDisplay := joinDisplay(cfg.Paths.PlansDir, slug, "data-model.md")
@@ -321,7 +317,7 @@ func CheckImplementReady(root, slug string) (CheckResult, error) {
 	contractsDisplay := joinDisplay(cfg.Paths.PlansDir, slug, "contracts")
 
 	checkFile(&result, cfg.Project.ConstitutionFile, absFromRoot(root, cfg.Project.ConstitutionFile))
-	checkFile(&result, specDisplay, absFromRoot(root, specDisplay))
+	checkFile(&result, specDisplay, specAbs)
 	checkFile(&result, planDisplay, absFromRoot(root, planDisplay))
 	checkFile(&result, tasksDisplay, absFromRoot(root, tasksDisplay))
 	checkFile(&result, dataModelDisplay, absFromRoot(root, dataModelDisplay))
@@ -344,7 +340,6 @@ func CheckImplementReady(root, slug string) (CheckResult, error) {
 		checkPattern(&result, string(content), coverageLinePattern.String(), "tasks include AC-to-task coverage lines")
 	}
 
-	specAbs := absFromRoot(root, specDisplay)
 	if fileExists(specAbs) && fileExists(tasksAbs) {
 		inspectResult, err := InspectSpec(root, specDisplay, tasksDisplay)
 		if err != nil {
@@ -370,18 +365,17 @@ func CheckVerifyReady(root, slug string) (CheckResult, error) {
 	}
 
 	result := CheckResult{}
-	specDisplay := joinDisplay(cfg.Paths.SpecsDir, slug+".md")
+	specDisplay, specAbs := resolveSpecDisplayPath(root, cfg.Paths.SpecsDir, slug)
 	tasksDisplay := joinDisplay(cfg.Paths.PlansDir, slug, "tasks.md")
 	reportTemplateDisplay := joinDisplay(cfg.Paths.TemplatesDir, cfg.Templates.VerifyReport)
 	promptDisplay := joinDisplay(cfg.Paths.TemplatesDir, cfg.Templates.VerifyPrompt)
 
 	checkFile(&result, cfg.Project.ConstitutionFile, absFromRoot(root, cfg.Project.ConstitutionFile))
-	checkFile(&result, specDisplay, absFromRoot(root, specDisplay))
+	checkFile(&result, specDisplay, specAbs)
 	checkFile(&result, tasksDisplay, absFromRoot(root, tasksDisplay))
 	checkFile(&result, reportTemplateDisplay, absFromRoot(root, reportTemplateDisplay))
 	checkFile(&result, promptDisplay, absFromRoot(root, promptDisplay))
 
-	specAbs := absFromRoot(root, specDisplay)
 	tasksAbs := absFromRoot(root, tasksDisplay)
 	if fileExists(specAbs) && fileExists(tasksAbs) {
 		inspectResult, err := InspectSpec(root, specDisplay, tasksDisplay)
@@ -423,8 +417,7 @@ func CheckArchiveReady(root, slug, status, reason string) (CheckResult, error) {
 		return result, nil
 	}
 
-	specDisplay := joinDisplay(cfg.Paths.SpecsDir, slug+".md")
-	specAbs := absFromRoot(root, specDisplay)
+	specDisplay, specAbs := resolveSpecDisplayPath(root, cfg.Paths.SpecsDir, slug)
 	if !fileExists(specAbs) {
 		result.AddError(fmt.Sprintf("missing required file: %s", specDisplay))
 		return result, nil
@@ -668,6 +661,36 @@ func absFromRoot(root, rel string) string {
 		return rel
 	}
 	return filepath.Join(root, filepath.FromSlash(rel))
+}
+
+func resolveSpecDisplayPath(root, specsDir, slug string) (string, string) {
+	display := joinDisplay(specsDir, slug, "spec.md")
+	abs := absFromRoot(root, display)
+	if fileExists(abs) {
+		return display, abs
+	}
+
+	legacyDisplay := joinDisplay(specsDir, slug+".md")
+	legacyAbs := absFromRoot(root, legacyDisplay)
+	if fileExists(legacyAbs) {
+		return legacyDisplay, legacyAbs
+	}
+	return display, abs
+}
+
+func resolveInspectDisplayPath(root, specsDir, slug string) (string, string) {
+	display := joinDisplay(specsDir, slug, "inspect.md")
+	abs := absFromRoot(root, display)
+	if fileExists(abs) {
+		return display, abs
+	}
+
+	legacyDisplay := joinDisplay(specsDir, slug+".inspect.md")
+	legacyAbs := absFromRoot(root, legacyDisplay)
+	if fileExists(legacyAbs) {
+		return legacyDisplay, legacyAbs
+	}
+	return display, abs
 }
 
 func checkFile(result *CheckResult, displayPath, absolutePath string) {

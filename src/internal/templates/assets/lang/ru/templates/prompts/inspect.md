@@ -8,8 +8,8 @@
 
 ## Phase Contract
 
-Inputs: `.draftspec/constitution.md`, `.draftspec/specs/<slug>.md`; опционально `plan.md`, `tasks.md`, если они существуют.
-Outputs: `.draftspec/specs/<slug>.inspect.md` с verdict `pass`, `concerns` или `blocked`.
+Inputs: `.draftspec/constitution.md`, `.draftspec/specs/<slug>/spec.md`; опционально `plan.md`, `tasks.md`, если они существуют.
+Outputs: `.draftspec/specs/<slug>/inspect.md` с verdict `pass`, `concerns` или `blocked`.
 Stop if: slug неоднозначен, spec отсутствует, или отчет потребовал бы выдумывать продуктовый intent.
 
 ## Load First
@@ -17,9 +17,9 @@ Stop if: slug неоднозначен, spec отсутствует, или от
 Всегда сначала прочитайте:
 
 - `.draftspec/constitution.md`
-- `.draftspec/specs/<slug>.md`
+- `.draftspec/specs/<slug>/spec.md`
 
-## Load Only If Needed
+## Load If Present
 
 Читайте это только если файл существует и реально влияет на проверку:
 
@@ -31,8 +31,6 @@ Stop if: slug неоднозначен, spec отсутствует, или от
 - `.draftspec/plans/<slug>/data-model.md`
 - `.draftspec/plans/<slug>/contracts/`
 - `.draftspec/plans/<slug>/research.md`
-- нерелевантные спецификации
-- нерелевантные plan packages
 - широкую историю репозитория
 - implementation-файлы, если они не нужны для подтверждения конкретного вывода по согласованности
 
@@ -98,22 +96,28 @@ Stop if: slug неоднозначен, spec отсутствует, или от
 - Для `concerns` явно говорите, можно ли двигаться дальше; если можно, указывайте точную следующую slash-команду.
 - Для `blocked` не подсказывайте следующую фазу; вместо этого указывайте, какой refinement нужен сначала.
 
+## Артефакт краткого описания спецификации
+
+После записи отчёта проверки также запишите `.draftspec/specs/<slug>/summary.md`.
+
+Summary ДОЛЖЕН содержать только:
+
+- YAML frontmatter с полями `slug` и `generated_at`
+- `## Goal` — одно предложение
+- `## Acceptance Criteria` — таблица: `ID | Summary | Proof Signal`; summary ≤ 8 слов; proof signal = наблюдаемая проверка из `Then`-клаузы
+- `## Out of Scope` — 3-5 bullets
+
+Держите summary не длиннее 25 строк. Он загружается в `tasks`, `implement` и `verify` вместо полного spec.md, чтобы снизить context overhead. Summary не заменяет полный spec на фазах, требующих полной inspect-проверки критериев (inspect, plan).
+
 ## Output expectations
 
-- По умолчанию сохраняйте отчет в `.draftspec/specs/<slug>.inspect.md`, если пользователь явно не просит другой путь.
-- Если пользователь задал явный путь, используйте именно его.
-- Также кратко суммируйте verdict в разговоре.
-- В разговоре по умолчанию предпочитайте compact report только с непустыми секциями.
-- Кратко суммируйте ошибки, предупреждения, открытые вопросы, предложения и итоговый verdict.
-- Завершайте разговор коротким стабильным summary block с полями `Slug`, `Status`, `Artifacts`, `Blockers` и `Next command` только если такой handoff действительно безопасен
-- Когда по фиче можно безопасно продолжать работу, в `## Next Step` и в разговорной сводке указывайте точную slash-команду следующей фазы, например `/draftspec.plan <slug>` или `/draftspec.tasks <slug>`.
-- Если сначала нужен refinement, говорите об этом прямо вместо подсказки следующей фазы.
+- Сохраняйте отчет в `.draftspec/specs/<slug>/inspect.md` и записывайте `.draftspec/specs/<slug>/summary.md`; кратко суммируйте verdict в разговоре compact report с непустыми секциями
+- Завершайте разговор summary block: `Slug`, `Status`, `Artifacts`, `Blockers`, `Next command`
+- Когда можно продолжать: в `## Next Step` указывайте точную slash-команду следующей фазы
+- Если сначала нужен refinement — говорите об этом прямо
 
 ## Self-Check
 
-- Я загрузил только артефакты, нужные для этого slug?
 - Я проверил каждый AC на наличие формата Given/When/Then?
 - Verdict (`pass`, `concerns`, `blocked`) опирается на конкретные находки, а не общие впечатления?
 - Если `tasks.md` существует, я убедился, что каждый AC покрыт хотя бы одной задачей?
-- Я избежал превращения проверки в широкий design review?
-- Следующая команда в Next Step соответствует verdict?

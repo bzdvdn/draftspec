@@ -23,14 +23,14 @@ Stop if: plan.md missing, plan underspecified, or any AC cannot be mapped to exe
 
 Always read these before decomposing the work:
 
-- `.draftspec/constitution.md`
+- `.draftspec/constitution.summary.md` if present; otherwise `.draftspec/constitution.md`
 - `.draftspec/plans/<slug>/plan.md`
 
-## Load Only If Needed
+## Load If Present
 
 Read these only when the decomposition requires them:
 
-- `.draftspec/specs/<slug>.md` when task intent, scope, or acceptance boundaries are unclear
+- `.draftspec/specs/<slug>/summary.md` if present; otherwise `.draftspec/specs/<slug>/spec.md` — when task intent, scope, or acceptance boundaries are unclear
 - `.draftspec/plans/<slug>/data-model.md` when task decomposition depends on entities, invariants, or lifecycle details
 - `.draftspec/plans/<slug>/contracts/` when tasks involve APIs, events, or integration boundaries
 - `.draftspec/plans/<slug>/research.md` only when it exists and affects implementation sequencing or risk
@@ -40,8 +40,6 @@ Do not assume `research.md` should exist; use it only when the plan clearly depe
 
 ## Do Not Read By Default
 
-- unrelated specs
-- unrelated plan packages
 - implementation files that are not needed to decompose the work
 - broad repository history
 
@@ -88,7 +86,8 @@ Do not jump ahead into implementation.
 - Each task MUST include a phase-scoped task ID in the form `T<phase>.<index>`.
 - Each task MUST follow the format: `- [ ] T<phase>.<index> <action verb> — <concrete measurable outcome>`
 - Each task SHOULD reference 1-2 stable IDs when possible (`AC-*`, `RQ-*`, `DEC-*`).
-- When it materially reduces downstream guesswork, add a short `Touches:` hint to a phase goal or task line naming the concrete surfaces likely to change. Keep it compact and use it only when confidence is high.
+- Add a `Touches:` hint to each task line whenever the implementation surface is known with confidence. This is the primary mechanism for preventing re-reads during implement — the more concrete the surfaces, the fewer exploratory reads the implement agent needs to make. Keep it compact (`Touches: auth handler, session store`) and omit only when the surface genuinely cannot be named yet.
+- After writing all task phases, add `## Surface Map` before the first phase: a two-column table mapping each unique implementation surface to the task IDs that touch it (`Surface | Tasks`). This lets `implement` batch-read all needed files in one pass without scanning `Touches:` across individual task lines.
 - The tasks taken together MUST cover all acceptance criteria from the spec. Any uncovered criterion is a blocker.
 - The `## Acceptance Coverage` section MUST include at least one explicit coverage line for each acceptance criterion.
 - Coverage lines SHOULD reference stable acceptance IDs and task IDs such as `AC-001 -> T1.1, T2.1`.
@@ -99,6 +98,8 @@ Do not jump ahead into implementation.
 
 - Each phase should have a short goal that explains why the phase exists.
 - Prefer a few concrete tasks with measurable outcomes over many tiny bookkeeping items.
+- Keep the outcome part of each task to ≤ 12 words. If more words are needed, the task is not concrete enough — split it or tighten the verb.
+- When the acceptance proof is simple, embed it directly in the outcome instead of requiring a spec lookup: prefer `add POST /auth/login — returns 200 with JWT token field — AC-001` over `add login handler — endpoint works — AC-001`.
 - Use action verbs tied to observable work: implement, add, migrate, validate, remove, backfill, document.
 - Keep foundational setup separate from core behavior and separate proof/validation from broad implementation.
 - If a task would benefit from a surface hint, prefer a compact `Touches: auth flow, session store` style note instead of speculative file-by-file path lists.
@@ -110,19 +111,12 @@ Do not jump ahead into implementation.
 
 ## Output expectations
 
-- Write or patch `.draftspec/plans/<slug>/tasks.md`
-- Ensure tasks can be executed in order
-- Call out blockers or missing inputs if decomposition is not yet possible
-- When referring to created or updated files in the conversation, list their exact project-relative paths, not only bare filenames
-- End the conversation with a short stable summary block that includes `Slug`, `Status`, `Artifacts`, `Blockers`, and `Next command` when that handoff is truly safe
-- When task decomposition is complete and implementation can begin, end the conversation summary with `Next command: /draftspec.implement <slug>`
-- If tasks are blocked or still need refinement, say that directly instead of suggesting `/draftspec.implement`
+- Write or patch `.draftspec/plans/<slug>/tasks.md`; call out blockers if decomposition is not yet possible
+- End with a summary block: `Slug`, `Status`, `Artifacts`, `Blockers`, `Next command`
+- When ready: `Next command: /draftspec.implement <slug>`
 
 ## Self-Check
 
-- Did I decompose from `plan.md` first?
 - Does every task have a stable task ID and measurable outcome?
 - Is every acceptance criterion covered explicitly?
-- Did I avoid reading implementation files unless decomposition required it?
-- If I read code, did I read only the smallest slice needed to avoid vague tasks?
 - Could another developer execute these tasks in order without guessing what `done` means for each line?

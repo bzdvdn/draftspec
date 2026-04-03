@@ -11,7 +11,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-//go:embed assets/scripts/* assets/scripts/powershell/* assets/lang/* assets/lang/*/* assets/lang/*/templates/* assets/lang/*/templates/prompts/* assets/lang/*/templates/contracts/* assets/lang/*/templates/archive/*
+//go:embed assets/scripts/* assets/scripts/powershell/* assets/lang/* assets/lang/*/* assets/lang/*/templates/* assets/lang/*/templates/prompts/* assets/lang/*/templates/contracts/* assets/lang/*/templates/archive/* assets/demo/specs/* assets/demo/plans/export-report/*
 var embedded embed.FS
 
 type File struct {
@@ -85,6 +85,11 @@ func Files(settings LanguageSettings) ([]File, error) {
 		{RelativePath: "templates/prompts/implement.md", TargetPath: "templates/prompts/implement.md", Mode: 0o644, Language: settings.Agent},
 		{RelativePath: "templates/prompts/archive.md", TargetPath: "templates/prompts/archive.md", Mode: 0o644, Language: settings.Agent},
 		{RelativePath: "templates/prompts/verify.md", TargetPath: "templates/prompts/verify.md", Mode: 0o644, Language: settings.Agent},
+		{RelativePath: "templates/prompts/handoff.md", TargetPath: "templates/prompts/handoff.md", Mode: 0o644, Language: settings.Agent},
+		{RelativePath: "templates/prompts/challenge.md", TargetPath: "templates/prompts/challenge.md", Mode: 0o644, Language: settings.Agent},
+		{RelativePath: "templates/prompts/scope.md", TargetPath: "templates/prompts/scope.md", Mode: 0o644, Language: settings.Agent},
+		{RelativePath: "templates/prompts/recap.md", TargetPath: "templates/prompts/recap.md", Mode: 0o644, Language: settings.Agent},
+		{RelativePath: "templates/prompts/hotfix.md", TargetPath: "templates/prompts/hotfix.md", Mode: 0o644, Language: settings.Agent},
 	}
 	files := make([]File, 0, len(definitions)+9)
 	configContent, err := generateConfig(settings)
@@ -244,6 +249,30 @@ func normalizeShellValue(shell string) string {
 		return "powershell"
 	}
 	return "sh"
+}
+
+// DemoFiles returns the pre-populated example artifacts for the demo workspace.
+// All paths are relative to the .draftspec directory.
+func DemoFiles() ([]File, error) {
+	entries := []struct {
+		assetPath  string
+		targetPath string
+	}{
+		{"assets/demo/specs/export-report.md", "specs/export-report/spec.md"},
+		{"assets/demo/specs/export-report.inspect.md", "specs/export-report/inspect.md"},
+		{"assets/demo/plans/export-report/plan.md", "plans/export-report/plan.md"},
+		{"assets/demo/plans/export-report/tasks.md", "plans/export-report/tasks.md"},
+		{"assets/demo/plans/export-report/data-model.md", "plans/export-report/data-model.md"},
+	}
+	files := make([]File, 0, len(entries))
+	for _, e := range entries {
+		content, err := FileContent(e.assetPath)
+		if err != nil {
+			return nil, err
+		}
+		files = append(files, File{TargetPath: e.targetPath, Content: content, Mode: 0o644})
+	}
+	return files, nil
 }
 
 func languageLabel(code, outputLanguage string) string {

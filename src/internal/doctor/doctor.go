@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"sort"
 	"strings"
@@ -13,6 +14,8 @@ import (
 	"draftspec/src/internal/config"
 	"draftspec/src/internal/workflow"
 )
+
+var placeholderPattern = regexp.MustCompile(`\[[A-Z][A-Z0-9_]*\]`)
 
 type Finding struct {
 	Level   string
@@ -35,6 +38,25 @@ func Check(root string) (Result, error) {
 	}
 
 	var findings []Finding
+
+	migrationResult, err := workflow.MigrateProject(root, false)
+	if err != nil {
+		return Result{}, err
+	}
+	for _, repair := range migrationResult.Results {
+		for _, action := range repair.Actions {
+			findings = append(findings, Finding{Level: "ok", Message: action})
+		}
+		for _, warning := range repair.Warnings {
+			findings = append(findings, Finding{Level: "warning", Message: warning})
+		}
+	}
+	for _, warning := range migrationResult.Warnings {
+		if warning == "no safe migrations were needed" {
+			continue
+		}
+		findings = append(findings, Finding{Level: "warning", Message: warning})
+	}
 
 	draftspecDir, err := cfg.DraftspecDir(root)
 	if err != nil {
@@ -96,6 +118,16 @@ func Check(root string) (Result, error) {
 		filepath.Join(scriptsDir, cfg.Scripts.VerifyTaskState),
 	} {
 		checkPath(&findings, path, false)
+	}
+
+	constitutionPath := filepath.Join(root, cfg.Project.ConstitutionFile)
+	if content, err := os.ReadFile(constitutionPath); err == nil {
+		if placeholderPattern.Match(content) {
+			findings = append(findings, Finding{
+				Level:   "warning",
+				Message: "constitution.md contains unfilled placeholder content — run /draftspec.constitution to complete setup",
+			})
+		}
 	}
 
 	if cfg.Language.Default != "en" && cfg.Language.Default != "ru" {

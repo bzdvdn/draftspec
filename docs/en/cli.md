@@ -139,7 +139,7 @@ Current repair scope includes legacy inspect report migration from:
 
 to the canonical path:
 
-- `.draftspec/specs/<slug>.inspect.md`
+- `.draftspec/specs/<slug>/inspect.md`
 
 Use `--dry-run` to preview changes and `--json` for structured output.
 
@@ -170,3 +170,43 @@ Lists spec slugs from `.draftspec/specs/`.
 ### `draftspec show-spec <name> [path]`
 
 Prints one spec file by slug.
+
+### `draftspec check <slug> [path]`
+
+Shows feature readiness and the exact next action for one feature.
+
+Output includes artifact presence, inspect and verify verdict, task progress, and the exact next slash command.
+
+Use `--all` to check every feature in one table. Exits with code 1 when any feature is blocked.
+Use `--json` for machine-readable output suitable for CI.
+
+```bash
+draftspec check export-report
+draftspec check export-report my-project --json
+draftspec check my-project --all
+draftspec check my-project --all --json
+```
+
+### `draftspec demo [path]`
+
+Creates a demo workspace at the given path (default: `./draftspec-demo`).
+
+The workspace is pre-populated with an example feature (`export-report`) at the implement phase — spec, inspect report, plan, tasks, and data model are all present. Suggests `/draftspec.scope`, `/draftspec.challenge`, and `/draftspec.handoff` to try immediately.
+
+```bash
+draftspec demo
+draftspec demo ./my-demo --agents claude
+```
+
+### `draftspec export <slug> [path]`
+
+Bundles all artifacts for one feature into a single markdown document.
+
+Reads and concatenates: spec, inspect report, plan, tasks, data model, research, challenge report, and verify report (skips missing files). Useful for sharing full feature context with a reviewer or a new agent session.
+
+Use `--output <file>` to write to a file instead of stdout.
+
+```bash
+draftspec export export-report
+draftspec export export-report my-project --output export-report-bundle.md
+```

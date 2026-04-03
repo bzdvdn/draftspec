@@ -39,13 +39,17 @@ func TestCheckInfersPhaseAcrossFeatureLifecycle(t *testing.T) {
 
 	check("constitution", "spec", true)
 
-	specPath := filepath.Join(root, ".draftspec", "specs", "demo.md")
+	specDir := filepath.Join(root, ".draftspec", "specs", "demo")
+	if err := os.MkdirAll(specDir, 0o755); err != nil {
+		t.Fatalf("MkdirAll(specDir) returned error: %v", err)
+	}
+	specPath := filepath.Join(specDir, "spec.md")
 	if err := os.WriteFile(specPath, []byte("# Demo\n"), 0o644); err != nil {
 		t.Fatalf("WriteFile(spec) returned error: %v", err)
 	}
 	check("spec", "inspect", false)
 
-	inspectPath := filepath.Join(root, ".draftspec", "specs", "demo.inspect.md")
+	inspectPath := filepath.Join(specDir, "inspect.md")
 	inspectContent := "---\nreport_type: inspect\nslug: demo\nstatus: pass\ndocs_language: en\ngenerated_at: 2026-03-30\n---\n# Inspect Report: demo\n\n## Verdict\n\n- status: pass\n"
 	if err := os.WriteFile(inspectPath, []byte(inspectContent), 0o644); err != nil {
 		t.Fatalf("WriteFile(inspect) returned error: %v", err)

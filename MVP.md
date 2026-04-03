@@ -39,7 +39,11 @@ Managed generated artifacts should remain refreshable without touching authored 
   draftspec.yaml
   constitution.md
   specs/
-    <slug>.md
+    <slug>/
+      spec.md
+      inspect.md
+      summary.md
+      hotfix.md
   plans/
     <slug>/
       plan.md
@@ -249,7 +253,7 @@ The constitution is authoritative over specs, plans, tasks, and implementation.
 Inputs:
 
 - `.draftspec/constitution.md`
-- `.draftspec/specs/<slug>.md`
+- `.draftspec/specs/<slug>/spec.md`
 - optional plan artifacts when they exist, with the cheapest scope preferred first:
   - `plan.md` before `tasks.md`
   - `tasks.md` before `data-model.md`, `contracts/`, or `research.md`
@@ -258,7 +262,7 @@ Inputs:
 Outputs:
 
 - a focused inspection report for one feature
-- a persisted inspect report at `.draftspec/specs/<slug>.inspect.md` before planning proceeds
+- a persisted inspect report at `.draftspec/specs/<slug>/inspect.md` before planning proceeds
 - compact by default in conversation output, with full sectioned output only when explicitly requested or persisted to a file
 - explicit Given/When/Then acceptance criteria, with `Given`, `When`, and `Then` kept canonical across documentation languages and inspect treating missing G/W/T as an error
 - explicit cheap checks for `constitution <-> spec`, `spec <-> plan`, and `plan <-> tasks` when those downstream artifacts exist
@@ -296,7 +300,7 @@ The verify phase must:
 
 Inputs:
 
-- `.draftspec/specs/<slug>.md`
+- `.draftspec/specs/<slug>/spec.md`
 - optional plan artifacts when they exist
 
 Outputs:
@@ -311,7 +315,7 @@ Outputs:
 Inputs:
 
 - one feature slug
-- `.draftspec/specs/<slug>.md` when present
+- `.draftspec/specs/<slug>/spec.md` when present
 - `.draftspec/plans/<slug>/plan.md` when present
 - `.draftspec/plans/<slug>/tasks.md` when present
 - archive presence for the same slug when present
@@ -328,7 +332,8 @@ Outputs:
 
 Safe repair scope for the MVP:
 
-- migrate legacy inspect reports from `.draftspec/plans/<slug>/inspect.md` to `.draftspec/specs/<slug>.inspect.md`
+- migrate legacy flat spec artifacts from `.draftspec/specs/<slug>.md`, `.draftspec/specs/<slug>.inspect.md`, `.draftspec/specs/<slug>.summary.md`, and `.draftspec/specs/<slug>.hotfix.md` to `.draftspec/specs/<slug>/`
+- migrate legacy inspect reports from `.draftspec/plans/<slug>/inspect.md` to `.draftspec/specs/<slug>/inspect.md`
 - remove duplicate legacy inspect reports when the canonical and legacy copies are byte-identical
 - stop with a warning instead of mutating files when canonical and legacy copies differ
 
@@ -401,7 +406,7 @@ If `/draftspec.spec` is invoked with `--name` but without enough feature detail 
 
 Output:
 
-- `.draftspec/specs/<slug>.md`
+- `.draftspec/specs/<slug>/spec.md`
 - work should happen from `feature/<slug>` when the environment can create or switch branches
 
 If the user explicitly provides `--branch <name>`, Draftspec should use that branch name instead of the default `feature/<slug>` without changing the spec slug.
@@ -422,8 +427,8 @@ The default spec template should stay compact while making downstream traceabili
 Inputs:
 
 - `.draftspec/constitution.md`
-- `.draftspec/specs/<slug>.md`
-- `.draftspec/specs/<slug>.inspect.md` (required — plan must not proceed without a persisted inspect report)
+- `.draftspec/specs/<slug>/spec.md`
+- `.draftspec/specs/<slug>/inspect.md` (required — plan must not proceed without a persisted inspect report)
 - repository code and docs when relevant
 
 Outputs:
@@ -450,7 +455,7 @@ The default plan package should support downstream work with minimal rereading:
 
 It then reads only as needed:
 
-- `.draftspec/specs/<slug>.md` when intent or scope boundaries are unclear
+- `.draftspec/specs/<slug>/spec.md` when intent or scope boundaries are unclear
 - `.draftspec/plans/<slug>/data-model.md` when decomposition depends on entities or invariants
 - `.draftspec/plans/<slug>/contracts/` when work crosses API or event boundaries
 - `.draftspec/plans/<slug>/research.md` only when present and needed
@@ -472,7 +477,7 @@ It must:
 
 It then reads only as needed:
 
-- `.draftspec/specs/<slug>.md` when task intent or acceptance scope is unclear
+- `.draftspec/specs/<slug>/spec.md` when task intent or acceptance scope is unclear
 - `.draftspec/plans/<slug>/plan.md` when architectural strategy or sequencing is needed
 - `.draftspec/plans/<slug>/data-model.md` when data shape or invariants matter
 - `.draftspec/plans/<slug>/contracts/` when APIs or events are involved

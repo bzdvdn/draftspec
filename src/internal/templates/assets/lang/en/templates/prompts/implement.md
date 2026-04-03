@@ -24,14 +24,14 @@ Stop if: tasks.md missing, next task not concrete, scope requires inventing new 
 
 Always read these before doing any implementation work:
 
-- `.draftspec/constitution.md`
+- `.draftspec/constitution.summary.md` if present; otherwise `.draftspec/constitution.md`
 - `.draftspec/plans/<slug>/tasks.md`
 
-## Load Only If Needed
+## Load If Present
 
 Read these only when the active task requires them:
 
-- `.draftspec/specs/<slug>.md` when task intent or acceptance scope is unclear
+- `.draftspec/specs/<slug>/summary.md` if present; otherwise `.draftspec/specs/<slug>/spec.md` — when task intent or acceptance scope is unclear
 - `.draftspec/plans/<slug>/plan.md` when architectural strategy or sequencing is needed
 - `.draftspec/plans/<slug>/data-model.md` when data shape, invariants, or lifecycle behavior matters
 - `.draftspec/plans/<slug>/contracts/` when APIs, events, or integration contracts are involved
@@ -43,8 +43,6 @@ Do not assume `research.md` should exist; use it only when the active task depen
 
 ## Do Not Read By Default
 
-- unrelated specs
-- unrelated plan packages
 - unrelated contracts
 - full repository code when only a few files are relevant
 - large historical discussion unless there is a blocker
@@ -75,16 +73,35 @@ Do not broaden scope to solve these problems.
 - If the selected phase or task IDs do not exist in `tasks.md`, stop and request refinement.
 - If scoped execution skips unfinished earlier work, warn about the ordering risk but do not silently broaden scope.
 
+## Read Discipline
+
+**Read each file once per session.** Do not re-read a file you have already loaded unless you edited it yourself and need to confirm a specific detail of your own change. After your own edit, you already know what changed — re-reading to "confirm" content you just wrote is wasteful.
+
+**Session start protocol** — before executing the first task:
+1. Run `.draftspec/scripts/check-implement-ready.*` if available.
+2. Read `tasks.md` and identify all tasks in the current scope.
+3. Collect the `Touches:` surfaces from every in-scope task; if `## Surface Map` is present in `tasks.md`, read it instead of scanning individual task lines.
+4. Read those surfaces once, in batch, before any implementation begins.
+5. Execute tasks from that pre-loaded context without reopening files between tasks.
+
+**Re-read only when:**
+- The file was changed externally (e.g. a user edit mid-session).
+- A specific task explicitly requires verifying the current state of a file after a prior task changed it in a non-obvious way.
+
+**Do not re-read between tasks** to "refresh" or "make sure" — use what you loaded at session start.
+
 ## Invariants
 
 - Implement only unfinished tasks from `tasks.md`.
 - Respect the order and phase structure in `tasks.md`.
 - Never redesign or re-plan the feature silently during implementation.
+- If you modified a file not listed in the active task's `Touches:`, stop and explain why before continuing. Unreported surface changes are a scope violation, not an improvement.
 - Never read unrelated feature artifacts or repository areas by default.
-- Prefer focused rereads of active-task files over reopening broad repository context already resolved during planning or task decomposition.
+- Do not re-read files between tasks; rely on the session start batch read and your own edit history.
 - When `/.draftspec/scripts/check-implement-ready.*` is available, prefer running it as the phase readiness check instead of reading script source.
 - Do not read `/.draftspec/scripts/*` by default unless you are debugging the scripts, working on Draftspec itself, or the user explicitly asks to inspect script logic.
 - If a task cannot be implemented safely from current artifacts, stop and request refinement.
+- If you need to make a non-obvious assumption to proceed (API shape, data format, error handling choice), log it as `[ASSUMPTION: ...]` in your progress output before acting on it. If the assumption significantly affects acceptance scope, stop and ask before proceeding.
 - Mark completed tasks in `tasks.md`.
 - Keep runtime updates short and tied to the current phase and task IDs.
 - Do not violate the constitution.
@@ -105,7 +122,7 @@ Do not broaden scope to solve these problems.
 
 ## Handoff Rules
 
-- Before marking a task done, confirm that the observable outcome named in the task text is actually present.
+- Before marking a task done, confirm that the observable outcome named in the task text is actually present. State explicitly: what file changed, what was added or modified, and what the observable proof is. Do not mark done if the only proof is "code looks correct".
 - If the task references `AC-*`, keep the implementation aligned with that acceptance scope instead of silently widening behavior.
 - When the active scope finishes, leave enough evidence for the next phase:
   - completed checkboxes in `tasks.md`
@@ -122,22 +139,13 @@ Do not broaden scope to solve these problems.
 
 ## Output expectations
 
-- Implement the work
-- Update `tasks.md` checkboxes for completed items
-- Report phase progress in runtime: when a phase starts, when it completes, and what remains next inside the current scope
-- Summarize completed tasks, remaining tasks, and any blockers
-- Explicitly state which acceptance criteria from the spec are now covered by the implementation
-- Negative examples: do not mark a task done after partial scaffolding, do not slip unrelated cleanup or refactors into the same run, and do not claim acceptance coverage that was not actually implemented
-- When referring to changed files in the conversation, list their exact project-relative paths, not only bare filenames
-- End the conversation with a short stable summary block that includes `Slug`, `Status`, `Artifacts`, `Blockers`, and `Next command` when that handoff is truly safe
-- When the requested implementation scope is complete and ready for validation, end the conversation summary with `Next command: /draftspec.verify <slug>`
-- If implementation is blocked or unfinished, say that directly instead of suggesting `/draftspec.verify`
+- Implement the work; update `tasks.md` checkboxes; report phase progress with `[T1.1] done` lines
+- State which acceptance criteria are now covered; do not claim coverage that was not implemented
+- End with a summary block: `Slug`, `Status`, `Artifacts`, `Blockers`, `Next command`
+- When ready: `Next command: /draftspec.verify <slug>`
 
 ## Self-Check
 
 - Did I execute only the requested scope from `tasks.md`?
-- Did I avoid silent redesign or scope expansion?
-- Did I read only the artifacts needed for the active task?
 - Did I update completed tasks and report acceptance coverage?
-- Did I begin from the active task surfaces before widening into more code?
 - Would `verify` understand what changed and what remains without rereading the whole repository?

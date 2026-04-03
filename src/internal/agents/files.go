@@ -3,7 +3,6 @@ package agents
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	"sort"
 	"strings"
 )
@@ -12,19 +11,6 @@ type File struct {
 	Path    string
 	Content string
 	Mode    os.FileMode
-}
-
-var supportedTargets = map[string]struct{}{
-	"claude":   {},
-	"codex":    {},
-	"copilot":  {},
-	"cursor":   {},
-	"kilocode": {},
-	"trae":     {},
-}
-
-func SupportedTargets() []string {
-	return []string{"claude", "codex", "copilot", "cursor", "kilocode", "trae"}
 }
 
 func NormalizeTargets(values []string) ([]string, error) {
@@ -50,8 +36,8 @@ func NormalizeTargets(values []string) ([]string, error) {
 				}
 				continue
 			}
-			if _, ok := supportedTargets[target]; !ok {
-				return nil, fmt.Errorf("unsupported agent target %q, expected one of: claude, codex, copilot, cursor, kilocode, trae, all", target)
+			if _, ok := adapterRegistry[target]; !ok {
+				return nil, fmt.Errorf("unsupported agent target %q, expected one of: aider, claude, codex, copilot, cursor, kilocode, roocode, trae, windsurf, all", target)
 			}
 			if _, ok := seen[target]; ok {
 				continue
@@ -71,9 +57,14 @@ func Files(targets []string, language string, shell string) ([]File, error) {
 		return nil, err
 	}
 
+	commands := DefaultCommands(shell)
 	var files []File
 	for _, target := range normalized {
-		targetFiles, err := filesForTarget(target, language, shell)
+		adapter, err := adapterForTarget(target)
+		if err != nil {
+			return nil, err
+		}
+		targetFiles, err := adapter.Render(commands, language)
 		if err != nil {
 			return nil, err
 		}
@@ -92,85 +83,49 @@ func FilesForTarget(target, language, shell string) ([]File, error) {
 	if len(normalized) == 0 {
 		return nil, nil
 	}
-	return filesForTarget(normalized[0], language, shell)
-}
 
-func PathsForTarget(target string) ([]string, error) {
-	files, err := FilesForTarget(target, "en", "sh")
+	adapter, err := adapterForTarget(normalized[0])
 	if err != nil {
 		return nil, err
 	}
-	paths := make([]string, 0, len(files))
-	for _, file := range files {
-		paths = append(paths, file.Path)
+	return adapter.Render(DefaultCommands(shell), language)
+}
+
+func PathsForTarget(target string) ([]string, error) {
+	adapter, err := adapterForTarget(target)
+	if err != nil {
+		return nil, err
+	}
+	paths, err := adapter.Paths(DefaultCommands("sh"), "en")
+	if err != nil {
+		return nil, err
 	}
 	sort.Strings(paths)
 	return paths, nil
 }
 
-func filesForTarget(target, language, shell string) ([]File, error) {
-	if target == "trae" {
-		return []File{{Path: ".trae/project_rules.md", Content: renderTrae(language, shell), Mode: 0o644}}, nil
-	}
-
-	var files []File
-	for _, command := range commandSpecs(shell) {
-		path, content, err := render(target, language, command)
-		if err != nil {
-			return nil, err
-		}
-		files = append(files, File{Path: path, Content: content, Mode: 0o644})
-	}
-	return files, nil
-}
-
-type commandSpec struct {
-	Name        string
-	Description string
-	PromptPath  string
-	Extras      []string
-}
+// commandSpec and commandSpecs are kept as compatibility shims while tests and
+// callers continue to use the previous names.
+type commandSpec = CommandDefinition
 
 func commandSpecs(shell string) []commandSpec {
-	normalizedShell := normalizeShell(shell)
-	launcher := scriptPath("run-draftspec", normalizedShell)
-	return []commandSpec{
-		{Name: "constitution", Description: "Create or update the project constitution", PromptPath: ".draftspec/templates/prompts/constitution.md", Extras: []string{launcher, scriptPath("check-constitution", normalizedShell)}},
-		{Name: "spec", Description: "Create or update one feature spec", PromptPath: ".draftspec/templates/prompts/spec.md", Extras: []string{launcher, scriptPath("check-spec-ready", normalizedShell)}},
-		{Name: "inspect", Description: "Inspect one feature for consistency and quality", PromptPath: ".draftspec/templates/prompts/inspect.md", Extras: []string{launcher, scriptPath("check-inspect-ready", normalizedShell), scriptPath("inspect-spec", normalizedShell)}},
-		{Name: "plan", Description: "Create or update one feature plan package", PromptPath: ".draftspec/templates/prompts/plan.md", Extras: []string{launcher, scriptPath("check-plan-ready", normalizedShell)}},
-		{Name: "tasks", Description: "Create or update tasks for one feature", PromptPath: ".draftspec/templates/prompts/tasks.md", Extras: []string{launcher, scriptPath("check-tasks-ready", normalizedShell)}},
-		{Name: "implement", Description: "Implement one feature from tasks", PromptPath: ".draftspec/templates/prompts/implement.md", Extras: []string{launcher, scriptPath("check-implement-ready", normalizedShell), scriptPath("list-open-tasks", normalizedShell)}},
-		{Name: "verify", Description: "Verify one implemented feature package", PromptPath: ".draftspec/templates/prompts/verify.md", Extras: []string{launcher, scriptPath("check-verify-ready", normalizedShell), scriptPath("verify-task-state", normalizedShell)}},
-		{Name: "archive", Description: "Archive one feature package", PromptPath: ".draftspec/templates/prompts/archive.md", Extras: []string{launcher, scriptPath("check-archive-ready", normalizedShell)}},
-	}
+	return DefaultCommands(shell)
 }
 
-func scriptPath(name, shell string) string {
-	ext := ".sh"
-	if shell == "powershell" {
-		ext = ".ps1"
+// render is kept as a narrow compatibility shim for single-command rendering.
+func render(target, language string, spec CommandDefinition) (string, string, error) {
+	adapter, err := adapterForTarget(target)
+	if err != nil {
+		return "", "", err
 	}
-	return ".draftspec/scripts/" + name + ext
-}
-
-func render(target, language string, spec commandSpec) (string, string, error) {
-	lang := normalizeLanguage(language)
-
-	switch target {
-	case "claude":
-		return filepath.ToSlash(filepath.Join(".claude", "commands", fmt.Sprintf("draftspec.%s.md", spec.Name))), renderClaude(spec, lang), nil
-	case "codex":
-		return filepath.ToSlash(filepath.Join(".codex", "prompts", fmt.Sprintf("draftspec.%s.md", spec.Name))), renderCodex(spec, lang), nil
-	case "copilot":
-		return filepath.ToSlash(filepath.Join(".github", "prompts", fmt.Sprintf("draftspec-%s.prompt.md", spec.Name))), renderCopilot(spec, lang), nil
-	case "cursor":
-		return filepath.ToSlash(filepath.Join(".cursor", "rules", fmt.Sprintf("draftspec-%s.mdc", spec.Name))), renderCursor(spec, lang), nil
-	case "kilocode":
-		return filepath.ToSlash(filepath.Join(".kilocode", "workflows", fmt.Sprintf("draftspec-%s.md", spec.Name))), renderKilo(spec, lang), nil
-	default:
-		return "", "", fmt.Errorf("unsupported agent target %q", target)
+	files, err := adapter.Render([]CommandDefinition{spec}, language)
+	if err != nil {
+		return "", "", err
 	}
+	if len(files) != 1 {
+		return "", "", fmt.Errorf("expected one rendered file for target %q, got %d", target, len(files))
+	}
+	return files[0].Path, files[0].Content, nil
 }
 
 func normalizeLanguage(language string) string {
@@ -188,6 +143,14 @@ func normalizeShell(shell string) string {
 	return "sh"
 }
 
+func scriptPath(name, shell string) string {
+	ext := ".sh"
+	if shell == "powershell" {
+		ext = ".ps1"
+	}
+	return ".draftspec/scripts/" + name + ext
+}
+
 func commandHint(name, lang string) string {
 	if lang == "ru" {
 		return fmt.Sprintf("Команда: `/draftspec.%s [request]`", name)
@@ -200,224 +163,6 @@ func toolInvocationHint(lang string) string {
 		return "Используйте инструменты напрямую через runtime агента; не печатайте raw JSON/XML/tool-call payloads и не выводите внутренние рассуждения о выборе инструмента."
 	}
 	return "Use tools directly through the agent runtime; do not print raw JSON/XML/tool-call payloads or expose internal reasoning about tool choice."
-}
-
-func renderClaude(spec commandSpec, lang string) string {
-	if lang == "ru" {
-		return fmt.Sprintf(`---
-description: %s
-argument-hint: [request]
----
-
-Следуйте файлу %q.
-
-%s
-
-Аргументы пользователя:
-$ARGUMENTS
-
-Требования:
-- сначала прочитайте .draftspec/constitution.md, если это требуется prompt-файлом
-- используйте только минимально нужный контекст репозитория
-- если доступны, сначала запускайте связанные scripts и опирайтесь на их вывод; не читайте исходники scripts по умолчанию:
-%s
-- обновляйте только релевантные артефакты и кратко сообщайте об итогах и блокерах
-`, spec.Description, spec.PromptPath, commandHint(spec.Name, lang), bulletList(spec.Extras))
-	}
-
-	return fmt.Sprintf(`---
-description: %s
-argument-hint: [request]
----
-
-Follow %q.
-
-%s
-
-User arguments:
-$ARGUMENTS
-
-Requirements:
-- read .draftspec/constitution.md first when the prompt requires it
-- use only the minimum repository context needed
-- when available, run related scripts first and rely on their output; do not read script source by default:
-%s
-- update only the relevant artifacts and report outcomes and blockers briefly
-`, spec.Description, spec.PromptPath, commandHint(spec.Name, lang), bulletList(spec.Extras))
-}
-
-func renderCodex(spec commandSpec, lang string) string {
-	title := titleCase(spec.Name)
-	if lang == "ru" {
-		return fmt.Sprintf(`# Draftspec %s
-
-Следуйте файлу %q.
-
-%s
-
-Вход пользователя: {{arguments}}
-
-Дополнительно:
-- если доступны связанные scripts, сначала запускайте их и опирайтесь на их вывод; не читайте исходники scripts по умолчанию
-- %s
-%s
-`, title, spec.PromptPath, commandHint(spec.Name, lang), toolInvocationHint(lang), bulletList(spec.Extras))
-	}
-
-	return fmt.Sprintf(`# Draftspec %s
-
-Follow %q.
-
-%s
-
-User input: {{arguments}}
-
-Additional context:
-- when related scripts are available, run them first and rely on their output; do not read script source by default
-- %s
-%s
-`, title, spec.PromptPath, commandHint(spec.Name, lang), toolInvocationHint(lang), bulletList(spec.Extras))
-}
-
-func renderCopilot(spec commandSpec, lang string) string {
-	if lang == "ru" {
-		return fmt.Sprintf(`# Draftspec %s
-
-Используйте %q как основной workflow prompt.
-
-%s
-
-Что нужно сделать:
-- обработать запрос пользователя для одной фазы %q
-- применять только минимально нужный контекст репозитория
-- при необходимости сначала запускайте связанные scripts и опирайтесь на их вывод; не читайте исходники scripts по умолчанию:
-%s
-- кратко сообщить о результатах и блокерах
-`, spec.Name, spec.PromptPath, commandHint(spec.Name, lang), spec.Name, bulletList(spec.Extras))
-	}
-
-	return fmt.Sprintf(`# Draftspec %s
-
-Use %q as the primary workflow prompt.
-
-%s
-
-What to do:
-- handle the user request for the %q phase
-- use only the minimum repository context required
-- when needed, run related scripts first and rely on their output; do not read script source by default:
-%s
-- report outcomes and blockers briefly
-`, spec.Name, spec.PromptPath, commandHint(spec.Name, lang), spec.Name, bulletList(spec.Extras))
-}
-
-func renderCursor(spec commandSpec, lang string) string {
-	if lang == "ru" {
-		return fmt.Sprintf(`---
-description: Draftspec %s workflow
-alwaysApply: false
----
-
-Следуйте файлу %q.
-
-%s
-
-Используйте эту rule, когда запрос явно относится к фазе %q или к команде /draftspec.%s.
-
-Если доступны связанные scripts, сначала запускайте их и опирайтесь на их вывод. Не читайте исходники scripts по умолчанию.
-
-Связанные scripts:
-%s
-`, spec.Name, spec.PromptPath, commandHint(spec.Name, lang), spec.Name, spec.Name, bulletList(spec.Extras))
-	}
-
-	return fmt.Sprintf(`---
-description: Draftspec %s workflow
-alwaysApply: false
----
-
-Follow %q.
-
-%s
-
-Use this rule when the request clearly maps to the %q phase or the /draftspec.%s command.
-
-When related scripts are available, run them first and rely on their output. Do not read script source by default.
-
-Related scripts:
-%s
-`, spec.Name, spec.PromptPath, commandHint(spec.Name, lang), spec.Name, spec.Name, bulletList(spec.Extras))
-}
-
-func renderKilo(spec commandSpec, lang string) string {
-	if lang == "ru" {
-		return fmt.Sprintf(`# Draftspec %s
-
-Следуйте файлу %q.
-
-%s
-
-Используйте это project rule, когда запрос относится к фазе %q.
-
-Если доступны связанные scripts, сначала запускайте их и опирайтесь на их вывод. Не читайте исходники scripts по умолчанию.
-
-Связанные scripts:
-%s
-`, spec.Name, spec.PromptPath, commandHint(spec.Name, lang), spec.Name, bulletList(spec.Extras))
-	}
-
-	return fmt.Sprintf(`# Draftspec %s
-
-Follow %q.
-
-%s
-
-Use this project rule when the request maps to the %q phase.
-
-When related scripts are available, run them first and rely on their output. Do not read script source by default.
-
-Related scripts:
-%s
-`, spec.Name, spec.PromptPath, commandHint(spec.Name, lang), spec.Name, bulletList(spec.Extras))
-}
-
-func renderTrae(language, shell string) string {
-	lang := normalizeLanguage(language)
-	if lang == "ru" {
-		var sections []string
-		sections = append(sections, "# Draftspec Project Rules")
-		sections = append(sections, "")
-		sections = append(sections, "Используйте .draftspec как основной источник проектного контекста. Следуйте AGENTS.md и соответствующим prompt-файлам в .draftspec/templates/prompts/.")
-		for _, spec := range commandSpecs(shell) {
-			sections = append(sections, "")
-			sections = append(sections, fmt.Sprintf("## /draftspec.%s", spec.Name))
-			sections = append(sections, fmt.Sprintf("- Основной prompt: %s", spec.PromptPath))
-			sections = append(sections, fmt.Sprintf("- %s", commandHint(spec.Name, lang)))
-			sections = append(sections, "- Используйте только минимально нужный контекст репозитория")
-			sections = append(sections, "- Если доступны связанные scripts, сначала запускайте их и опирайтесь на их вывод")
-			sections = append(sections, "- Не читайте исходники scripts по умолчанию")
-			sections = append(sections, "- Связанные scripts:")
-			sections = append(sections, bulletList(spec.Extras))
-		}
-		return strings.Join(sections, "\n") + "\n"
-	}
-
-	var sections []string
-	sections = append(sections, "# Draftspec Project Rules")
-	sections = append(sections, "")
-	sections = append(sections, "Use .draftspec as the primary source of project context. Follow AGENTS.md and the matching prompt files under .draftspec/templates/prompts/.")
-	for _, spec := range commandSpecs(shell) {
-		sections = append(sections, "")
-		sections = append(sections, fmt.Sprintf("## /draftspec.%s", spec.Name))
-		sections = append(sections, fmt.Sprintf("- Primary prompt: %s", spec.PromptPath))
-		sections = append(sections, fmt.Sprintf("- %s", commandHint(spec.Name, lang)))
-		sections = append(sections, "- Use only the minimum repository context required")
-		sections = append(sections, "- When related scripts are available, run them first and rely on their output")
-		sections = append(sections, "- Do not read script source by default")
-		sections = append(sections, "- Related scripts:")
-		sections = append(sections, bulletList(spec.Extras))
-	}
-	return strings.Join(sections, "\n") + "\n"
 }
 
 func titleCase(value string) string {

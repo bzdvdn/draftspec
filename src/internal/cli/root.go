@@ -22,6 +22,9 @@ func NewRootCmd() *cobra.Command {
 	cmd.AddCommand(newMigrateCmd())
 	cmd.AddCommand(newListSpecsCmd())
 	cmd.AddCommand(newShowSpecCmd())
+	cmd.AddCommand(newCheckCmd())
+	cmd.AddCommand(newDemoCmd())
+	cmd.AddCommand(newExportCmd())
 	cmd.AddCommand(newInternalCmd())
 
 	return cmd

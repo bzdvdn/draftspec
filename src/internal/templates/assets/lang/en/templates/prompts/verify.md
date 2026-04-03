@@ -16,14 +16,14 @@ Stop if: slug ambiguous, tasks.md missing, or verdict would require inventing im
 
 Always read these first:
 
-- `.draftspec/constitution.md`
+- `.draftspec/constitution.summary.md` if present; otherwise `.draftspec/constitution.md`
 - `.draftspec/plans/<slug>/tasks.md`
 
-## Load Only If Needed
+## Load If Present
 
 Read these only when needed to confirm a concrete claim:
 
-- `.draftspec/specs/<slug>.md`
+- `.draftspec/specs/<slug>/summary.md` if present; otherwise `.draftspec/specs/<slug>/spec.md`
 - `.draftspec/plans/<slug>/plan.md`
 - `.draftspec/plans/<slug>/data-model.md`
 - `.draftspec/plans/<slug>/contracts/`
@@ -32,8 +32,6 @@ Read these only when needed to confirm a concrete claim:
 
 ## Do Not Read By Default
 
-- unrelated specs
-- unrelated plan packages
 - unrelated code areas
 - broad repository history
 - archives unless the current verification explicitly depends on them
@@ -101,21 +99,13 @@ Stop and ask for clarification only if:
 
 ## Output expectations
 
-- Output the report to the conversation unless the user asks to persist it
-- If persisted without an explicit path, use `.draftspec/plans/<slug>/verify.md`
+- Output the report to the conversation unless the user asks to persist it; if persisted without explicit path, use `.draftspec/plans/<slug>/verify.md`
 - Summarize the verdict, completed checks, remaining concerns, and whether the feature is safe to archive
-- In `## Checks`, explicitly cover task completion, acceptance evidence, and implementation alignment where inspected
-- Negative examples: do not return `pass` from checkbox state alone, do not imply full-feature verification from one inspected file, and do not call archive safe when `Not Verified` still lists material gaps
-- When referring to inspected or changed files in the conversation, list their exact project-relative paths, not only bare filenames
-- End the conversation with a short stable summary block that includes `Slug`, `Status`, `Artifacts`, `Blockers`, and either `Next command` or `Return to`
-- When the feature is safe to archive, end the conversation summary with `Next command: /draftspec.archive <slug>`
-- When the verdict sends work back to an earlier phase, name that earlier phase explicitly and include its exact slash command instead of suggesting archive
+- End with a summary block: `Slug`, `Status`, `Artifacts`, `Blockers`, and either `Next command` or `Return to`
+- When safe to archive: `Next command: /draftspec.archive <slug>`; when returning to an earlier phase, name it explicitly with its slash command
 
 ## Self-Check
 
-- Did I start from `tasks.md` as the verification entrypoint?
-- Is every claim in the verdict backed by inspected evidence, not just checkbox state?
-- Did I prefer `concerns` over `pass` when evidence was partial?
+- Is every verdict claim backed by inspected evidence, not just checkbox state?
 - Is the `Not Verified` section honest about what I did not check?
-- Would `archive` be safe based only on what I actually verified?
 - Is the next step or return phase appropriate for the verdict?

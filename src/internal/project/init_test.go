@@ -50,6 +50,14 @@ func TestInitializeCreatesWorkspaceAndAgentTargets(t *testing.T) {
 			t.Fatalf("expected %s to exist: %v", path, err)
 		}
 	}
+
+	agentsContent, err := os.ReadFile(filepath.Join(root, "AGENTS.md"))
+	if err != nil {
+		t.Fatalf("ReadFile(AGENTS.md) returned error: %v", err)
+	}
+	if !strings.Contains(string(agentsContent), "<!-- draftspec:start -->") {
+		t.Fatalf("expected AGENTS.md to contain managed draftspec block, got %q", string(agentsContent))
+	}
 }
 
 func TestAddRemoveAndCleanupAgents(t *testing.T) {
@@ -361,5 +369,32 @@ func TestRefreshDryRunDoesNotWriteChanges(t *testing.T) {
 	}
 	if got, want := cfg.Runtime.Shell, "sh"; got != want {
 		t.Fatalf("shell after dry-run = %q, want %q", got, want)
+	}
+}
+
+func TestRefreshDryRunAfterInitializeDoesNotReportAgentsDrift(t *testing.T) {
+	root := t.TempDir()
+
+	_, err := Initialize(root, InitOptions{
+		InitGit:     false,
+		DefaultLang: "en",
+		Shell:       "sh",
+		AgentTargets: []string{
+			"codex",
+		},
+	})
+	if err != nil {
+		t.Fatalf("Initialize returned error: %v", err)
+	}
+
+	result, err := Refresh(root, RefreshOptions{DryRun: true})
+	if err != nil {
+		t.Fatalf("Refresh returned error: %v", err)
+	}
+
+	for _, path := range result.Updated {
+		if path == "AGENTS.md" {
+			t.Fatalf("did not expect AGENTS.md drift immediately after initialize, got updated=%v", result.Updated)
+		}
 	}
 }

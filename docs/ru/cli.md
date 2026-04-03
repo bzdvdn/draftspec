@@ -139,7 +139,7 @@ draftspec add-agent my-project --agents claude --agents codex
 
 в канонический путь:
 
-- `.draftspec/specs/<slug>.inspect.md`
+- `.draftspec/specs/<slug>/inspect.md`
 
 Используй `--dry-run`, чтобы посмотреть изменения без применения, и `--json` для структурированного вывода.
 
@@ -170,3 +170,43 @@ draftspec add-agent my-project --agents claude --agents codex
 ### `draftspec show-spec <name> [path]`
 
 Печатает одну спецификацию по slug.
+
+### `draftspec check <slug> [path]`
+
+Показывает готовность одной фичи и точное следующее действие.
+
+Вывод включает наличие артефактов, вердикт inspect и verify, прогресс задач и точную следующую slash-команду.
+
+Используй `--all`, чтобы проверить все фичи одной таблицей. Выходит с кодом 1, если хоть одна фича заблокирована.
+Используй `--json` для машинно-читаемого вывода в CI.
+
+```bash
+draftspec check export-report
+draftspec check export-report my-project --json
+draftspec check my-project --all
+draftspec check my-project --all --json
+```
+
+### `draftspec demo [path]`
+
+Создаёт демо-workspace по указанному пути (по умолчанию: `./draftspec-demo`).
+
+Workspace заполнен примером фичи (`export-report`) на фазе implement — spec, inspect report, plan, tasks и data model уже присутствуют. После создания предлагает попробовать `/draftspec.scope`, `/draftspec.challenge` и `/draftspec.handoff`.
+
+```bash
+draftspec demo
+draftspec demo ./my-demo --agents claude
+```
+
+### `draftspec export <slug> [path]`
+
+Упаковывает все артефакты одной фичи в один markdown-документ.
+
+Читает и конкатенирует: spec, inspect report, plan, tasks, data model, research, challenge report и verify report (пропускает отсутствующие файлы). Удобно для передачи полного контекста фичи ревьюеру или новой агентской сессии.
+
+Используй `--output <file>`, чтобы записать в файл вместо stdout.
+
+```bash
+draftspec export export-report
+draftspec export export-report my-project --output export-report-bundle.md
+```

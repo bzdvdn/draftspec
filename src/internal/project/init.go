@@ -294,9 +294,9 @@ func ensureAgentsSnippet(path, snippetPath string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	snippet := string(snippetBytes)
+	block := renderManagedAgentsBlock(string(snippetBytes))
 	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
-		return true, os.WriteFile(path, []byte(snippet), 0o644)
+		return true, os.WriteFile(path, []byte(block), 0o644)
 	} else if err != nil {
 		return false, err
 	}
@@ -304,17 +304,11 @@ func ensureAgentsSnippet(path, snippetPath string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	if strings.Contains(string(content), "## Draftspec") {
+	updated := upsertManagedAgentsBlock(string(content), block)
+	if updated == string(content) {
 		return false, nil
 	}
-	var builder strings.Builder
-	builder.Write(content)
-	if len(content) > 0 && !strings.HasSuffix(string(content), "\n") {
-		builder.WriteString("\n")
-	}
-	builder.WriteString("\n")
-	builder.WriteString(snippet)
-	return true, os.WriteFile(path, []byte(builder.String()), 0o644)
+	return true, os.WriteFile(path, []byte(updated), 0o644)
 }
 
 func ensureAgentFiles(root string, targets []string, language string, shell string) []string {

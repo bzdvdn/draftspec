@@ -1,0 +1,79 @@
+package agents
+
+import (
+	"fmt"
+	"path/filepath"
+)
+
+type claudeAdapter struct{}
+
+func (claudeAdapter) Target() string { return "claude" }
+
+func (claudeAdapter) Render(commands []CommandDefinition, language string) ([]File, error) {
+	lang := normalizeLanguage(language)
+	files := make([]File, 0, len(commands))
+	for _, command := range commands {
+		files = append(files, File{
+			Path:    filepath.ToSlash(filepath.Join(".claude", "commands", fmt.Sprintf("draftspec.%s.md", command.Name))),
+			Content: renderClaude(command, lang),
+			Mode:    0o644,
+		})
+	}
+	return files, nil
+}
+
+func (claudeAdapter) Paths(commands []CommandDefinition, language string) ([]string, error) {
+	files, err := claudeAdapter{}.Render(commands, language)
+	if err != nil {
+		return nil, err
+	}
+	paths := make([]string, 0, len(files))
+	for _, file := range files {
+		paths = append(paths, file.Path)
+	}
+	return paths, nil
+}
+
+func renderClaude(spec CommandDefinition, lang string) string {
+	if lang == "ru" {
+		return fmt.Sprintf(`---
+description: %s
+argument-hint: [request]
+---
+
+Следуйте файлу %q.
+
+%s
+
+Аргументы пользователя:
+$ARGUMENTS
+
+Требования:
+- сначала прочитайте .draftspec/constitution.md, если это требуется prompt-файлом
+- используйте только минимально нужный контекст репозитория
+- если доступны, сначала запускайте связанные scripts и опирайтесь на их вывод; не читайте исходники scripts по умолчанию:
+%s
+- обновляйте только релевантные артефакты и кратко сообщайте об итогах и блокерах
+`, spec.Description, spec.PromptPath, commandHint(spec.Name, lang), bulletList(spec.Extras))
+	}
+
+	return fmt.Sprintf(`---
+description: %s
+argument-hint: [request]
+---
+
+Follow %q.
+
+%s
+
+User arguments:
+$ARGUMENTS
+
+Requirements:
+- read .draftspec/constitution.md first when the prompt requires it
+- use only the minimum repository context needed
+- when available, run related scripts first and rely on their output; do not read script source by default:
+%s
+- update only the relevant artifacts and report outcomes and blockers briefly
+`, spec.Description, spec.PromptPath, commandHint(spec.Name, lang), bulletList(spec.Extras))
+}

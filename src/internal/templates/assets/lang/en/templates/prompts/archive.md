@@ -16,9 +16,9 @@ Stop if: see Stop Conditions.
 
 Always read these first:
 
-- `.draftspec/specs/<slug>.md`
+- `.draftspec/specs/<slug>/spec.md`
 
-## Load Only If Needed
+## Load If Present
 
 Read plan artifacts only to inform `summary.md`. If the summary can be written from the spec alone, do not read them:
 
@@ -30,7 +30,6 @@ Read plan artifacts only to inform `summary.md`. If the summary can be written f
 
 ## Do Not Read By Default
 
-- unrelated specs
 - unrelated archive entries
 - unrelated repository files
 
@@ -45,7 +44,7 @@ Stop and ask a minimal follow-up question if:
 ## Rules
 
 - Archive under `.draftspec/archive/<slug>/<YYYY-MM-DD>/`.
-- Use copy-based archiving in MVP; do not delete active files (`specs/<slug>.md` and `plans/<slug>/`) unless explicitly instructed by the user.
+- Use copy-based archiving in MVP; do not delete active files (`specs/<slug>/spec.md` and `plans/<slug>/`) unless explicitly instructed by the user.
 - Write `summary.md` inside the archive directory.
 - Keep `summary.md` compact. Prefer status, reason, completed scope, and notable deviations over long retrospective narration.
 - If plan artifacts exist, archive them together with the spec.

@@ -106,7 +106,7 @@ Suggested semantics:
 
 When an inspection report is persisted to disk, Draftspec should use this canonical path:
 
-- `.draftspec/specs/<slug>.inspect.md`
+- `.draftspec/specs/<slug>/inspect.md`
 
 Use `.draftspec/templates/inspect-report.md` as the canonical template when the report is written to disk.
 Persisted inspect and verify reports should start with a machine-readable metadata block containing `report_type`, `slug`, `status`, `docs_language`, and `generated_at`.

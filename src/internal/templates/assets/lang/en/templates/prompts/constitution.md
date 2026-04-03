@@ -19,15 +19,18 @@ When the project already exists, work in two layers:
 
 Do not redesign an existing project into an idealized architecture. Describe current reality first, then formalize how future changes must be governed.
 
-## Load Only
+## Load First
 
 - current user request and conversation
 - `.draftspec/constitution.md`
-- `README.md`, if present
-- `AGENTS.md`, if present
-- project manifests and configuration files when they quickly explain language, runtime, architectural boundaries, or integrations
 - top-level directory structure
 - only the smallest amount of repository context needed to make the constitution concrete
+
+## Load If Present
+
+- `README.md`
+- `AGENTS.md`
+- project manifests and configuration files that quickly explain language, runtime, architectural boundaries, or integrations
 
 ## Repository Evidence
 
@@ -48,8 +51,6 @@ Do not derive strict constitutional rules from weak signals alone.
 
 ## Do Not Read By Default
 
-- unrelated specs
-- unrelated plan packages
 - large code areas that do not affect the constitution
 - old feature artifacts unless they are required to resolve a constitutional conflict
 - the whole repository by default
@@ -105,9 +106,23 @@ If the constitution is already current and does not conflict with the request, s
 - If a rule is introduced by user intent, phrase it as law for downstream phases.
 - Update `## Last Updated` with today's date in `YYYY-MM-DD` format whenever the constitution changes.
 
+## Summary artifact
+
+After writing or patching `constitution.md`, also write or update `.draftspec/constitution.summary.md`.
+
+The summary MUST contain only:
+
+- `## Purpose` — 1-2 sentences
+- `## Key Constraints` — 3-5 bullets, hard non-negotiable limits only
+- `## Language Policy` — 3 lines: docs, agent, comments
+- `## Development Workflow` — 3-5 key rules most relevant to spec, plan, and implement phases
+- `## Decision Priorities` — 3-5 bullets
+
+Keep the summary under 60 lines. It is loaded by `implement`, `tasks`, and `verify` instead of the full constitution to reduce context overhead. The summary is not a substitute for the full constitution in phases that require constitutional consistency checks (spec, inspect, plan).
+
 ## Output expectations
 
-- Write the updated `.draftspec/constitution.md`
+- Write the updated `.draftspec/constitution.md` and `.draftspec/constitution.summary.md`
 - Briefly summarize what changed and what remains unresolved
-- Separately note what was inferred from the codebase and what was added as new mandatory law
-- If there are unresolved constitutional questions, explicitly mark them as **BLOCKER** for downstream phases (spec, inspect, plan)
+- Note what was inferred from the codebase and what was added as new mandatory law
+- Mark unresolved constitutional questions as **BLOCKER** for downstream phases
