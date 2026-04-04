@@ -21,11 +21,11 @@ Always read these first if they exist:
 
 ## Load If Present
 
-Read these only when they exist and are needed to populate open items or decisions:
+Read based on the inferred phase — only the artifacts that exist and contribute to the handoff:
 
-- `.draftspec/specs/<slug>/inspect.md`
-- `.draftspec/plans/<slug>/plan.md`
-- `.draftspec/plans/<slug>/tasks.md`
+- `.draftspec/specs/<slug>/inspect.md` — read the verdict line to populate `## Current Phase` and detect blockers
+- `.draftspec/plans/<slug>/plan.md` — read `DEC-*` entries to populate `## Key Decisions` when the feature is in plan phase or later
+- `.draftspec/plans/<slug>/tasks.md` — read task checkboxes to populate `## Open Work` and `## Completed` when the feature is in tasks/implement phase or later
 
 ## Do Not Read By Default
 

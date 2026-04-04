@@ -34,20 +34,9 @@ Do not redesign an existing project into an idealized architecture. Describe cur
 
 ## Repository Evidence
 
-Treat these as strong signals:
+**Strong signals** (safe to derive rules from): directory boundaries (`api/`, `cmd/`, `internal/`, `migrations/`), dependencies and config revealing transports/storage/runtime, existing workflow docs, entrypoint files showing composition root or role separation.
 
-- explicit directory boundaries such as `api/`, `workers/`, `cmd/`, `internal/`, `contracts/`, `migrations/`
-- dependencies and config that clearly reveal transports, storage systems, or runtime shape
-- existing documents that already define workflow or architectural boundaries
-- key entrypoint files that show the composition root, process model, or role separation
-
-Treat these as weak signals:
-
-- isolated files not supported by broader structure
-- naming that is not confirmed by configuration or component relationships
-- general best-practice expectations not grounded in the repository
-
-Do not derive strict constitutional rules from weak signals alone.
+**Weak signals** (context only, not rule sources): isolated files without structural support, naming not confirmed by config, general best-practice expectations not grounded in the repo.
 
 ## Do Not Read By Default
 

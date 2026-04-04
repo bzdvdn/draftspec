@@ -27,13 +27,14 @@ Read these only to determine per-feature phase and status:
 - `.draftspec/scripts/list-specs.sh` — run it to enumerate active specs; do not read its source
 - One header block per active spec (goal and phase markers only — do not read full spec content)
 - `.draftspec/specs/<slug>/inspect.md` metadata block only (verdict line) when inspect exists
+- `.draftspec/archive/` — list subdirectories to identify recently archived features; read only `summary.md` from archives dated within the last 7 days
 
 ## Do Not Read By Default
 
 - Full spec content beyond the goal and phase indicators
 - Plan packages unless the user explicitly asks for plan-level detail
 - tasks.md, data-model.md, contracts/
-- archived features
+- archived features older than 7 days
 - implementation files
 - script source files
 
@@ -52,6 +53,7 @@ Stop and ask only if:
 - Do not read the full plan package for any feature unless the user explicitly asks.
 - Keep the response compact: it must be readable in under 30 seconds.
 - If there are no active features, say so clearly after summarizing the project context.
+- Check `.draftspec/archive/` for features archived within the last 7 days. If any exist, include them in the output under **Recently Archived**.
 
 ## Output Format
 
@@ -65,7 +67,13 @@ Respond inline only. Use this structure:
 <slug>  <name>  [phase]  [inspect: pass|concerns|blocked — omit if no inspect]
 ```
 
-**Summary** — one line: how many features are active, how many are blocked, what the dominant phase is.
+**Recently Archived** (only if any archives exist from the last 7 days) — one row per feature:
+
+```
+<slug>  <status>  <archived_at>  <one-line reason from summary.md>
+```
+
+**Summary** — one line: how many features are active, how many are blocked, what the dominant phase is, how many were recently archived.
 
 **Suggested next command** — the single most useful next action based on current state (e.g. the most-blocked feature's recovery command, or the feature closest to archive).
 

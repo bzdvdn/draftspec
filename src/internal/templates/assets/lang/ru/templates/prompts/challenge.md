@@ -27,10 +27,10 @@ Stop if: slug неоднозначен или спек для slug не суще
 
 ## Load If Present
 
-Читайте только при наличии и только если это соответствует флагу или режиму по умолчанию:
+Читайте в зависимости от активного флага:
 
-- `.draftspec/specs/<slug>/inspect.md`
-- `.draftspec/plans/<slug>/plan.md`
+- `.draftspec/specs/<slug>/inspect.md` — читать в default режиме или `--spec` (пропустить в `--plan`)
+- `.draftspec/plans/<slug>/plan.md` — читать в default режиме или `--plan` (пропустить в `--spec`)
 
 ## Do Not Read By Default
 

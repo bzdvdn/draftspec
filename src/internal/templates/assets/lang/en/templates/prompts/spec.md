@@ -85,6 +85,9 @@ If the spec already exists and is current, say so and do not modify the file.
 - Every acceptance criterion MUST use Given/When/Then format.
 - Every acceptance criterion MUST have a stable ID such as `AC-001`.
 - Ask follow-up questions only when the missing information is critical.
+- When a requirement or AC detail is unclear but the spec can still proceed, mark it inline with `[NEEDS CLARIFICATION: what is unknown and why it matters]` instead of blocking the entire spec. Inspect will flag these as errors that must be resolved before planning.
+- `## Assumptions` is mandatory. Record reasonable defaults chosen when the feature description did not specify a detail, environmental assumptions, and dependencies on existing systems. Making assumptions explicit lets inspect catch wrong ones early.
+- `## Success Criteria` with `SC-*` IDs is optional. Include it only when the feature has measurable performance, reliability, or user-experience targets that go beyond behavioral correctness (e.g., latency, throughput, error rate, task completion time). Omit for purely behavioral features.
 
 ## Resolution Rules
 
@@ -130,9 +133,11 @@ If the spec already exists and is current, say so and do not modify the file.
 - `## Change Delta` should make it obvious what becomes newly possible, what changes, and what stays unchanged.
 - `## Affected Surfaces` should stay compact and name only the user-visible or repository-visible surfaces that define the feature boundary.
 - `## Scope Snapshot`, `## Scope`, and `## Non-Goals` should make the feature boundary obvious to a reviewer.
-- `## Context` should capture repository constraints, preserved behavior, and assumptions that materially affect the feature.
-- `## Requirements` should stay clear and testable; avoid vague wording like `support this properly` or `handle it cleanly`.
-- `## Edge Cases` should include only behavior that materially changes implementation or validation, not a brainstorming dump.
+- `## Context` should capture repository constraints, preserved behavior, and integration points that materially affect the feature.
+- `## Assumptions` should list every non-obvious assumption the spec relies on — environment, user behavior, system state, existing service stability. Bad: omitting assumptions entirely. Good: `Users have stable network; export API is available and returns <2s for 10k records`.
+- `## Success Criteria` (when present) should define measurable outcomes separate from behavioral AC. Each `SC-*` must have a number and a measurement method. Bad: `system should be fast`. Good: `SC-001 Dashboard loads in <1s for 95th percentile on 100 concurrent users`.
+- `## Requirements` should stay clear and testable. Bad: `support CSV export properly`. Good: `RQ-001 Export returns a valid CSV file with UTF-8 BOM header; rows match the current filter`.
+- `## Edge Cases` should include only behavior that materially changes implementation or validation. Bad: `think about what happens with large files`. Good: `Export with >50k rows streams to disk instead of buffering in memory; user sees a progress indicator`.
 - `## Open Questions` should say `none` when no real question remains.
 - Negative examples: do not merge multiple features into one spec, do not hide scope expansion inside edge cases, and do not use `TBD` acceptance criteria.
 - Negative examples: do not add library lists, framework choices, SDK names, or version pins to the spec unless they are product or repository constraints.

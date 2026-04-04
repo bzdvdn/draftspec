@@ -32,7 +32,9 @@ One concise paragraph covering who benefits, what changes for them, and how succ
 
 - RQ-001 One clear, testable requirement written as expected behavior or capability
 - RQ-002 One clear, testable requirement written as expected behavior or capability
+- RQ-003 System MUST [specific capability] [NEEDS CLARIFICATION: detail not specified — option A or option B?]
 - Keep each requirement scoped tightly enough that a reviewer can confirm whether it is satisfied
+- Mark unclear requirements inline with `[NEEDS CLARIFICATION: what is unknown and why it matters]`
 
 ## Non-Goals
 
@@ -57,6 +59,18 @@ One concise paragraph covering who benefits, what changes for them, and how succ
 - **When** the action or event
 - **Then** the expected observable outcome
 - Evidence: what a developer, reviewer, or user can directly observe when this criterion passes
+
+## Assumptions
+
+- Assumption about the environment, users, or system state that must hold for this feature to work
+- Reasonable default chosen when the feature description did not specify a detail
+- Dependency on an existing system, service, or behavior that is assumed to be stable
+
+## Success Criteria
+
+- SC-001 Measurable outcome that defines quality beyond behavioral correctness (e.g., "Export completes in under 5s for 10k rows")
+- SC-002 Measurable outcome (e.g., "Error rate stays below 0.1% after rollout")
+- Include only when the feature has meaningful performance, reliability, or user-experience targets; omit this section for purely behavioral features
 
 ## Edge Cases
 

@@ -6,9 +6,13 @@
 
 Подтвердите, что реализованная работа достаточно согласована с задачами и правилами проекта, чтобы безопасно двигаться дальше.
 
+## Flags
+
+`--deep`: режим полной валидации реализации — читает все plan artifacts и проверяет реальный код для каждой завершённой задачи и acceptance criterion, а не только структурные проверки. Выдаёт comprehensive отчёт с per-AC evidence. Без этого флага verification остаётся структурным и cheap по умолчанию.
+
 ## Phase Contract
 
-Inputs: `.draftspec/constitution.md`, `.draftspec/plans/<slug>/tasks.md`; spec, plan, код — только для подтверждения конкретных выводов.
+Inputs: `.draftspec/constitution.md`, `.draftspec/plans/<slug>/tasks.md`; spec, plan, код — только для подтверждения конкретных выводов (или все артефакты в режиме `--deep`).
 Outputs: отчет с verdict (`pass`, `concerns` или `blocked`) в чате; сохраняется в `.draftspec/plans/<slug>/verify.md` по запросу.
 Stop if: slug неоднозначен, tasks.md отсутствует, или verdict потребовал бы выдумывать факты о реализации.
 
@@ -21,14 +25,14 @@ Stop if: slug неоднозначен, tasks.md отсутствует, или 
 
 ## Load If Present
 
-Читайте это только когда нужно подтвердить конкретный вывод:
+Читайте когда конкретная проверка ссылается на содержимое этих файлов (например, задача заявляет выполнение `AC-*`, или `DEC-*` ограничивает форму реализации):
 
-- `.draftspec/specs/<slug>/summary.md` если присутствует; иначе `.draftspec/specs/<slug>/spec.md`
-- `.draftspec/plans/<slug>/plan.md`
-- `.draftspec/plans/<slug>/data-model.md`
-- `.draftspec/plans/<slug>/contracts/`
-- `.draftspec/plans/<slug>/research.md` только если файл существует и текущая проверка зависит от зафиксированного trade-off или внешней зависимости
-- только те code files, которые действительно нужны, чтобы подтвердить, была ли задача или acceptance claim реализована
+- `.draftspec/specs/<slug>/summary.md` (или `spec.md`) — при проверке acceptance coverage или выравнивания task↔AC
+- `.draftspec/plans/<slug>/plan.md` — когда задача ссылается на `DEC-*` или архитектурное решение, требующее подтверждения
+- `.draftspec/plans/<slug>/data-model.md` — когда задача затрагивает persisted state или форму сущности
+- `.draftspec/plans/<slug>/contracts/` — когда задача затрагивает API или event boundaries
+- `.draftspec/plans/<slug>/research.md` — только если проверка зависит от зафиксированного trade-off или finding по внешней зависимости
+- code files — только конкретные файлы из `Touches:` задачи, нужные для подтверждения реализации
 
 ## Do Not Read By Default
 
@@ -61,7 +65,13 @@ Stop if: slug неоднозначен, tasks.md отсутствует, или 
 - Если `tasks.md` использует task IDs вроде `T1.1`, ссылайтесь на них напрямую в checks, findings и выводах.
 - Если evidence частичны, но явного противоречия нет, предпочитайте `concerns`, а не `pass`.
 - Держите verification структурным и cheap-by-default.
-- Углубляйтесь в более широкий implementation review только если пользователь явно об этом просит или если конкретное противоречие нельзя разрешить по `tasks`, plan artifacts и сфокусированным evidence.
+- Когда `--deep` присутствует в `$ARGUMENTS`, переключитесь в режим полной валидации:
+  - Читайте все plan artifacts (`plan.md`, `data-model.md`, `contracts/`, `research.md`).
+  - Для каждой завершённой задачи читайте реальные файлы реализации из `Touches:` и подтверждайте, что работа соответствует описанию задачи.
+  - Для каждого `AC-*` проследите по коду, что acceptance criterion выполнен с конкретными evidence.
+  - Секция `## Scope` должна указывать `mode: deep` и перечислять все проверенные surfaces.
+  - Секция `## Not Verified` должна быть минимальной или `none` — deep режим предполагает тщательность.
+- Без `--deep` углубляйтесь в более широкий implementation review только если конкретное противоречие нельзя разрешить по `tasks`, plan artifacts и сфокусированным evidence.
 - Используйте простой verdict: `pass`, `concerns` или `blocked`.
 - Используйте `pass`, если блокирующих проблем нет и остаются только незначительные предупреждения или их нет совсем.
 - Используйте `concerns`, если по workflow можно двигаться дальше, но warnings или открытые вопросы желательно закрыть в ближайшее время.

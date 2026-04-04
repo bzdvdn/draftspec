@@ -78,3 +78,7 @@ Describe the implementation shape for this feature without restating the full sp
 - Automated tests to add or update
 - Targeted manual checks, review evidence, or operational checks to run
 - Acceptance IDs and decision IDs that each validation step proves
+
+## Constitution Compliance
+
+- no conflicts | list specific conflicts with constitution sections and how the plan resolves or defers them

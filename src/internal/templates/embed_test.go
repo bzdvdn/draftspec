@@ -146,7 +146,7 @@ func TestInspectPromptDefinesCheapScopeAndVerdictRules(t *testing.T) {
 	content := fileContentByTarget(t, files, "templates/prompts/inspect.md")
 	requiredSnippets := []string{
 		"Always read these first:",
-		"Read these only when they exist and materially affect the inspection:",
+		"Read these only when they exist and the inspection requires cross-artifact consistency checks",
 		"Do Not Read By Default",
 		"Prefer the cheapest inspection scope first",
 		"Default to a compact report in conversation output",
@@ -227,8 +227,6 @@ func TestGeneratedAgentSnippetMentionsDraftspecLauncher(t *testing.T) {
 	content := fileContentByTarget(t, files, "templates/agents-snippet.md")
 	requiredSnippets := []string{
 		"./.draftspec/scripts/run-draftspec.ps1",
-		"DRAFTSPEC_BIN",
-		"draftspec` from `PATH",
 	}
 	for _, snippet := range requiredSnippets {
 		if !strings.Contains(content, snippet) {

@@ -21,10 +21,10 @@ Always read these first:
 
 ## Load If Present
 
-Read these only when they exist and materially affect the inspection:
+Read these only when they exist and the inspection requires cross-artifact consistency checks (spec↔plan alignment, acceptance↔task coverage):
 
-- `.draftspec/plans/<slug>/plan.md`
-- `.draftspec/plans/<slug>/tasks.md`
+- `.draftspec/plans/<slug>/plan.md` — read when checking goal alignment, scope expansion, or acceptance coverage at plan level
+- `.draftspec/plans/<slug>/tasks.md` — read when verifying that every `AC-*` is covered by at least one task
 
 ## Do Not Read By Default
 
@@ -32,7 +32,7 @@ Read these only when they exist and materially affect the inspection:
 - `.draftspec/plans/<slug>/contracts/`
 - `.draftspec/plans/<slug>/research.md`
 - broad repository history
-- implementation files unless they are needed to verify a concrete consistency claim
+- implementation files unless a finding names a specific file and the claim cannot be confirmed from spec/plan/tasks alone
 
 ## Stop Conditions
 
@@ -53,7 +53,12 @@ Stop and ask a minimal follow-up question only if:
 - Verify `constitution <-> spec`: the spec must not conflict with explicit constitutional constraints, workflow rules, or language policy.
 - Treat technology names, framework choices, library lists, or version pins in the spec as a `Warning` unless they clearly represent a user requirement, repository constraint, or external compatibility contract.
 - Every acceptance criterion in the spec MUST have an explicit Given/When/Then format. The `Given`, `When`, and `Then` markers remain canonical regardless of the documentation language. Missing G/W/T is an `Error`, not a `Suggestion`.
+- Any `[NEEDS CLARIFICATION: ...]` marker remaining in the spec is an `Error`. These must be resolved before planning can begin.
+- If `## Assumptions` is missing, flag it as a `Warning`. If present, check each assumption for plausibility against the constitution and known repository state — an assumption that contradicts repository reality is an `Error`.
+- If `## Success Criteria` is present, each `SC-*` must have a measurable metric and measurement method. Vague SC entries (e.g., "system should be fast") are a `Warning`.
 - If `tasks.md` exists, verify that every acceptance criterion from the spec is covered by at least one task. An uncovered criterion is an `Error`.
+- If `tasks.md` exists and has task IDs but is missing `## Surface Map`, flag it as a `Warning` — the implement agent needs this section as a batch-read manifest.
+- If `tasks.md` exists and any task line with a task ID is missing a `Touches:` field, flag it as a `Warning` — tasks without `Touches:` force the implement agent into exploratory reads.
 - If `tasks.md` uses task IDs such as `T1.1`, prefer traceability statements that reference those task IDs directly.
 - Prefer the cheapest inspection scope first: `constitution.md` and `spec.md`, then `plan.md`, then `tasks.md`, and only then deeper plan artifacts when a concrete claim requires them.
 - If no `plan.md` exists, do not widen the inspection into optional plan artifacts or implementation code.
@@ -67,6 +72,7 @@ Stop and ask a minimal follow-up question only if:
 - Check `Scope Expansion`: the plan must not introduce major new workstreams, components, or integration surfaces that are outside the spec.
 - Check `Acceptance Coverage at Plan Level`: major acceptance-critical behavior from the spec should be reflected in the plan intent, even before tasks exist.
 - Check `Constitution Consistency`: the plan must not violate constitutional rules or architectural constraints.
+- If `plan.md` exists and is missing `## Constitution Compliance`, flag it as a `Warning` — this section makes constitution adherence explicit and reviewable.
 - Check `Artifact Justification`: if the plan introduces `data-model.md` or `contracts/`, the need for those artifacts should be justified by the spec.
 - Do not turn this into a broad design review. Prefer catching obvious drift over scoring architecture quality.
 - Keep the inspection report in the project's configured documentation language when writing it to disk.

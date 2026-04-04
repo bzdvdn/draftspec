@@ -27,10 +27,10 @@ Default (no flag): challenge whatever is present — spec, inspect report, and p
 
 ## Load If Present
 
-Read these only when relevant to the target flag or when the default mode applies:
+Read based on the active flag:
 
-- `.draftspec/specs/<slug>/inspect.md`
-- `.draftspec/plans/<slug>/plan.md`
+- `.draftspec/specs/<slug>/inspect.md` — read in default mode or `--spec` mode (skip in `--plan` mode)
+- `.draftspec/plans/<slug>/plan.md` — read in default mode or `--plan` mode (skip in `--spec` mode)
 
 ## Do Not Read By Default
 

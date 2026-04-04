@@ -5,9 +5,32 @@ All notable changes to this project will be documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v0.2.0]
+## [Unreleased]
+
+### Changed
+
+- `/draftspec.archive` now uses **move-based** archiving by default — active files (`specs/<slug>/` and `plans/<slug>/`) are deleted after copying to `.draftspec/archive/`; pass `--copy` to keep originals in place (useful for `deferred` features)
+- `/draftspec.recap` now shows **recently archived** features (last 7 days) with status, date, and reason — gives new sessions context about what was recently completed or deferred
+- All `## Load If Present` sections now use **concrete trigger conditions** instead of vague "when needed" / "when relevant" — each artifact lists the specific signal that justifies reading it (e.g., "when a task references a `DEC-*`", "when verifying `AC-*` coverage")
+- Compressed verbose sections: `constitution.md` Repository Evidence (14→4 lines), `implement.md` Read Discipline (16→6 lines), `plan.md` and `tasks.md` Content Quality Rules (deduplicated negative examples)
+- `/draftspec.handoff` Load If Present now uses phase-aware triggers — each artifact specifies which handoff section it populates and at which phase it becomes relevant
+- `/draftspec.spec` Content Quality Rules now include **positive examples** alongside negative ones for `## Requirements` and `## Edge Cases` — shows the concrete quality bar instead of only warning about bad patterns
+- `/draftspec.tasks` `Touches:` field is now **MUST** (was SHOULD) — a task without `Touches:` forces the implement agent into exploratory reads; module-level names allowed only when the exact file cannot be determined yet
+- `/draftspec.tasks` `## Surface Map` section is now **MUST** before the first phase — serves as the implement agent's batch-read manifest; without it the agent must scan every task line to build the read list
+- `/draftspec.plan` now requires **`## Constitution Compliance`** section — explicit `no conflicts` or list of specific conflicts with constitution sections and how the plan resolves them; makes adherence reviewable instead of implicit
+- `agents-snippet.md` compressed **~55%** (~1000 → ~450 tokens) — removed per-phase read hints, detailed optional command descriptions, and separate discipline sections that duplicate per-prompt rules; snippet now serves as a concise project map, not a second copy of prompt instructions
 
 ### Added
+
+- Spec template: mandatory `## Assumptions` section — records environmental assumptions, reasonable defaults, and system dependencies explicitly so inspect can catch wrong ones early
+- Spec template: optional `## Success Criteria` with `SC-*` IDs — measurable performance/reliability/UX targets separate from behavioral `AC-*` criteria; omit for purely behavioral features
+- Spec template and prompt: `[NEEDS CLARIFICATION: ...]` inline markers — flag unclear requirements or AC details directly where they appear instead of only in `## Open Questions`; inspect treats remaining markers as `Error` blocking planning
+- Inspect prompt: checks for `[NEEDS CLARIFICATION]` markers (Error), missing `## Assumptions` (Warning), assumption plausibility against constitution/repo (Error if contradicted), and vague `SC-*` entries (Warning)
+- `/draftspec.archive --restore`: reverse a previous archive — restores the latest snapshot back into active `specs/` and `plans/`, removes the archive entry, and suggests `/draftspec.inspect` as the next step; stops if active files already exist to prevent overwriting
+- `/draftspec.verify --deep`: full implementation validation mode — reads all plan artifacts and traces every completed task and `AC-*` through actual code; default mode remains structural and cheap; deep mode produces comprehensive per-AC evidence report
+- `/draftspec.plan --update`: targeted edit mode — update a specific section, `DEC-*`, implementation surface, or add a contract without rewriting the entire plan package; does not invalidate downstream `tasks.md` unless the change materially affects task decomposition
+
+## [v0.2.0] 2026-04-02
 
 - `draftspec check --all [path]`: aggregate readiness table across all features; exits with code 1 when any feature is blocked; supports `--json`
 - `draftspec export <slug> [path]`: bundles all artifacts for one feature (spec, inspect report, plan, tasks, data model, research, challenge, verify) into a single markdown document; use `--output` to write to a file

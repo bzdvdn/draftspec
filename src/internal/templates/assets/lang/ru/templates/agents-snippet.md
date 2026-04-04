@@ -1,57 +1,23 @@
 ## Draftspec
 
-Основной контекст проекта хранится в `.draftspec/`.
+Основной контекст проекта — `.draftspec/`. Языки: docs=[DOCS_LANGUAGE], agent=[AGENT_LANGUAGE], comments=[COMMENTS_LANGUAGE]
 
-Предпочтительные языки:
-- Документация: [DOCS_LANGUAGE]
-- Агент: [AGENT_LANGUAGE]
-- Комментарии в коде: [COMMENTS_LANGUAGE]
-
-Workflow-команды:
-- `/draftspec.constitution`: patch-обновить `.draftspec/constitution.md`
-- `/draftspec.spec`: создать или уточнить один файл `.draftspec/specs/<slug>/spec.md` и работать из `feature/<slug>`
-- `/draftspec.inspect`: проанализировать одну фичу на согласованность и качество до или после планирования
-- `/draftspec.plan`: создать или обновить `.draftspec/plans/<slug>/plan.md`, `data-model.md` и `contracts/`
+Цепочка workflow: `constitution → spec → inspect → plan → tasks → implement → verify → archive`
+- `/draftspec.constitution`: создать или обновить `.draftspec/constitution.md`
+- `/draftspec.spec`: создать или уточнить `.draftspec/specs/<slug>/spec.md`; `--amend` для точечных правок
+- `/draftspec.inspect`: проверить одну фичу на согласованность и качество
+- `/draftspec.plan`: создать или обновить `.draftspec/plans/<slug>/`; `--update` для точечных правок, `--research` для research-first
 - `/draftspec.tasks`: создать или обновить `.draftspec/plans/<slug>/tasks.md`
-- `/draftspec.implement`: выполнить незавершенные задачи
-- `/draftspec.verify`: проверить один реализованный feature package перед archive
-- `/draftspec.archive`: архивировать один feature package в `.draftspec/archive/`
+- `/draftspec.implement`: выполнить незавершённые задачи из `tasks.md`
+- `/draftspec.verify`: проверить один feature package; `--deep` для полной per-AC валидации по коду
+- `/draftspec.archive`: архивировать в `.draftspec/archive/` (move-based); `--copy` оставляет оригиналы, `--restore` восстанавливает
 
-Опциональные команды (вызываются в любой момент, вне обязательной цепочки):
-- `/draftspec.challenge`: адверсариальная проверка спека или плана — находит слабые допущения, проблемы со scope и логические дыры до реализации; `--spec` или `--plan` сужают цель
-- `/draftspec.handoff`: сгенерировать компактный документ передачи сессии — фиксирует текущую фазу, открытую работу, ключевые решения и следующую команду, чтобы новая сессия могла продолжить без повторного чтения всего
-- `/draftspec.hotfix`: экстренное исправление вне стандартной цепочки фаз — для понятных исправлений с определенной причиной, затрагивающих ≤ 3 файла; пишет минимальный спек, реализует исправление, проверяет inline и готовит к archive
-- `/draftspec.scope`: быстрая проверка границ scope — отвечает, остаются ли текущий план или задачи в границах спека; `--plan` или `--tasks` сужают цель; файл не создаётся
-- `/draftspec.recap`: обзор проекта — перечисляет все активные фичи с текущей фазой и вердиктом inspect; slug не нужен; файл не создаётся; полезно в начале новой сессии
+Опциональные (в любой момент): `/draftspec.challenge` (адверсариальная проверка; `--spec`/`--plan`), `/draftspec.handoff` (передача сессии), `/draftspec.hotfix` (экстренное исправление ≤ 3 файлов), `/draftspec.scope` (проверка границ; `--plan`/`--tasks`), `/draftspec.recap` (обзор проекта)
 
 Дисциплина чтения:
-- Следуйте цепочке `constitution -> spec -> inspect -> plan -> tasks -> implement -> verify -> archive`
-- Не пропускайте prerequisites
-- По умолчанию загружайте только текущий feature slug
-- Предпочитайте readiness scripts каждой фазы перед чтением более глубоких артефактов
-- Когда нужен сам Draftspec CLI, предпочитайте `./.draftspec/scripts/run-draftspec.sh`; этот launcher сначала проверяет `DRAFTSPEC_BIN`, а затем `draftspec` из `PATH`
-- Сохраняйте обязательный inspect report в `.draftspec/specs/<slug>/inspect.md` до начала planning
-- `/draftspec.spec` поддерживает `--name`, optional `--slug` и optional `--branch`; для chat-based ввода описание фичи может прийти следующим сообщением
-- Для file-based входа в `/draftspec.spec` предпочитайте `name:` и опциональный `slug:` в начале файла, а не fallback на filename
-- Разрешайте явный `--branch <name>` override для repository-specific branch naming conventions, например Jira keys
-- В `tasks` начинайте с `plan.md` и грузите более глубокие артефакты только при необходимости
-- В `implement` начинайте с `tasks.md` и грузите более глубокие артефакты только при необходимости
+- Не пропускайте фазы; по умолчанию загружайте только текущий feature slug
+- Предпочитайте readiness scripts перед чтением более глубоких артефактов; для CLI используйте `./.draftspec/scripts/run-draftspec.sh`
+- Не загружайте: нерелевантные specs/plans, широкие сканы репозитория, исходники scripts, файлы уже прочитанные в сессии (если сами не редактировали)
+- Используйте настроенный язык комментариев для нового/изменяемого кода; сохраняйте существующие соглашения файла
 
-Никогда не загружайте по умолчанию:
-- нерелевантные спецификации или plan packages
-- широкие сканы репозитория
-- исходники scripts (используйте readiness scripts)
-- файл, который уже был прочитан в текущей сессии, если только вы его сами не редактировали
-
-Дисциплина языка реализации:
-- Считайте настроенный язык комментариев в коде основным для новых или изменяемых комментариев
-- Сохраняйте устойчивое локальное соглашение файла, если редактируете комментарии в уже существующем коде
-- Не смешивайте языки комментариев в одной локальной области кода без сильной причины
-
-Перед значимыми изменениями:
-- Просмотреть `.draftspec/constitution.md`
-- Изучить релевантный `.draftspec/specs/<slug>/spec.md`
-- Изучить релевантный feature package в `.draftspec/plans/<slug>/`, если он есть
-
-После значимых решений или изменений:
-- Поддерживать согласованность спецификаций, планов, задач, archive state и реализации
+Перед значимыми изменениями: просмотрите `constitution.md`, релевантный `specs/<slug>/spec.md` и `plans/<slug>/` если есть. После изменений: поддерживайте согласованность specs, plans, tasks и реализации.

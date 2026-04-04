@@ -21,10 +21,10 @@ Stop if: slug неоднозначен, spec отсутствует, или от
 
 ## Load If Present
 
-Читайте это только если файл существует и реально влияет на проверку:
+Читайте только если файл существует и inspect требует cross-artifact consistency checks (выравнивание spec↔plan, покрытие acceptance↔tasks):
 
-- `.draftspec/plans/<slug>/plan.md`
-- `.draftspec/plans/<slug>/tasks.md`
+- `.draftspec/plans/<slug>/plan.md` — читать при проверке goal alignment, scope expansion или acceptance coverage на уровне плана
+- `.draftspec/plans/<slug>/tasks.md` — читать при проверке, что каждый `AC-*` покрыт хотя бы одной задачей
 
 ## Do Not Read By Default
 
@@ -32,7 +32,7 @@ Stop if: slug неоднозначен, spec отсутствует, или от
 - `.draftspec/plans/<slug>/contracts/`
 - `.draftspec/plans/<slug>/research.md`
 - широкую историю репозитория
-- implementation-файлы, если они не нужны для подтверждения конкретного вывода по согласованности
+- implementation-файлы, если только finding не ссылается на конкретный файл и вывод нельзя подтвердить из spec/plan/tasks
 
 ## Stop Conditions
 
@@ -53,7 +53,12 @@ Stop if: slug неоднозначен, spec отсутствует, или от
 - Проверяйте `constitution <-> spec`: спецификация не должна противоречить явным ограничениям конституции, workflow-правилам или language policy.
 - Считайте technology names, framework choices, library lists или version pins в спецификации `Warning`, если они явно не выглядят как user requirement, repository constraint или внешний compatibility contract.
 - Каждый критерий приемки в спецификации ДОЛЖЕН иметь явный формат Given/When/Then. Маркеры `Given`, `When`, `Then` остаются каноническими независимо от языка документации. Отсутствие G/W/T — `Error`, а не `Suggestion`.
+- Любой оставшийся маркер `[NEEDS CLARIFICATION: ...]` в spec — это `Error`. Они должны быть закрыты до начала planning.
+- Если `## Assumptions` / `## Допущения` отсутствует, это `Warning`. Если присутствует, проверяйте каждое допущение на правдоподобность по конституции и известному состоянию репозитория — допущение, противоречащее реальности репозитория, это `Error`.
+- Если `## Success Criteria` / `## Критерии успеха` присутствует, каждый `SC-*` должен иметь измеримую метрику и метод измерения. Размытые SC (напр., «система должна быть быстрой») — `Warning`.
 - Если `tasks.md` существует, проверяйте, что каждый критерий приемки из spec покрыт хотя бы одной задачей. Непокрытый критерий — `Error`.
+- Если `tasks.md` существует, содержит task IDs, но не имеет `## Surface Map` — это `Warning`: implement-агенту нужна эта секция как манифест batch-чтения.
+- Если `tasks.md` существует и любая строка задачи с task ID не содержит поле `Touches:` — это `Warning`: задачи без `Touches:` вынуждают implement-агента к exploratory reads.
 - Если `tasks.md` использует task IDs вроде `T1.1`, предпочитайте traceability-формулировки с прямыми ссылками на эти task IDs.
 - Предпочитайте самый дешевый inspection scope: `constitution.md` и `spec.md`, затем `plan.md`, затем `tasks.md`, и только после этого более глубокие plan artifacts, если они нужны для подтверждения конкретного вывода.
 - Если `plan.md` отсутствует, не расширяйте проверку на optional plan artifacts или implementation code.
@@ -67,6 +72,7 @@ Stop if: slug неоднозначен, spec отсутствует, или от
 - Проверяйте `Scope Expansion`: plan не должен вводить крупные новые workstreams, компоненты или integration surfaces, которых нет в spec.
 - Проверяйте `Acceptance Coverage at Plan Level`: major acceptance-critical behavior из spec должно быть отражено в намерении плана, даже до появления tasks.
 - Проверяйте `Constitution Consistency`: plan не должен нарушать правила конституции или архитектурные ограничения.
+- Если `plan.md` существует и не содержит `## Соответствие конституции` / `## Constitution Compliance` — это `Warning`: эта секция делает соответствие конституции явным и проверяемым.
 - Проверяйте `Artifact Justification`: если plan вводит `data-model.md` или `contracts/`, необходимость этих артефактов должна быть оправдана spec.
 - Не превращайте это в широкий design review. Предпочитайте ловить явный drift, а не оценивать качество архитектуры целиком.
 - Если записываете отчет в файл, держите его на настроенном языке документации проекта.
