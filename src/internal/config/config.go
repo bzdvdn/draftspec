@@ -70,6 +70,11 @@ type Config struct {
 	Agents    Agents    `yaml:"agents"`
 	Templates Templates `yaml:"templates"`
 	Scripts   Scripts   `yaml:"scripts"`
+	Workflow  Workflow  `yaml:"workflow,omitempty"`
+}
+
+type Workflow struct {
+	Schema string `yaml:"schema,omitempty"`
 }
 
 type Project struct {

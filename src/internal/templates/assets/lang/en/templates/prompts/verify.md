@@ -60,6 +60,8 @@ Stop and ask for clarification only if:
 - Prefer confirming concrete implementation claims over broad subjective review.
 - Treat verify as an evidence log, not a reassurance ritual.
 - Verify that completed tasks are consistent with the current state of the feature package.
+- **Traceability Evidence**: Use `/.draftspec/scripts/trace.* <slug>` to scan for `@ds-task` and `@ds-test` annotations in the code. Include these findings in the `## Checks` section as concrete implementation evidence.
+- **Legacy Fallback**: If `trace` returns no findings (e.g., for older features without annotations), you MUST proceed with manual inspection of the implementation files listed in `Touches:` and run relevant tests to confirm the implementation claims. Note the lack of annotations as a minor warning in the report.
 - Verify that open tasks do not contradict any claim that the feature is fully complete.
 - Verify acceptance-to-task coverage consistency when `tasks.md` includes an `Acceptance Coverage` section.
 - When `tasks.md` uses task IDs such as `T1.1`, reference those IDs directly in checks, findings, and conclusions.

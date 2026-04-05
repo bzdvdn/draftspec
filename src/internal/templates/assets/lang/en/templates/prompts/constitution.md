@@ -6,7 +6,19 @@ You are creating or updating `.draftspec/constitution.md` for this project.
 
 Produce a strict project constitution that is authoritative for both humans and development agents.
 
+For a **greenfield project** (from scratch), focus on establishing immutable architectural boundaries, selecting the technology stack, and defining quality standards that will serve as the basis for the subsequent "Foundation" design.
+
 For an existing codebase, formalize the project's observable reality first, then separately codify any new mandatory rules explicitly requested by the user.
+
+## Greenfield mode
+
+When starting a project from scratch:
+
+- codify the selected technology stack (language, frameworks, database)
+- define core architectural patterns (e.g., Clean Architecture, Hexagonal)
+- establish naming conventions and directory structure
+- define dependency management and external integration rules
+- lay the groundwork for the first design artifact — `foundation.md`
 
 ## Brownfield mode
 
@@ -64,6 +76,8 @@ If the constitution is already current and does not conflict with the request, s
   - `## Purpose`
   - `## Core Principles`
   - `## Constraints`
+  - `## Tech Stack`
+  - `## Core Architecture`
   - `## Decision Priorities`
   - `## Key Quality Dimensions`
   - `## Language Policy`
@@ -73,7 +87,10 @@ If the constitution is already current and does not conflict with the request, s
   - `## Last Updated`
 - Ensure there are at least 5 principle subsections under `## Core Principles` using `### Principle Name` headings.
 - You may add extra sections when they materially improve project governance.
-- Replace placeholder tokens like `[PROJECT_NAME]` or `[PRINCIPLE_1_NAME]` with concrete text.
+- Replace placeholder tokens like `[PROJECT_NAME]`, `[TECH_STACK]`, or `[ARCHITECTURE]` with concrete text.
+- When the `--foundation` flag is used (or when designing from scratch), pay special attention to filling the `## Tech Stack` and `## Core Architecture` sections. These sections should describe:
+  - Selected languages, frameworks, databases, and infrastructure.
+  - Structural patterns, data flows, and directory organization.
 - For a brownfield project, codify what the codebase already demonstrates before introducing new mandatory norms.
 - If the user explicitly requests new development rules, encode them in `## Development Workflow` and `## Governance` as mandatory rules for future work.
 - The `## Development Workflow` section MUST define how feature branches, specs, inspect, plans, tasks, and implementation relate to constitutional compliance.

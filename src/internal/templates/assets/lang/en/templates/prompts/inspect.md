@@ -48,6 +48,10 @@ Stop and ask a minimal follow-up question only if:
 - If `/.draftspec/scripts/check-inspect-ready.*` is available, prefer it as the cheap first pass before deepening into artifacts.
 - Use `/.draftspec/scripts/inspect-spec.*` only as a fallback when the phase-readiness wrapper is unavailable.
 - Prefer helper script output over reading helper script source.
+- Treat helper script output as the primary structural evidence layer for inspect. When the scripts report concrete `ERROR` / `WARN` findings, use those findings as the starting point for your report instead of re-deriving the same points from scratch.
+- If helper output exposes finding categories such as structure, traceability, ambiguity, consistency, or readiness, preserve that signal in your reasoning. Expand on it only when extra context is genuinely needed.
+- Do not ignore a concrete helper finding just because your broader intuition is optimistic. Resolve or explicitly explain it.
+- Use your own reasoning mainly for what the cheap checks cannot prove directly: constitutional conflicts, invented product intent, unjustified scope expansion, contradictory assumptions, or subtle spec↔plan drift.
 - Do not read `/.draftspec/scripts/*` by default unless you are debugging the script, working on Draftspec itself, or the user explicitly asks to inspect script logic.
 - Inspect spec completeness and clarity.
 - Verify `constitution <-> spec`: the spec must not conflict with explicit constitutional constraints, workflow rules, or language policy.
@@ -77,6 +81,10 @@ Stop and ask a minimal follow-up question only if:
 - Do not turn this into a broad design review. Prefer catching obvious drift over scoring architecture quality.
 - Keep the inspection report in the project's configured documentation language when writing it to disk.
 - Prefer concrete findings over generic advice.
+- Prefer this reporting order:
+  - 1. structural findings from helper output
+  - 2. cross-artifact consistency findings confirmed from the loaded artifacts
+  - 3. narrow judgment calls that require agent reasoning
 - Default to a compact report in conversation output: always include `Verdict`, include `Errors`, `Warnings`, and `Next Step` when non-empty, and include `Questions`, `Suggestions`, or `Traceability` only when they add real signal.
 - Produce the full sectioned report only when the user explicitly asks for a full report or when the report is being persisted to a file.
 - When writing the report to disk, include a machine-readable metadata block at the top with `report_type`, `slug`, `status`, `docs_language`, and `generated_at`.
@@ -101,6 +109,7 @@ Stop and ask a minimal follow-up question only if:
 - For `pass`, name the exact next slash command.
 - For `concerns`, say whether the workflow may continue; if it may, include the exact next slash command.
 - For `blocked`, do not suggest the next phase command; state which refinement is required first.
+- Avoid duplicating the same issue in multiple sections. If helper output already established the concrete problem, keep your wording concise and move on to its consequence or required refinement.
 
 ## Spec Summary Artifact
 
@@ -120,7 +129,7 @@ Keep the summary under 25 lines. It is loaded by `tasks`, `implement`, and `veri
 - Persist to `.draftspec/specs/<slug>/inspect.md` and write `.draftspec/specs/<slug>/summary.md`
 - Summarize verdict in the conversation; prefer compact report with only non-empty sections.
 - End with a summary block: `Slug`, `Status`, `Artifacts`, `Blockers`, `Next command`
-- When ready: `Next command: /draftspec.plan <slug>` (or `/draftspec.tasks <slug>` when plan already exists)
+- When ready: `Next command: /draftspec.plan <slug>` (or `/draftspec.tasks <slug>` when plan already exists; after archive you MAY mention `/draftspec.recap` as an optional summary but don’t advertise it as required)
 
 ## Self-Check
 

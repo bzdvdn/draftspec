@@ -9,6 +9,8 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- `inspect` helper flow now treats readiness/script output as the primary structural evidence layer: categorized findings (`structure`, `traceability`, `ambiguity`, `consistency`, `readiness`) are surfaced in `draftspec check`, `draftspec feature`, and inspect prompts so agents deepen findings instead of re-deriving them
+- phase readiness checks now emit structured findings for ambiguity and acceptance/task traceability; implement readiness also warns when plan implementation surfaces drift from `tasks.md` `Surface Map` or `Touches:` references
 - `/draftspec.archive` now uses **move-based** archiving by default — active files (`specs/<slug>/` and `plans/<slug>/`) are deleted after copying to `.draftspec/archive/`; pass `--copy` to keep originals in place (useful for `deferred` features)
 - `/draftspec.recap` now shows **recently archived** features (last 7 days) with status, date, and reason — gives new sessions context about what was recently completed or deferred
 - All `## Load If Present` sections now use **concrete trigger conditions** instead of vague "when needed" / "when relevant" — each artifact lists the specific signal that justifies reading it (e.g., "when a task references a `DEC-*`", "when verifying `AC-*` coverage")
@@ -25,7 +27,17 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Spec template: mandatory `## Assumptions` section — records environmental assumptions, reasonable defaults, and system dependencies explicitly so inspect can catch wrong ones early
 - Spec template: optional `## Success Criteria` with `SC-*` IDs — measurable performance/reliability/UX targets separate from behavioral `AC-*` criteria; omit for purely behavioral features
 - Spec template and prompt: `[NEEDS CLARIFICATION: ...]` inline markers — flag unclear requirements or AC details directly where they appear instead of only in `## Open Questions`; inspect treats remaining markers as `Error` blocking planning
-- Inspect prompt: checks for `[NEEDS CLARIFICATION]` markers (Error), missing `## Assumptions` (Warning), assumption plausibility against constitution/repo (Error if contradicted), and vague `SC-*` entries (Warning)
+- `inspect` prompt: checks for `[NEEDS CLARIFICATION]` markers (Error), missing `## Assumptions` (Warning), assumption plausibility against constitution/repo (Error if contradicted), and vague `SC-*` entries (Warning)
+- `research.md` template: mandatory `## Goal`, `## Research Questions`, `## Exploration Areas`, and `## Recommendations` sections — provides a structured way to record discovery and architecture trade-offs
+- `draftspec trace <slug> [path]`: scan for `@ds-task` and `@ds-test` annotations in code — provides verifiable traceability between requirements, tasks, and implementation (including test evidence)
+- `.draftspec/scripts/trace.*`: new helper script for agents to run traceability checks without direct CLI dependency
+- `draftspec trace --tests`: new flag to filter only test-related annotations (`@ds-test`)
+- `Verify Evidence`: the `verify` prompt now instructs agents to use `draftspec trace` as primary implementation evidence; includes a `Legacy Fallback` strategy for features without annotations (manual inspection of `Touches:` files)
+- `draftspec dashboard [path]`: visual dashboard of all active features, their progress, status, and Git branch alignment
+- `Lazy Decomposition`: `tasks` prompt now discourages micro-tasks (1-5 lines) during initial decomposition to save tokens; `implement` prompt now allows `In-place Decomposition` (indented sub-tasks like `T1.1.1`) for the active task only
+- `Decomposition Guardrails`: implementation agents are forbidden from adding new implementation surfaces (`Touches:`) or changing `AC-*` mapping during in-place decomposition
+- `Smart Branching`: `doctor`, `check`, and `dashboard` now warn when the current Git branch does not match the feature slug (expected `feature/<slug>`)
+- `doctor` now includes traceability and branching checks: warns about orphaned `@ds-task` annotations and invalid `AC-*` references, plus non-standard branch names
 - `/draftspec.archive --restore`: reverse a previous archive — restores the latest snapshot back into active `specs/` and `plans/`, removes the archive entry, and suggests `/draftspec.inspect` as the next step; stops if active files already exist to prevent overwriting
 - `/draftspec.verify --deep`: full implementation validation mode — reads all plan artifacts and traces every completed task and `AC-*` through actual code; default mode remains structural and cheap; deep mode produces comprehensive per-AC evidence report
 - `/draftspec.plan --update`: targeted edit mode — update a specific section, `DEC-*`, implementation surface, or add a contract without rewriting the entire plan package; does not invalidate downstream `tasks.md` unless the change materially affects task decomposition

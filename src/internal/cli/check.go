@@ -10,12 +10,14 @@ import (
 )
 
 type checkResult struct {
-	Slug        string         `json:"slug"`
-	Phase       string         `json:"phase"`
-	Verdict     string         `json:"verdict"`
-	NextCommand string         `json:"next_command,omitempty"`
-	Blocked     bool           `json:"blocked"`
-	Artifacts   checkArtifacts `json:"artifacts"`
+	Slug          string                  `json:"slug"`
+	Phase         string                  `json:"phase"`
+	Verdict       string                  `json:"verdict"`
+	NextCommand   string                  `json:"next_command,omitempty"`
+	Blocked       bool                    `json:"blocked"`
+	Artifacts     checkArtifacts          `json:"artifacts"`
+	CheckSummary  *checkFindingSummary    `json:"check_summary,omitempty"`
+	CheckFindings []workflow.CheckFinding `json:"check_findings,omitempty"`
 }
 
 type checkArtifacts struct {
@@ -34,6 +36,13 @@ type checkArtifact struct {
 type checkAllResult struct {
 	Blocked  bool          `json:"blocked"`
 	Features []checkResult `json:"features"`
+}
+
+type checkFindingSummary struct {
+	Errors            int            `json:"errors"`
+	Warnings          int            `json:"warnings"`
+	ErrorCategories   map[string]int `json:"error_categories,omitempty"`
+	WarningCategories map[string]int `json:"warning_categories,omitempty"`
 }
 
 func newCheckCmd() *cobra.Command {
@@ -75,7 +84,10 @@ func newCheckCmd() *cobra.Command {
 				return err
 			}
 
-			result := buildCheckResult(state)
+			result, err := buildCheckResult(root, state)
+			if err != nil {
+				return err
+			}
 
 			if jsonOutput {
 				payload, err := json.MarshalIndent(result, "", "  ")
@@ -111,7 +123,10 @@ func runCheckAll(cmd *cobra.Command, root string, jsonOutput bool) error {
 	results := make([]checkResult, 0, len(states))
 	anyBlocked := false
 	for _, state := range states {
-		r := buildCheckResult(state)
+		r, err := buildCheckResult(root, state)
+		if err != nil {
+			return err
+		}
 		results = append(results, r)
 		if r.Blocked {
 			anyBlocked = true
@@ -137,7 +152,7 @@ func runCheckAll(cmd *cobra.Command, root string, jsonOutput bool) error {
 	return nil
 }
 
-func buildCheckResult(state workflow.FeatureState) checkResult {
+func buildCheckResult(root string, state workflow.FeatureState) (checkResult, error) {
 	result := checkResult{
 		Slug:    state.Slug,
 		Phase:   state.Phase,
@@ -170,7 +185,19 @@ func buildCheckResult(state workflow.FeatureState) checkResult {
 	}
 
 	result.NextCommand = nextCommand(state)
-	return result
+
+	phaseResult, err := phaseCheckResult(root, state)
+	if err != nil {
+		return checkResult{}, err
+	}
+	if len(phaseResult.Findings) > 0 {
+		result.CheckFindings = phaseResult.Findings
+	}
+	if summary := summarizeCheckFindings(phaseResult.Findings); summary != nil {
+		result.CheckSummary = summary
+	}
+
+	return result, nil
 }
 
 func nextCommand(state workflow.FeatureState) string {
@@ -216,6 +243,13 @@ func printCheck(cmd *cobra.Command, state workflow.FeatureState, result checkRes
 	fmt.Fprintf(w, "  tasks     %s\n", artifactLine(state.TasksExists, tasksDetail))
 	fmt.Fprintf(w, "  verify    %s\n", artifactLine(state.VerifyExists, state.VerifyStatus))
 
+	if state.BranchMismatch {
+		fmt.Fprintln(w)
+		fmt.Fprintf(w, "warning:  branch mismatch\n")
+		fmt.Fprintf(w, "          current:  %s\n", state.CurrentBranch)
+		fmt.Fprintf(w, "          expected: feature/%s\n", state.Slug)
+	}
+
 	fmt.Fprintln(w)
 
 	if state.Blocked {
@@ -226,6 +260,16 @@ func printCheck(cmd *cobra.Command, state workflow.FeatureState, result checkRes
 
 	if result.NextCommand != "" {
 		fmt.Fprintf(w, "next:     %s\n", result.NextCommand)
+	}
+
+	if result.CheckSummary != nil && (result.CheckSummary.Errors > 0 || result.CheckSummary.Warnings > 0) {
+		fmt.Fprintf(w, "checks:   %s\n", renderCheckSummary(*result.CheckSummary))
+	}
+
+	if len(result.CheckFindings) > 0 {
+		for _, line := range topFindingLines(result.CheckFindings, 3) {
+			fmt.Fprintf(w, "detail:   %s\n", line)
+		}
 	}
 
 	if state.InspectLegacy {
@@ -291,4 +335,113 @@ func printCheckAll(cmd *cobra.Command, states []workflow.FeatureState, results [
 	} else {
 		fmt.Fprintf(w, "verdict:  all %d features ready\n", len(results))
 	}
+}
+
+func phaseCheckResult(root string, state workflow.FeatureState) (workflow.CheckResult, error) {
+	switch state.ReadyFor {
+	case "inspect":
+		return workflow.CheckInspectReady(root, state.Slug)
+	case "plan":
+		return workflow.CheckPlanReady(root, state.Slug)
+	case "tasks":
+		return workflow.CheckTasksReady(root, state.Slug)
+	case "implement":
+		return workflow.CheckImplementReady(root, state.Slug)
+	case "verify":
+		return workflow.CheckVerifyReady(root, state.Slug)
+	default:
+		return workflow.CheckResult{}, nil
+	}
+}
+
+func summarizeCheckFindings(findings []workflow.CheckFinding) *checkFindingSummary {
+	if len(findings) == 0 {
+		return nil
+	}
+
+	summary := &checkFindingSummary{
+		ErrorCategories:   map[string]int{},
+		WarningCategories: map[string]int{},
+	}
+	for _, finding := range findings {
+		switch finding.Severity {
+		case workflow.SeverityError:
+			summary.Errors++
+			summary.ErrorCategories[string(finding.Category)]++
+		case workflow.SeverityWarning:
+			summary.Warnings++
+			summary.WarningCategories[string(finding.Category)]++
+		}
+	}
+	if summary.Errors == 0 && summary.Warnings == 0 {
+		return nil
+	}
+	if len(summary.ErrorCategories) == 0 {
+		summary.ErrorCategories = nil
+	}
+	if len(summary.WarningCategories) == 0 {
+		summary.WarningCategories = nil
+	}
+	return summary
+}
+
+func renderCheckSummary(summary checkFindingSummary) string {
+	parts := make([]string, 0, 2)
+	if summary.Errors > 0 {
+		parts = append(parts, fmt.Sprintf("errors=%d", summary.Errors))
+	}
+	if summary.Warnings > 0 {
+		parts = append(parts, fmt.Sprintf("warnings=%d", summary.Warnings))
+	}
+	if cats := renderCategoryCounts(summary.ErrorCategories); cats != "" {
+		parts = append(parts, "error_categories="+cats)
+	}
+	if cats := renderCategoryCounts(summary.WarningCategories); cats != "" {
+		parts = append(parts, "warning_categories="+cats)
+	}
+	return strings.Join(parts, "  ")
+}
+
+func renderCategoryCounts(counts map[string]int) string {
+	if len(counts) == 0 {
+		return ""
+	}
+	order := []string{"structure", "traceability", "ambiguity", "consistency", "readiness"}
+	parts := make([]string, 0, len(counts))
+	for _, key := range order {
+		if counts[key] > 0 {
+			parts = append(parts, fmt.Sprintf("%s=%d", key, counts[key]))
+		}
+	}
+	for key, count := range counts {
+		known := false
+		for _, ordered := range order {
+			if key == ordered {
+				known = true
+				break
+			}
+		}
+		if !known {
+			parts = append(parts, fmt.Sprintf("%s=%d", key, count))
+		}
+	}
+	return strings.Join(parts, ",")
+}
+
+func topFindingLines(findings []workflow.CheckFinding, limit int) []string {
+	lines := make([]string, 0, limit)
+	for _, finding := range findings {
+		if finding.Severity != workflow.SeverityError && finding.Severity != workflow.SeverityWarning {
+			continue
+		}
+		line := string(finding.Severity) + " [" + string(finding.Category) + "] " + finding.Message
+		if len(finding.Refs) > 0 {
+			line += " (" + strings.Join(finding.Refs, ", ") + ")"
+		}
+		lines = append(lines, line)
+		if len(lines) == limit {
+			break
+		}
+	}
+	return lines
 }

@@ -97,7 +97,8 @@ Do not jump ahead into implementation.
 ## Content Quality Rules
 
 - Each phase should have a short goal that explains why the phase exists.
-- Prefer a few concrete tasks with measurable outcomes over many tiny bookkeeping items.
+- **Lazy Decomposition**: Prefer a few concrete tasks (5-10 per feature) with measurable outcomes over many tiny bookkeeping items. Do not create "micro-tasks" (1-5 lines of code) during the tasks phase; the implementation agent will refine them in-place if needed.
+- Focus on "milestone" tasks tied to specific files or functional boundaries.
 - Keep the outcome part of each task to ≤ 12 words. If more words are needed, the task is not concrete enough — split it or tighten the verb.
 - When the acceptance proof is simple, embed it directly in the outcome instead of requiring a spec lookup: prefer `add POST /auth/login — returns 200 with JWT token field — AC-001` over `add login handler — endpoint works — AC-001`.
 - Use action verbs tied to observable work: implement, add, migrate, validate, remove, backfill, document.

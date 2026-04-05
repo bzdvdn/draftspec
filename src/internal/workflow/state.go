@@ -10,6 +10,7 @@ import (
 
 	"draftspec/src/internal/config"
 	"draftspec/src/internal/featurepaths"
+	"draftspec/src/internal/gitutil"
 )
 
 type FeatureState struct {
@@ -31,6 +32,8 @@ type FeatureState struct {
 	TasksOpen      int    `json:"tasks_open"`
 	ReadyFor       string `json:"ready_for,omitempty"`
 	Blocked        bool   `json:"blocked"`
+	CurrentBranch  string `json:"current_branch,omitempty"`
+	BranchMismatch bool   `json:"branch_mismatch,omitempty"`
 }
 
 var checkboxPattern = regexp.MustCompile(`^- \[([ x])\]`)
@@ -92,6 +95,18 @@ func State(root, slug string) (FeatureState, error) {
 	state.Archived = archiveExists(archiveSlugDir)
 	state.InspectStatus, _ = reportStatus(state.InspectPath)
 	state.VerifyStatus, _ = reportStatus(state.VerifyPath)
+
+	if branch, err := gitutil.CurrentBranch(root); err == nil {
+		state.CurrentBranch = branch
+		if !state.Archived && state.SpecExists {
+			// Expected branch is feature/<slug>
+			expected := "feature/" + slug
+			if branch != expected && branch != "main" && branch != "master" && !strings.HasPrefix(branch, "hotfix/") {
+				state.BranchMismatch = true
+			}
+		}
+	}
+
 	inferLifecycle(&state)
 
 	return state, nil

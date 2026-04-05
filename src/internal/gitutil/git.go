@@ -57,6 +57,14 @@ func EnsureBranch(root, branch string) (string, error) {
 	return fmt.Sprintf("created and switched to new orphan branch %s", branch), nil
 }
 
+func CurrentBranch(root string) (string, error) {
+	stdout, _, err := run(root, "git", "rev-parse", "--abbrev-ref", "HEAD")
+	if err != nil {
+		return "", err
+	}
+	return strings.TrimSpace(stdout), nil
+}
+
 func branchExists(root, branch string) (bool, error) {
 	_, _, err := run(root, "git", "rev-parse", "--verify", "--quiet", "refs/heads/"+branch)
 	if err == nil {

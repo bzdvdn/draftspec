@@ -77,6 +77,7 @@ Do not broaden scope to solve these problems.
 **Read each file once per session.** Re-read only if the file was changed externally or a task requires verifying state after a non-obvious prior change.
 
 **Session start** (before first task):
+
 1. Run `.draftspec/scripts/check-implement-ready.*` if available.
 2. Read `tasks.md`; use `## Surface Map` as the batch-read manifest — it lists every implementation surface and which tasks touch it. If Surface Map is missing, fall back to collecting `Touches:` fields from in-scope tasks.
 3. Batch-read all surfaces from the manifest in one pass. Execute tasks from pre-loaded context — do not re-open files between tasks.
@@ -94,6 +95,14 @@ Do not broaden scope to solve these problems.
 - If a task cannot be implemented safely from current artifacts, stop and request refinement.
 - If you need to make a non-obvious assumption to proceed (API shape, data format, error handling choice), log it as `[ASSUMPTION: ...]` in your progress output before acting on it. If the assumption significantly affects acceptance scope, stop and ask before proceeding.
 - Mark completed tasks in `tasks.md`.
+- **In-place Decomposition**: If a task `T1.1` is too complex to track as a single unit, you may refine it by adding indented sub-tasks (e.g., `- [ ] T1.1.1 Sub-task`).
+- **Sub-task Guardrails**:
+  - Sub-tasks MUST NOT add new files to the `Touches:` list of the parent task.
+  - Sub-tasks MUST NOT change or expand the `AC-*` mapping of the parent task.
+  - If decomposition reveals that the original `plan.md` is flawed or needs a new implementation surface, you MUST stop and request a plan update or `repair`.
+- **Annotate Code**: Every non-trivial change must include a comment reference to the task ID and the primary Acceptance Criterion (AC) it satisfies.
+  Format: `// @ds-task <TASK_ID>: <Short Description> (<AC_ID>)`
+  Example: `// @ds-task T1.1: Add CSV export method (AC-001)`
 - Keep runtime updates short and tied to the current phase and task IDs.
 - Do not violate the constitution.
 - Leave the feature in a state that the next verify pass can inspect without guessing what changed, what remains, and why a task is done.

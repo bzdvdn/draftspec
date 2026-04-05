@@ -24,16 +24,16 @@ In short: Draftspec aims to maximize discipline per token: strong phase boundari
 
 ## Draftspec vs OpenSpec vs Spec Kit
 
-| Dimension | Draftspec | OpenSpec | Spec Kit |
-| --- | --- | --- | --- |
-| Workflow style | Strict phase chain with narrow context | Fluid artifact-guided workflow | Thorough multi-step SDD workflow |
-| Default context size | Smallest by default | Moderate | Largest |
-| Artifact overhead | Low | Medium | High |
-| Phase discipline | High | Medium | Highest |
-| Brownfield ergonomics | High | High | Medium |
-| Team collaboration model | Branch-first, feature-local artifacts | Change-folder oriented | Branch and workflow heavy |
-| Shared mutable state | Avoided by design | Low | Varies by setup |
-| Best fit | Lean strict SDD on real codebases | Flexible SDD-lite for fast iteration | Full-featured rigorous SDD |
+| Dimension                | Draftspec                              | OpenSpec                             | Spec Kit                         |
+| ------------------------ | -------------------------------------- | ------------------------------------ | -------------------------------- |
+| Workflow style           | Strict phase chain with narrow context | Fluid artifact-guided workflow       | Thorough multi-step SDD workflow |
+| Default context size     | Smallest by default                    | Moderate                             | Largest                          |
+| Artifact overhead        | Low                                    | Medium                               | High                             |
+| Phase discipline         | High                                   | Medium                               | Highest                          |
+| Brownfield ergonomics    | High                                   | High                                 | Medium                           |
+| Team collaboration model | Branch-first, feature-local artifacts  | Change-folder oriented               | Branch and workflow heavy        |
+| Shared mutable state     | Avoided by design                      | Low                                  | Varies by setup                  |
+| Best fit                 | Lean strict SDD on real codebases      | Flexible SDD-lite for fast iteration | Full-featured rigorous SDD       |
 
 In short, Draftspec aims to sit between OpenSpec and Spec Kit: stricter than OpenSpec, lighter than Spec Kit, and optimized for branch-based collaboration with minimal default context.
 
@@ -73,6 +73,7 @@ draftspec remove-agent [path]
 draftspec cleanup-agents [path]
 draftspec doctor [path]
 draftspec doctor [path] --json
+draftspec dashboard [path]
 draftspec feature <slug> [path]
 draftspec feature repair <slug> [path]
 draftspec features [path]
@@ -83,6 +84,7 @@ draftspec check <slug> [path]
 draftspec check <slug> [path] --json
 draftspec check [path] --all
 draftspec check [path] --all --json
+draftspec trace [slug] [path]
 draftspec demo [path]
 draftspec export <slug> [path]
 draftspec export <slug> [path] --output <file>
@@ -103,11 +105,12 @@ constitution -> spec -> inspect -> plan -> tasks -> implement -> verify -> archi
 - Draftspec prefers stable IDs and explicit references over repeated narrative summaries: `RQ-*` for requirements, `AC-*` for acceptance criteria, `DEC-*` for plan decisions, and phase-scoped `T*` task IDs.
 - Agent workflows are designed to load only the minimum context required.
 - Strictness comes from phase entrypoints, templates, stable artifact structure, and readiness checks rather than large default prompts.
+- `inspect` now treats helper-script output as the primary structural evidence layer: readiness checks can emit categorized findings such as `structure`, `traceability`, `ambiguity`, `consistency`, and `readiness`, which the agent should preserve and only deepen when necessary.
 - Agent-facing `/draftspec.spec` is branch-first: it should work from `feature/<slug>`, support `--name` with optional `--slug` / `--branch`, and still prefer explicit `name:` / `slug:` metadata for prompt files.
 - `draftspec init` requires an explicit `--shell` and generates one script family: `sh` or `powershell`. Supported agent targets: `claude`, `codex`, `copilot`, `cursor`, `kilocode`, `trae`, `windsurf`, `roocode`, `aider`.
 - Generated workspaces include `.draftspec/scripts/run-draftspec.*` as the stable CLI launcher for agents; it resolves `DRAFTSPEC_BIN` first and falls back to `draftspec` from `PATH`.
 - `draftspec feature repair` and `draftspec migrate` provide safe canonicalization for legacy artifacts such as old inspect report paths.
-- `draftspec check <slug>` shows artifact presence, inspect and verify verdict, task progress, and the exact next slash command; exits with code 1 when blocked; supports `--json` for CI use. `--all` shows a readiness table across all features.
+- `draftspec check <slug>` shows artifact presence, inspect and verify verdict, task progress, the exact next slash command, and a compact readiness summary from structured checks; exits with code 1 when blocked; supports `--json` for CI use. `--all` shows a readiness table across all features.
 - `draftspec demo [path]` creates a demo workspace pre-populated with an example feature at the implement phase — spec, inspect report, plan, tasks, and data model are all populated.
 - `draftspec export <slug>` bundles all feature artifacts into one markdown document for sharing with a reviewer or new agent session; supports `--output` to write to a file.
 - `/draftspec.plan` supports `--research`: enters research-first mode — agent identifies concrete unknowns, writes `research.md`, then asks "Research complete — proceed to full plan?" before producing `plan.md`.
@@ -115,9 +118,20 @@ constitution -> spec -> inspect -> plan -> tasks -> implement -> verify -> archi
 - `/draftspec.handoff` without a slug generates handoff documents for all active features at once.
 - `/draftspec.hotfix`: emergency fix workflow — writes a minimal hotfix spec (fix, root cause, risk, verification, touches) before any code change, implements, verifies inline, then archives; skips inspect, plan, and tasks phases; use only when the root cause is known and the fix touches ≤ 3 files.
 - `doctor` warns when the same stable ID (`AC-*`, `RQ-*`) appears across multiple specs.
+- **Traceability by design**. Agents are instructed to annotate code with `// @ds-task <ID> (<AC_ID>)` during implementation. Use `draftspec trace <slug>` to scan and verify these links between code and requirements.
 - Generated docs and prompts support English and Russian.
 
-## Quick Example
+- **Greenfield-friendly**. While Draftspec is optimized for brownfield, it works great for from-scratch projects using a "Foundation-first" approach.
+
+## Quick Start (Greenfield)
+
+If you are starting a project from scratch:
+
+1.  **Init**: `draftspec init . --lang en --shell sh`
+2.  **Establishment**: Define the tech stack, architecture, and rules via `/draftspec.constitution --foundation`. This creates a unified document for project rules and technical foundation.
+3.  **First Feature**: Once the baseline is established, move to the first functional specification via `/draftspec.spec`.
+
+## Usage Example (Brownfield)
 
 ```bash
 # try the demo instantly — no project setup required
@@ -152,6 +166,7 @@ Call `/draftspec.spec --name "CSV export for reports"` in your agent.
 
 ```markdown
 ## Goal
+
 Allow users to download the reports table as a CSV file.
 
 ## Acceptance Criteria
@@ -188,22 +203,24 @@ Call `/draftspec.tasks csv-export-for-reports`.
 
 ```markdown
 ## Surface Map
-| Surface                        | Tasks      |
-|-------------------------------|------------|
-| hooks/useReportExport.ts       | T1.1       |
-| components/ReportsPage.tsx     | T1.2       |
-| tests/reports.test.ts          | T2.1       |
+
+| Surface                    | Tasks |
+| -------------------------- | ----- |
+| hooks/useReportExport.ts   | T1.1  |
+| components/ReportsPage.tsx | T1.2  |
+| tests/reports.test.ts      | T2.1  |
 
 ## Phase 1: Hook and button
 
-- [ ] T1.1 add `useReportExport` hook — converts `rows[]` to CSV blob and triggers browser download — AC-001  `Touches: hooks/useReportExport.ts`
-- [ ] T1.2 add Export CSV button to ReportsPage — calls hook on click, disabled when rows empty — AC-001, AC-002  `Touches: components/ReportsPage.tsx`
+- [ ] T1.1 add `useReportExport` hook — converts `rows[]` to CSV blob and triggers browser download — AC-001 `Touches: hooks/useReportExport.ts`
+- [ ] T1.2 add Export CSV button to ReportsPage — calls hook on click, disabled when rows empty — AC-001, AC-002 `Touches: components/ReportsPage.tsx`
 
 ## Phase 2: Tests
 
-- [ ] T2.1 add tests for useReportExport — covers non-empty rows, empty rows, header-only output — AC-001, AC-002  `Touches: tests/reports.test.ts`
+- [ ] T2.1 add tests for useReportExport — covers non-empty rows, empty rows, header-only output — AC-001, AC-002 `Touches: tests/reports.test.ts`
 
 ## Acceptance Coverage
+
 AC-001 → T1.1, T1.2, T2.1
 AC-002 → T1.2, T2.1
 ```
@@ -284,7 +301,6 @@ Project contribution and trust docs:
 - [Contributing](CONTRIBUTING.md)
 - [Code of Conduct](CODE_OF_CONDUCT.md)
 - [Security Policy](SECURITY.md)
-
 
 ## Development
 
