@@ -24,7 +24,26 @@ type InitOptions struct {
 	AgentTargets []string
 }
 
-type InitResult struct{ Messages []string }
+type InitResult struct {
+	Messages []string
+
+	RootAbs string
+
+	Shell        string
+	DocsLang     string
+	AgentLang    string
+	CommentsLang string
+	AgentTargets []string
+
+	GitRepoStatus string // initialized, kept, skipped
+
+	EnsuredDirs []string
+	Created     []string
+	Kept        []string
+
+	AgentsSnippetChanged  bool
+	AgentArtifactMessages []string
+}
 
 type AddAgentsOptions struct {
 	Targets   []string
@@ -72,6 +91,16 @@ func Initialize(root string, options InitOptions) (InitResult, error) {
 	cfg.Runtime.Shell = shell
 	cfg.Scripts = config.ScriptDefaultsForShell(shell)
 	cfg.Agents.Targets = normalizedAgentTargets
+
+	result := InitResult{
+		RootAbs:      root,
+		Shell:        shell,
+		DocsLang:     cfg.Language.Docs,
+		AgentLang:    cfg.Language.Agent,
+		CommentsLang: cfg.Language.Comments,
+		AgentTargets: normalizedAgentTargets,
+	}
+
 	var messages []string
 	if options.InitGit {
 		created, err := gitutil.EnsureRepository(root)
@@ -79,11 +108,14 @@ func Initialize(root string, options InitOptions) (InitResult, error) {
 			return InitResult{}, err
 		}
 		if created {
+			result.GitRepoStatus = "initialized"
 			messages = append(messages, "initialized git repository")
 		} else {
+			result.GitRepoStatus = "kept"
 			messages = append(messages, "kept existing git repository")
 		}
 	} else {
+		result.GitRepoStatus = "skipped"
 		messages = append(messages, "skipped git repository initialization")
 	}
 	draftspecDir, err := cfg.DraftspecDir(root)
@@ -115,7 +147,9 @@ func Initialize(root string, options InitOptions) (InitResult, error) {
 		if err := os.MkdirAll(dir, 0o755); err != nil {
 			return InitResult{}, err
 		}
-		messages = append(messages, fmt.Sprintf("ensured directory %s", rel(root, dir)))
+		relPath := rel(root, dir)
+		result.EnsuredDirs = append(result.EnsuredDirs, relPath)
+		messages = append(messages, fmt.Sprintf("ensured directory %s", relPath))
 	}
 	files, err := templates.Files(languages)
 	if err != nil {
@@ -128,8 +162,10 @@ func Initialize(root string, options InitOptions) (InitResult, error) {
 			return InitResult{}, err
 		}
 		if written {
+			result.Created = append(result.Created, rel(root, target))
 			messages = append(messages, fmt.Sprintf("created %s", rel(root, target)))
 		} else {
+			result.Kept = append(result.Kept, rel(root, target))
 			messages = append(messages, fmt.Sprintf("kept existing %s", rel(root, target)))
 		}
 	}
@@ -141,20 +177,22 @@ func Initialize(root string, options InitOptions) (InitResult, error) {
 	if err != nil {
 		return InitResult{}, err
 	}
+	result.AgentsSnippetChanged = changed
 	if changed {
 		messages = append(messages, "updated AGENTS.md with Draftspec guidance")
 	} else {
 		messages = append(messages, "kept existing AGENTS.md Draftspec guidance")
 	}
-	for _, message := range ensureAgentFiles(root, normalizedAgentTargets, languages.Agent, cfg.Runtime.Shell) {
-		messages = append(messages, message)
-	}
+	result.AgentArtifactMessages = ensureAgentFiles(root, normalizedAgentTargets, languages.Agent, cfg.Runtime.Shell)
+	messages = append(messages, result.AgentArtifactMessages...)
 	if len(normalizedAgentTargets) > 0 {
 		messages = append(messages, fmt.Sprintf("enabled agent targets: %s", strings.Join(normalizedAgentTargets, ", ")))
 	} else {
 		messages = append(messages, "enabled agent targets: none")
 	}
-	return InitResult{Messages: messages}, nil
+	result.Messages = messages
+
+	return result, nil
 }
 
 func AddAgents(root string, options AddAgentsOptions) (AddAgentsResult, error) {

@@ -251,13 +251,13 @@ func checkPath(findings *[]Finding, path string, expectDir bool) {
 func severityRank(level string) int {
 	switch level {
 	case "error":
-		return 3
+		return 1
 	case "warning":
 		return 2
 	case "ok":
-		return 1
+		return 3
 	default:
-		return 0
+		return 4
 	}
 }
 

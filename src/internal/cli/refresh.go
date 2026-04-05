@@ -22,11 +22,31 @@ func newRefreshCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "refresh [path]",
 		Short: "Refresh generated Draftspec artifacts for an existing project without touching authored feature state",
-		Args:  cobra.MaximumNArgs(1),
+		Long: `Refreshes Draftspec-managed artifacts inside an already initialized project.
+
+Synchronizes:
+  - .draftspec/draftspec.yaml (config)
+  - managed templates/prompts/scripts inside .draftspec/
+  - the managed Draftspec block in AGENTS.md
+  - agent-target artifacts (.claude/, .cursor/, etc.)
+
+Does not touch authored feature state:
+  - .draftspec/specs/** and .draftspec/plans/** are not modified.
+
+Tip: use --dry-run to preview changes without writing.`,
+		Example: "  draftspec refresh .\n  draftspec refresh . --dry-run\n  draftspec refresh . --agents claude,cursor --agent-lang en",
+		Args:    cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			root := "."
 			if len(args) == 1 {
 				root = args[0]
+			}
+
+			if !jsonOutput {
+				printPanel(cmd.OutOrStdout(), "draftspec refresh", []string{
+					"Sync managed files (without modifying specs/plans).",
+					"Tip: add --dry-run to preview changes.",
+				})
 			}
 
 			result, err := project.Refresh(root, project.RefreshOptions{
@@ -54,6 +74,14 @@ func newRefreshCmd() *cobra.Command {
 			for _, line := range result.Messages {
 				fmt.Fprintln(cmd.OutOrStdout(), line)
 			}
+
+			printPanel(cmd.OutOrStdout(), "refresh summary", []string{
+				fmt.Sprintf("created: %d", len(result.Created)),
+				fmt.Sprintf("updated: %d", len(result.Updated)),
+				fmt.Sprintf("removed: %d", len(result.Removed)),
+				fmt.Sprintf("unchanged: %d", len(result.Unchanged)),
+				fmt.Sprintf("dry-run: %t", result.DryRun),
+			})
 			return nil
 		},
 	}

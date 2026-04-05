@@ -1,8 +1,6 @@
 package cli
 
 import (
-	"fmt"
-
 	"draftspec/src/internal/project"
 	"github.com/spf13/cobra"
 )
@@ -20,7 +18,15 @@ func newInitCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "init [path]",
 		Short: "Initialize a .draftspec workspace in the target project",
-		Args:  cobra.MaximumNArgs(1),
+		Long: `Initializes a Draftspec workspace inside the target project.
+
+Creates the .draftspec/ directory structure (specs/plans/archive/templates/scripts), inserts/updates a managed block in AGENTS.md, and (optionally) generates agent-target artifacts.
+
+Notes:
+  - Template files are created only if missing (existing files are kept).
+  - The managed Draftspec block in AGENTS.md is inserted/updated automatically.`,
+		Example: "  draftspec init . --lang en --shell sh --agents codex\n  draftspec init /path/to/repo --git=false --lang en --shell sh",
+		Args:    cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			root := "."
 			if len(args) == 1 {
@@ -40,9 +46,7 @@ func newInitCmd() *cobra.Command {
 				return err
 			}
 
-			for _, line := range result.Messages {
-				fmt.Fprintln(cmd.OutOrStdout(), line)
-			}
+			printInitOutput(cmd.OutOrStdout(), result)
 
 			return nil
 		},
