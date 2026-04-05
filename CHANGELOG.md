@@ -7,6 +7,10 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- `plan.md` template: new `## Incremental Delivery` section with `MVP (First Value)` and `Iterative Expansion` subsections — guides agents to define the smallest testable increment and plan subsequent value delivery steps while maintaining AC traceability
+
 ### Changed
 
 - `inspect` helper flow now treats readiness/script output as the primary structural evidence layer: categorized findings (`structure`, `traceability`, `ambiguity`, `consistency`, `readiness`) are surfaced in `draftspec check`, `draftspec feature`, and inspect prompts so agents deepen findings instead of re-deriving them

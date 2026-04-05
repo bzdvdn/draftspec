@@ -126,6 +126,7 @@ constitution -> spec -> inspect -> plan -> tasks -> implement -> verify -> archi
 - `draftspec demo [path]` создает демо-workspace с заполненным примером фичи на фазе implement — spec, inspect-отчет, plan, tasks и data model уже заполнены.
 - `draftspec export <slug>` упаковывает все артефакты фичи в один markdown-документ для передачи ревьюеру или новой агентской сессии; поддерживает `--output` для записи в файл.
 - `/draftspec.plan` поддерживает флаг `--research`: входит в режим research-first — агент фиксирует конкретные неизвестные, пишет `research.md`, затем спрашивает "Research complete — proceed to full plan?" перед созданием `plan.md`.
+- `/draftspec.plan` включает секцию `## Incremental Delivery`: направляет агентов на определение MVP (наименьшего тестируемого инкремента) и планирование шагов итеративного расширения с трассировкой AC — предотвращает монолитные реализации и позволяет проводить раннюю валидацию.
 - `/draftspec.spec` поддерживает флаг `--amend`: режим точечного редактирования — добавить критерий или исправить секцию без переписывания спека и без инвалидации inspect-отчёта.
 - `/draftspec.handoff` без slug генерирует handoff-документы для всех активных фич одновременно.
 - `/draftspec.hotfix`: экстренный workflow исправления — пишет минимальный hotfix-спек (fix, root cause, risk, verification, touches) до любого изменения кода, реализует, проверяет inline и архивирует; пропускает фазы inspect, plan и tasks; используйте только когда причина известна и исправление затрагивает ≤ 3 файлов.

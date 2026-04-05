@@ -114,6 +114,7 @@ constitution -> spec -> inspect -> plan -> tasks -> implement -> verify -> archi
 - `draftspec demo [path]` creates a demo workspace pre-populated with an example feature at the implement phase — spec, inspect report, plan, tasks, and data model are all populated.
 - `draftspec export <slug>` bundles all feature artifacts into one markdown document for sharing with a reviewer or new agent session; supports `--output` to write to a file.
 - `/draftspec.plan` supports `--research`: enters research-first mode — agent identifies concrete unknowns, writes `research.md`, then asks "Research complete — proceed to full plan?" before producing `plan.md`.
+- `/draftspec.plan` includes `## Incremental Delivery`: guides agents to define MVP (smallest testable increment) and plan iterative expansion steps with AC traceability — avoids monolithic implementations and enables early validation.
 - `/draftspec.spec` supports `--amend`: targeted edit mode — update one section or add one criterion without rewriting the spec or invalidating an existing inspect report.
 - `/draftspec.handoff` without a slug generates handoff documents for all active features at once.
 - `/draftspec.hotfix`: emergency fix workflow — writes a minimal hotfix spec (fix, root cause, risk, verification, touches) before any code change, implements, verifies inline, then archives; skips inspect, plan, and tasks phases; use only when the root cause is known and the fix touches ≤ 3 files.

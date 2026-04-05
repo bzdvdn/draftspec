@@ -54,6 +54,18 @@ Describe the implementation shape for this feature without restating the full sp
   Affects: packages, modules, files, or boundaries touched
   Validation: test, check, or observable condition that proves the decision works
 
+## Incremental Delivery
+
+### MVP (First Value)
+
+- Minimal set of tasks that can be implemented and tested independently
+- MVP readiness criteria: which ACs are covered and how to quickly verify
+
+### Iterative Expansion
+
+- What to add after MVP for the next value increment
+- Which ACs are covered at each step and how to validate them independently
+
 ## Sequencing Notes
 
 - What must happen first and why

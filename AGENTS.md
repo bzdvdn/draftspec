@@ -1,85 +1,124 @@
-## Draftspec Self-Hosting
+# draftspec — Agent Guide
 
-This repository builds the `draftspec` CLI itself.
+## Project Map
 
-Generated `/.draftspec/` and `/AGENTS.md` files in this repository are local test artifacts used to validate `draftspec init`. They are not product source files and should not be committed.
+This is the **draftspec** repository — a lightweight SDD (Specification-Driven Development) kit for development agents.
 
-## Read Order
+### Key Directories
 
-Before making meaningful changes, read:
+- `src/` — Go source code (CLI implementation)
+  - `src/cmd/draftspec/` — main CLI entrypoint
+  - `src/internal/` — internal packages (templates, cli, config, etc.)
+- `.draftspec/` — draftspec's own project context (dogfooding)
+  - `specs/` — feature specifications for draftspec itself
+  - `plans/` — implementation plans for draftspec features
+  - `templates/` — template files that draftspec generates for other projects
+  - `scripts/` — helper scripts for workflow phases
+- `docs/` — extended documentation (en/ru)
+- `demo/` — demo assets and terminal tapes
 
-1. `README.md`
-2. `MVP.md`
-3. relevant Go files under `src/cmd/` and `src/internal/`
+### Important Files
 
-If local self-hosted Draftspec files exist, use them only as runtime test output, not as the canonical product spec.
+- `README.md` / `README.ru.md` — project overview and usage
+- `CHANGELOG.md` — release history
+- `MVP.md` — product definition and roadmap
+- `go.mod` — Go module definition
+- `.draftspec/constitution.md` — project constitution (highest-priority rules)
 
-## Workflow Chain
+## Workflow
 
-The intended agent flow is:
+draftspec follows a strict phase chain:
 
-1. `/draftspec.constitution`
-2. `/draftspec.spec`
-3. `/draftspec.plan`
-4. `/draftspec.tasks`
-5. `/draftspec.implement`
+```
+constitution → spec → inspect → plan → tasks → implement → verify → archive
+```
 
-Dependency rules:
+When working on draftspec features:
 
-- `plan` must not run before `spec`
-- `tasks` must not run before `plan`
-- `implement` must not run before `tasks`
-- every phase must comply with the constitution
+1. **Check existing specs**: `draftspec list-specs`
+2. **Read the spec**: `.draftspec/specs/<slug>/spec.md`
+3. **Check inspect report**: `.draftspec/specs/<slug>/inspect.md` (must be `pass`)
+4. **Read the plan**: `.draftspec/plans/<slug>/plan.md`
+5. **Read tasks**: `.draftspec/plans/<slug>/tasks.md`
+6. **Implement tasks in order**, marking them complete
+7. **Verify**: ensure all ACs are covered
 
-## Language Model
+## Development Rules
 
-`draftspec init` now supports generated language settings.
+### Go Standards
 
-- `--lang` sets the base language and defaults to `en`
-- `--docs-lang` controls generated docs and templates
-- `--agent-lang` controls prompts and inserted `AGENTS.md` guidance
-- `--comments-lang` records the preferred code comment language
-- supported values are `en` and `ru`
-- `spec`, `plan`, and `tasks` prompts should keep generated docs in the configured documentation language
-- `implement` should keep new or edited code comments in the configured comments language unless a stronger local convention applies
+- Run `go fmt ./...` before committing
+- Run `go vet ./...` — must pass with no issues
+- Run `go test ./...` — all tests must pass
+- Follow Clean Architecture: domain → application → infrastructure
 
-When changing this behavior, keep config, generated docs, prompts, and scripts aligned.
+### Constitution Compliance
 
-## Token Discipline
+Always read `.draftspec/constitution.md` before starting work. Key principles:
 
-Keep Draftspec light.
+- **Interface abstraction**: external dependencies through Go interfaces
+- **Clean Architecture**: domain layer imports only standard library
+- **Context safety**: all operations accept `context.Context` as first parameter
+- **Testability**: every public interface must have mock implementations
+- **Minimal configuration**: package works out of the box with sensible defaults
 
-- Load only the current feature slug.
-- Do not read unrelated plans or specs.
-- Prefer scripts for readiness checks.
-- Prefer patching existing docs over full rewrites.
-- Treat `research.md` as optional.
-- Use `plan.md` as the tasks entrypoint.
-- Use `tasks.md` as the implement entrypoint.
-- Load `spec`, `data-model`, and `contracts` during tasks only when the decomposition requires them.
-- Load `spec`, `plan`, `data-model`, and `contracts` during implement only when the active task requires them.
+### Language Policy
 
-## Working On The CLI
+- Documentation: Russian (docs/README.ru.md, constitution.md)
+- Agent communication: Russian
+- Code comments: Russian (godoc)
+- Variable/function names: English (Go standard)
 
-When changing CLI behavior:
+## CLI Commands
 
-- update the Go implementation
-- keep embedded template assets aligned with the behavior
-- update `README.md` and `MVP.md` when the product contract changes
-- verify generated output from `draftspec init` when relevant
+```bash
+# Check workspace health
+draftspec doctor .
 
-## Generated Output Policy
+# List active features
+draftspec list-specs .
 
-When testing `draftspec` in this repository:
+# Show feature readiness
+draftspec check <slug> .
 
-- `/.draftspec/` is generated output
-- `/AGENTS.md` is generated output
-- these files may be refreshed during testing
-- they should not be treated as the source of truth for product design
+# Show all features status
+draftspec check . --all
 
-The source of truth lives in:
+# Visual dashboard
+draftspec dashboard .
 
-- `README.md`
-- `MVP.md`
-- Go source files
-- embedded assets under `src/internal/templates/assets/`
+# Trace requirements in code
+draftspec trace <slug> .
+
+# Export feature artifacts
+draftspec export <slug> . --output feature.md
+```
+
+## Template Updates
+
+When modifying templates in `src/internal/templates/assets/`:
+
+- Update both `lang/ru/` and `lang/en/` versions
+- Test with `draftspec demo ./test-demo`
+- Regenerate with `draftspec refresh .`
+
+## Testing
+
+```bash
+# Run all tests
+go test ./...
+
+# Run with coverage
+go test -cover ./...
+
+# Build with version stamp
+go build -ldflags "-X draftspec/src/internal/cli.Version=v0.2.0" -o bin/draftspec ./src/cmd/draftspec
+```
+
+## Key Design Principles
+
+1. **Discipline per token**: maximize workflow strictness while minimizing context size
+2. **Branch-first**: each feature lives in `feature/<slug>` branch
+3. **Stable IDs**: `AC-*`, `RQ-*`, `DEC-*`, `T*` for traceability
+4. **Narrow context**: each phase loads only the minimum required artifacts
+5. **No shared mutable state**: feature state stays local to the feature branch
