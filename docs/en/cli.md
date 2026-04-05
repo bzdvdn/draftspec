@@ -111,9 +111,26 @@ Checks workspace health.
 
 - `error` for missing required files or invalid config values
 - `warning` for orphaned agent artifacts still present on disk
+- `warning` for non-standard Git branch names
 - `ok` when the workspace is healthy
 
 Use `--json` for machine-readable output in automation and CI.
+
+### `draftspec dashboard [path]`
+
+Displays a visual dashboard of all active features in the project.
+
+The dashboard includes:
+
+- Feature slug
+- Current workflow phase
+- Implementation progress percentage
+- Status (READY/BLOCKED)
+- Current Git branch (with `!!` warning if there is a mismatch with the feature slug)
+
+```bash
+draftspec dashboard
+```
 
 ### `draftspec feature <slug> [path]`
 
@@ -175,16 +192,37 @@ Prints one spec file by slug.
 
 Shows feature readiness and the exact next action for one feature.
 
-Output includes artifact presence, inspect and verify verdict, task progress, and the exact next slash command.
+Output includes artifact presence, inspect and verify verdict, task progress, the exact next slash command, and a compact structured-check summary when phase-specific readiness checks produce categorized findings.
 
 Use `--all` to check every feature in one table. Exits with code 1 when any feature is blocked.
-Use `--json` for machine-readable output suitable for CI.
+Use `--json` for machine-readable output suitable for CI, including `check_summary` and `check_findings` when available.
 
 ```bash
 draftspec check export-report
 draftspec check export-report my-project --json
 draftspec check my-project --all
 draftspec check my-project --all --json
+```
+
+### `draftspec trace [slug] [path]`
+
+Scans for traceability annotations in the codebase.
+
+Annotations follow the format:
+- `// @ds-task <TASK_ID>: <Description> (<AC_ID>)` for implementation code.
+- `// @ds-test <TASK_ID>: <TestName> (<AC_ID>)` for test evidence.
+
+This command identifies links between implementation code, task IDs from `tasks.md`, and acceptance criteria from `spec.md`.
+
+Use `slug` to filter findings for a specific feature.
+Use `--tests` to show only test evidence.
+Use `--json` for machine-readable output.
+
+```bash
+draftspec trace
+draftspec trace export-report
+draftspec trace export-report --tests
+draftspec trace export-report my-project --json
 ```
 
 ### `draftspec demo [path]`

@@ -251,6 +251,50 @@ User request:
 
 Expected agent behavior:
 
+- read `tasks.md` and use it as the execution manifest
+- perform **In-place Decomposition** if a task is too complex, adding indented sub-tasks (e.g., `T1.1.1`)
+- annotate every non-trivial code change with `// @ds-task <ID> (<AC_ID>)`
+- mark completed tasks in `tasks.md`
+- stay within the `Touches:` list defined for each task
+
+Example code annotation:
+
+```go
+// @ds-task T1.1: Add partner scheduling override model (AC-001)
+func SavePartnerSchedule(p Partner) {
+    // ...
+}
+```
+
+## 7. Verify the Implementation
+
+User request:
+
+```text
+/draftspec.verify partner-scheduling
+```
+
+Expected agent behavior:
+
+- use `/.draftspec/scripts/trace.sh partner-scheduling` to collect implementation evidence
+- look for `// @ds-task` and `// @ds-test` annotations in the code
+- confirm that implementation matches task descriptions and acceptance criteria
+- provide a clear verdict (`pass`, `concerns`, or `blocked`)
+- include concrete evidence in the `## Checks` section
+
+Example test annotation:
+
+```go
+// @ds-test T1.1: TestSavePartnerSchedule (AC-001)
+func TestSavePartnerSchedule(t *testing.T) {
+    // ...
+}
+```
+
+If the feature is older and lacks annotations, the agent falls back to manual inspection of the files listed in `Touches:` and running tests manually.
+
+Expected agent behavior:
+
 - start from `tasks.md`
 - load spec, plan, data model, or contracts only for the active task
 - implement unfinished tasks in order

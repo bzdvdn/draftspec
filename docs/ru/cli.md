@@ -111,9 +111,26 @@ draftspec add-agent my-project --agents claude --agents codex
 
 - `error` для отсутствующих обязательных файлов и невалидных значений config
 - `warning` для orphaned agent artifacts, которые все еще лежат на диске
+- `warning` для нестандартных имен веток Git
 - `ok`, когда workspace выглядит здоровым
 
 Используй `--json`, если нужен machine-readable output для automation и CI.
+
+### `draftspec dashboard [path]`
+
+Отображает визуальный дашборд всех активных фич в проекте.
+
+Дашборд включает:
+
+- Слаг фичи
+- Текущую фазу workflow
+- Процент прогресса реализации
+- Статус (READY/BLOCKED)
+- Текущую ветку Git (с пометкой `!!` при несоответствии слагу фичи)
+
+```bash
+draftspec dashboard
+```
 
 ### `draftspec feature <slug> [path]`
 
@@ -175,16 +192,37 @@ draftspec add-agent my-project --agents claude --agents codex
 
 Показывает готовность одной фичи и точное следующее действие.
 
-Вывод включает наличие артефактов, вердикт inspect и verify, прогресс задач и точную следующую slash-команду.
+Вывод включает наличие артефактов, вердикт inspect и verify, прогресс задач, точную следующую slash-команду и компактную сводку structured checks, если phase-specific readiness checks уже дали категоризированные findings.
 
 Используй `--all`, чтобы проверить все фичи одной таблицей. Выходит с кодом 1, если хоть одна фича заблокирована.
-Используй `--json` для машинно-читаемого вывода в CI.
+Используй `--json` для машинно-читаемого вывода в CI, включая `check_summary` и `check_findings`, когда они доступны.
 
 ```bash
 draftspec check export-report
 draftspec check export-report my-project --json
 draftspec check my-project --all
 draftspec check my-project --all --json
+```
+
+### `draftspec trace [slug] [path]`
+
+Сканирует кодовую базу на наличие аннотаций прослеживаемости (traceability).
+
+Форматы аннотаций:
+- `// @ds-task <TASK_ID>: <Описание> (<AC_ID>)` для кода реализации.
+- `// @ds-test <TASK_ID>: <НазваниеТеста> (<AC_ID>)` для тестовых доказательств.
+
+Эта команда находит связи между кодом реализации, ID задач из `tasks.md` и критериями приемки из `spec.md`.
+
+Используй `slug`, чтобы отфильтровать находки для конкретной фичи.
+Используй `--tests`, чтобы показать только тестовые доказательства.
+Используй `--json` для машинно-читаемого вывода.
+
+```bash
+draftspec trace
+draftspec trace export-report
+draftspec trace export-report --tests
+draftspec trace export-report my-project --json
 ```
 
 ### `draftspec demo [path]`

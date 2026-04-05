@@ -13,6 +13,7 @@ Draftspec is split into a few practical layers:
 - `src/internal/templates/` for localized generated assets and file generation
 - `src/internal/agents/` for project-local command or prompt file generation
 - `src/internal/specs/` for reading spec files used by the public CLI
+- `src/internal/trace/` for scanning traceability annotations in code
 - `src/internal/doctor/` for workspace health checks
 
 ## CLI Layer
@@ -25,6 +26,8 @@ The public CLI is intentionally small. `src/internal/cli/` wires commands such a
 - `remove-agent`
 - `cleanup-agents`
 - `doctor`
+- `dashboard`
+- `trace`
 - `list-specs`
 - `show-spec`
 
@@ -88,6 +91,7 @@ This keeps one main source of truth for workflow prompts while still supporting 
 - list agent targets
 - remove agent targets
 - clean up orphaned agent artifacts
+- create helper scripts in `.draftspec/scripts/`
 
 This layer is responsible for:
 
@@ -96,9 +100,19 @@ This layer is responsible for:
 - updating `AGENTS.md`
 - syncing enabled agent targets into config
 
+## Traceability and Verification Layer
+
+`src/internal/trace/trace.go` handles the core logic for linking code to requirements:
+
+- scans files for `@ds-task` and `@ds-test` annotations
+- filters findings by feature slug
+- supports JSON output for integration with verification workflows
+
+This layer allows the `verify` phase to remain token-efficient by replacing manual code review with deterministic metadata scanning.
+
 ## Health and Maintenance Layer
 
-`src/internal/doctor/doctor.go` checks workspace health.
+`src/internal/doctor/doctor.go` and `src/internal/gitutil/` check workspace health and alignment.
 
 It verifies:
 
@@ -106,12 +120,15 @@ It verifies:
 - configured languages are valid
 - enabled agent targets have their generated files
 - disabled targets do not leave stale artifacts behind unnoticed
+- **Smart Branching**: checks if the current Git branch matches the feature slug (expected `feature/<slug>`)
+- **Traceability Integrity**: warns about orphaned `@ds-task` annotations or invalid `AC-*` references
 
 Related maintenance commands:
 
 - `remove-agent` disables a target and removes its generated files
 - `cleanup-agents` removes orphaned leftovers for disabled targets
 - `doctor` reports `error`, `warning`, and `ok`
+- `dashboard` provides a visual summary of project progress, status, and branch health
 
 ## Design Principles
 

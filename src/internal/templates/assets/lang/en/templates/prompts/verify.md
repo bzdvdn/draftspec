@@ -6,9 +6,13 @@ You are verifying one implemented feature package after task execution.
 
 Confirm whether the implemented work is aligned enough with tasks and project rules to proceed safely.
 
+## Flags
+
+`--deep`: full implementation validation mode — read all plan artifacts and inspect actual code for every completed task and acceptance criterion, not just structural checks. Produces a comprehensive report with per-AC evidence. Without this flag, verification stays structural and cheap by default.
+
 ## Phase Contract
 
-Inputs: `.draftspec/constitution.md`, `.draftspec/plans/<slug>/tasks.md`; spec, plan, code only to confirm concrete claims.
+Inputs: `.draftspec/constitution.md`, `.draftspec/plans/<slug>/tasks.md`; spec, plan, code only to confirm concrete claims (or all artifacts in `--deep` mode).
 Outputs: verdict report (`pass`, `concerns`, or `blocked`) in conversation; persisted to `.draftspec/plans/<slug>/verify.md` on request.
 Stop if: slug ambiguous, tasks.md missing, or verdict would require inventing implementation facts.
 
@@ -21,14 +25,14 @@ Always read these first:
 
 ## Load If Present
 
-Read these only when needed to confirm a concrete claim:
+Read when a specific check references content in these files (e.g., a task claims to satisfy an `AC-*`, or a `DEC-*` constrains implementation shape):
 
-- `.draftspec/specs/<slug>/summary.md` if present; otherwise `.draftspec/specs/<slug>/spec.md`
-- `.draftspec/plans/<slug>/plan.md`
-- `.draftspec/plans/<slug>/data-model.md`
-- `.draftspec/plans/<slug>/contracts/`
-- `.draftspec/plans/<slug>/research.md` only when it exists and the active verification depends on a documented trade-off or external dependency
-- only the code files needed to confirm whether a task or acceptance claim was actually implemented
+- `.draftspec/specs/<slug>/summary.md` (or `spec.md`) — when verifying acceptance coverage or task-to-AC alignment
+- `.draftspec/plans/<slug>/plan.md` — when a task references a `DEC-*` or architectural decision that must be confirmed
+- `.draftspec/plans/<slug>/data-model.md` — when a task touches persisted state or entity shape
+- `.draftspec/plans/<slug>/contracts/` — when a task touches API or event boundaries
+- `.draftspec/plans/<slug>/research.md` — only when the check depends on a documented trade-off or external dependency finding
+- code files — only the specific files named in a task's `Touches:` that are needed to confirm the task was actually implemented
 
 ## Do Not Read By Default
 
@@ -56,12 +60,20 @@ Stop and ask for clarification only if:
 - Prefer confirming concrete implementation claims over broad subjective review.
 - Treat verify as an evidence log, not a reassurance ritual.
 - Verify that completed tasks are consistent with the current state of the feature package.
+- **Traceability Evidence**: Use `/.draftspec/scripts/trace.* <slug>` to scan for `@ds-task` and `@ds-test` annotations in the code. Include these findings in the `## Checks` section as concrete implementation evidence.
+- **Legacy Fallback**: If `trace` returns no findings (e.g., for older features without annotations), you MUST proceed with manual inspection of the implementation files listed in `Touches:` and run relevant tests to confirm the implementation claims. Note the lack of annotations as a minor warning in the report.
 - Verify that open tasks do not contradict any claim that the feature is fully complete.
 - Verify acceptance-to-task coverage consistency when `tasks.md` includes an `Acceptance Coverage` section.
 - When `tasks.md` uses task IDs such as `T1.1`, reference those IDs directly in checks, findings, and conclusions.
 - Prefer `concerns` over `pass` when the evidence is partial but no contradiction has been found.
 - Keep default verification structural and cheap by default.
-- Only deepen into broader implementation validation when the user explicitly asks for it or when a concrete contradiction cannot be resolved from tasks, plan artifacts, and focused evidence.
+- When `--deep` is present in `$ARGUMENTS`, switch to full validation mode:
+  - Read all plan artifacts (`plan.md`, `data-model.md`, `contracts/`, `research.md`).
+  - For every completed task, read the actual implementation files listed in `Touches:` and confirm the work matches the task description.
+  - For every `AC-*`, trace through the code to confirm the acceptance criterion is satisfied with concrete evidence.
+  - The `## Scope` section must state `mode: deep` and list all surfaces inspected.
+  - The `## Not Verified` section should be minimal or `none` — deep mode is expected to be thorough.
+- Without `--deep`, only deepen into broader implementation validation when a concrete contradiction cannot be resolved from tasks, plan artifacts, and focused evidence.
 - Use a simple verdict: `pass`, `concerns`, or `blocked`.
 - Use `pass` when no blocking problems are present and only minor or no warnings remain.
 - Use `concerns` when the feature can move forward, but warnings or open questions should be resolved soon.

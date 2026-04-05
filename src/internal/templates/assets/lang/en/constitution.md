@@ -32,6 +32,14 @@
 
 [CONSTRAINTS]
 
+## Tech Stack
+
+[TECH_STACK]
+
+## Core Architecture
+
+[ARCHITECTURE]
+
 ## Language Policy
 
 - Documentation language: [DOCS_LANGUAGE]

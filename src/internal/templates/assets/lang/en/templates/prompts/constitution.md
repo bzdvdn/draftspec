@@ -6,7 +6,19 @@ You are creating or updating `.draftspec/constitution.md` for this project.
 
 Produce a strict project constitution that is authoritative for both humans and development agents.
 
+For a **greenfield project** (from scratch), focus on establishing immutable architectural boundaries, selecting the technology stack, and defining quality standards that will serve as the basis for the subsequent "Foundation" design.
+
 For an existing codebase, formalize the project's observable reality first, then separately codify any new mandatory rules explicitly requested by the user.
+
+## Greenfield mode
+
+When starting a project from scratch:
+
+- codify the selected technology stack (language, frameworks, database)
+- define core architectural patterns (e.g., Clean Architecture, Hexagonal)
+- establish naming conventions and directory structure
+- define dependency management and external integration rules
+- lay the groundwork for the first design artifact — `foundation.md`
 
 ## Brownfield mode
 
@@ -34,20 +46,9 @@ Do not redesign an existing project into an idealized architecture. Describe cur
 
 ## Repository Evidence
 
-Treat these as strong signals:
+**Strong signals** (safe to derive rules from): directory boundaries (`api/`, `cmd/`, `internal/`, `migrations/`), dependencies and config revealing transports/storage/runtime, existing workflow docs, entrypoint files showing composition root or role separation.
 
-- explicit directory boundaries such as `api/`, `workers/`, `cmd/`, `internal/`, `contracts/`, `migrations/`
-- dependencies and config that clearly reveal transports, storage systems, or runtime shape
-- existing documents that already define workflow or architectural boundaries
-- key entrypoint files that show the composition root, process model, or role separation
-
-Treat these as weak signals:
-
-- isolated files not supported by broader structure
-- naming that is not confirmed by configuration or component relationships
-- general best-practice expectations not grounded in the repository
-
-Do not derive strict constitutional rules from weak signals alone.
+**Weak signals** (context only, not rule sources): isolated files without structural support, naming not confirmed by config, general best-practice expectations not grounded in the repo.
 
 ## Do Not Read By Default
 
@@ -75,6 +76,8 @@ If the constitution is already current and does not conflict with the request, s
   - `## Purpose`
   - `## Core Principles`
   - `## Constraints`
+  - `## Tech Stack`
+  - `## Core Architecture`
   - `## Decision Priorities`
   - `## Key Quality Dimensions`
   - `## Language Policy`
@@ -84,7 +87,10 @@ If the constitution is already current and does not conflict with the request, s
   - `## Last Updated`
 - Ensure there are at least 5 principle subsections under `## Core Principles` using `### Principle Name` headings.
 - You may add extra sections when they materially improve project governance.
-- Replace placeholder tokens like `[PROJECT_NAME]` or `[PRINCIPLE_1_NAME]` with concrete text.
+- Replace placeholder tokens like `[PROJECT_NAME]`, `[TECH_STACK]`, or `[ARCHITECTURE]` with concrete text.
+- When the `--foundation` flag is used (or when designing from scratch), pay special attention to filling the `## Tech Stack` and `## Core Architecture` sections. These sections should describe:
+  - Selected languages, frameworks, databases, and infrastructure.
+  - Structural patterns, data flows, and directory organization.
 - For a brownfield project, codify what the codebase already demonstrates before introducing new mandatory norms.
 - If the user explicitly requests new development rules, encode them in `## Development Workflow` and `## Governance` as mandatory rules for future work.
 - The `## Development Workflow` section MUST define how feature branches, specs, inspect, plans, tasks, and implementation relate to constitutional compliance.

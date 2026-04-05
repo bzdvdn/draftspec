@@ -13,6 +13,7 @@ Draftspec разбит на несколько практических слое
 - `src/internal/templates/` для локализованных generated assets и сборки файлов
 - `src/internal/agents/` для генерации project-local command или prompt files
 - `src/internal/specs/` для чтения spec files, используемых публичным CLI
+- `src/internal/trace/` для сканирования аннотаций прослеживаемости в коде
 - `src/internal/doctor/` для health-check логики
 
 ## CLI-Слой
@@ -25,6 +26,8 @@ Draftspec разбит на несколько практических слое
 - `remove-agent`
 - `cleanup-agents`
 - `doctor`
+- `dashboard`
+- `trace`
 - `list-specs`
 - `show-spec`
 
@@ -88,6 +91,7 @@ Draftspec генерирует файлы из локализованных asse
 - получение списка agent targets
 - удаление agent targets
 - очистка orphaned agent artifacts
+- создание вспомогательных скриптов в `.draftspec/scripts/`
 
 Этот слой отвечает за:
 
@@ -96,9 +100,19 @@ Draftspec генерирует файлы из локализованных asse
 - обновление `AGENTS.md`
 - синхронизацию enabled agent targets в config
 
+## Слой Прослеживаемости и Верификации
+
+Пакет `src/internal/trace/` реализует основную логику связи кода с требованиями:
+
+- сканирует файлы на наличие аннотаций `@ds-task` и `@ds-test`
+- фильтрует находки по слагу фичи
+- поддерживает JSON-вывод для интеграции с workflow верификации
+
+Этот слой позволяет фазе `verify` оставаться экономной по токенам, заменяя ручной анализ кода детерминированным сканированием метаданных.
+
 ## Слой Здоровья и Обслуживания
 
-`src/internal/doctor/doctor.go` проверяет здоровье workspace.
+`src/internal/doctor/doctor.go` и `src/internal/gitutil/` проверяют здоровье и согласованность workspace.
 
 Он валидирует:
 
@@ -106,12 +120,15 @@ Draftspec генерирует файлы из локализованных asse
 - корректность настроенных языков
 - наличие generated files для включенных agent targets
 - отсутствие незамеченных stale artifacts от отключенных targets
+- **Smart Branching**: проверяет соответствие текущей ветки Git слагу фичи (ожидается `feature/<slug>`)
+- **Traceability Integrity**: предупреждает об осиротевших аннотациях `@ds-task` или невалидных ссылках на `AC-*`
 
 Связанные maintenance-команды:
 
 - `remove-agent` отключает target и удаляет его generated files
 - `cleanup-agents` удаляет orphaned leftovers для отключенных targets
 - `doctor` сообщает `error`, `warning` и `ok`
+- `dashboard` предоставляет визуальную сводку прогресса, статуса и здоровья веток проекта
 
 ## Принципы Дизайна
 

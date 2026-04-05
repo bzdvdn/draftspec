@@ -1,57 +1,23 @@
 ## Draftspec
 
-Primary project context lives in `.draftspec/`.
+Primary project context lives in `.draftspec/`. Languages: docs=[DOCS_LANGUAGE], agent=[AGENT_LANGUAGE], comments=[COMMENTS_LANGUAGE]
 
-Preferred language settings:
-- Documentation: [DOCS_LANGUAGE]
-- Agent interaction: [AGENT_LANGUAGE]
-- Code comments: [COMMENTS_LANGUAGE]
-
-Workflow commands:
-- `/draftspec.constitution`: patch `.draftspec/constitution.md`
-- `/draftspec.spec`: create or refine one file in `.draftspec/specs/<slug>/spec.md` and work from `feature/<slug>`
-- `/draftspec.inspect`: inspect one feature for consistency and quality before or after planning
-- `/draftspec.plan`: create or patch `.draftspec/plans/<slug>/plan.md`, `data-model.md`, and `contracts/`
+Workflow chain: `constitution → spec → inspect → plan → tasks → implement → verify → archive`
+- `/draftspec.constitution`: create or patch `.draftspec/constitution.md`
+- `/draftspec.spec`: create or refine `.draftspec/specs/<slug>/spec.md`; `--amend` for targeted edits
+- `/draftspec.inspect`: check one feature for consistency and quality
+- `/draftspec.plan`: create or patch `.draftspec/plans/<slug>/`; `--update` for targeted edits, `--research` for research-first
 - `/draftspec.tasks`: create or patch `.draftspec/plans/<slug>/tasks.md`
-- `/draftspec.implement`: execute unfinished tasks
-- `/draftspec.verify`: verify one implemented feature package before archive
-- `/draftspec.archive`: archive one feature package under `.draftspec/archive/`
+- `/draftspec.implement`: execute unfinished tasks from `tasks.md`
+- `/draftspec.verify`: verify one feature package; `--deep` for full per-AC code tracing
+- `/draftspec.archive`: archive to `.draftspec/archive/` (move-based); `--copy` keeps originals, `--restore` unarchives
 
-Optional commands (call at any point, outside the required chain):
-- `/draftspec.challenge`: adversarial review of a spec or plan — finds weak assumptions, scope problems, and logic gaps before implementation; use `--spec` or `--plan` to narrow the target
-- `/draftspec.handoff`: generate a compact session handoff document — captures current phase, open work, key decisions, and next command so a new session can resume without re-reading everything
-- `/draftspec.hotfix`: emergency fix outside the standard phase chain — for well-understood fixes with identified root cause touching ≤ 3 files; writes minimal spec, implements fix, verifies inline, and prepares for archive
-- `/draftspec.scope`: quick scope boundary check — answers whether current plan or tasks stay within spec boundaries; use `--plan` or `--tasks` to narrow the target; produces no file
-- `/draftspec.recap`: project-level overview — lists all active features with current phase and inspect verdict; no slug required; produces no file; useful at the start of a new session
+Optional (any point): `/draftspec.challenge` (adversarial review; `--spec`/`--plan`), `/draftspec.handoff` (session handoff), `/draftspec.hotfix` (emergency fix ≤ 3 files), `/draftspec.scope` (boundary check; `--plan`/`--tasks`), `/draftspec.recap` (project overview)
 
 Read discipline:
-- Follow `constitution -> spec -> inspect -> plan -> tasks -> implement -> verify -> archive`
-- Do not skip prerequisites
-- Load only the current feature slug by default
-- Prefer the readiness scripts for each phase before reading deeper artifacts
-- When you need the Draftspec CLI itself, prefer `./.draftspec/scripts/run-draftspec.sh`; it resolves `DRAFTSPEC_BIN` first and falls back to `draftspec` from `PATH`
-- Persist the required inspect report at `.draftspec/specs/<slug>/inspect.md` before planning
-- `/draftspec.spec` supports `--name`, optional `--slug`, and optional `--branch`; for chat-based input, the feature description may arrive in the next message
-- For file-based `/draftspec.spec` input, prefer a top-of-file `name:` and optional `slug:` before falling back to the filename
-- Allow an explicit `--branch <name>` override for repository-specific branch naming conventions such as Jira keys
-- During `tasks`, start with `plan.md` and read deeper artifacts only if required
-- During `implement`, start with `tasks.md` and read deeper artifacts only if required
+- Do not skip phases; load only the current feature slug by default
+- Prefer readiness scripts over reading deeper artifacts; use `./.draftspec/scripts/run-draftspec.sh` for CLI access
+- Never load: unrelated specs/plans, broad repo scans, script source, files already read this session (unless you edited them)
+- Use the configured comment language for new/edited code comments; preserve existing file conventions
 
-Never load by default:
-- unrelated specs or plan packages
-- broad repository scans
-- script source files (use readiness scripts instead)
-- a file you already read in the current session unless you edited it yourself
-
-Implementation language discipline:
-- Treat the configured code comment language as the default for new or edited code comments
-- Preserve an established local file convention when changing comments in existing files
-- Avoid mixed-language comments in the same local code area unless there is a strong project reason
-
-Before making meaningful changes:
-- Review `.draftspec/constitution.md`
-- Inspect the relevant `.draftspec/specs/<slug>/spec.md`
-- Inspect the relevant feature package in `.draftspec/plans/<slug>/` when present
-
-After meaningful decisions or changes:
-- Keep specs, plans, tasks, archive state, and implementation aligned
+Before meaningful changes: review `constitution.md`, the relevant `specs/<slug>/spec.md`, and `plans/<slug>/` if present. After changes: keep specs, plans, tasks, and implementation aligned.

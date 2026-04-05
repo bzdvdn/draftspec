@@ -29,15 +29,14 @@ Always read these before doing any implementation work:
 
 ## Load If Present
 
-Read these only when the active task requires them:
+Read when the active task explicitly references or depends on content in these files:
 
-- `.draftspec/specs/<slug>/summary.md` if present; otherwise `.draftspec/specs/<slug>/spec.md` — when task intent or acceptance scope is unclear
-- `.draftspec/plans/<slug>/plan.md` when architectural strategy or sequencing is needed
-- `.draftspec/plans/<slug>/data-model.md` when data shape, invariants, or lifecycle behavior matters
-- `.draftspec/plans/<slug>/contracts/` when APIs, events, or integration contracts are involved
-- `.draftspec/plans/<slug>/research.md` only when it exists and the current task depends on it
-- only the code files needed for the active tasks
-- start from the implementation surfaces already identified by the plan or tasks before widening code inspection
+- `.draftspec/specs/<slug>/summary.md` (or `spec.md`) — when a task references an `AC-*` whose intent or scope boundary is ambiguous from the task text alone
+- `.draftspec/plans/<slug>/plan.md` — when a task references a `DEC-*`, sequencing constraint, or implementation surface not fully described in the task
+- `.draftspec/plans/<slug>/data-model.md` — when a task creates or modifies entities, fields, invariants, or state transitions
+- `.draftspec/plans/<slug>/contracts/` — when a task creates or modifies API endpoints, event payloads, or integration boundaries
+- `.draftspec/plans/<slug>/research.md` — only when a task depends on a documented trade-off or external dependency finding
+- code files — only those listed in `Touches:` for the active tasks; start from surfaces identified by plan/tasks before widening
 
 Do not assume `research.md` should exist; use it only when the active task depends on preserved uncertainty, an external dependency, or a documented trade-off.
 
@@ -75,20 +74,13 @@ Do not broaden scope to solve these problems.
 
 ## Read Discipline
 
-**Read each file once per session.** Do not re-read a file you have already loaded unless you edited it yourself and need to confirm a specific detail of your own change. After your own edit, you already know what changed — re-reading to "confirm" content you just wrote is wasteful.
+**Read each file once per session.** Re-read only if the file was changed externally or a task requires verifying state after a non-obvious prior change.
 
-**Session start protocol** — before executing the first task:
+**Session start** (before first task):
+
 1. Run `.draftspec/scripts/check-implement-ready.*` if available.
-2. Read `tasks.md` and identify all tasks in the current scope.
-3. Collect the `Touches:` surfaces from every in-scope task; if `## Surface Map` is present in `tasks.md`, read it instead of scanning individual task lines.
-4. Read those surfaces once, in batch, before any implementation begins.
-5. Execute tasks from that pre-loaded context without reopening files between tasks.
-
-**Re-read only when:**
-- The file was changed externally (e.g. a user edit mid-session).
-- A specific task explicitly requires verifying the current state of a file after a prior task changed it in a non-obvious way.
-
-**Do not re-read between tasks** to "refresh" or "make sure" — use what you loaded at session start.
+2. Read `tasks.md`; use `## Surface Map` as the batch-read manifest — it lists every implementation surface and which tasks touch it. If Surface Map is missing, fall back to collecting `Touches:` fields from in-scope tasks.
+3. Batch-read all surfaces from the manifest in one pass. Execute tasks from pre-loaded context — do not re-open files between tasks.
 
 ## Invariants
 
@@ -103,6 +95,14 @@ Do not broaden scope to solve these problems.
 - If a task cannot be implemented safely from current artifacts, stop and request refinement.
 - If you need to make a non-obvious assumption to proceed (API shape, data format, error handling choice), log it as `[ASSUMPTION: ...]` in your progress output before acting on it. If the assumption significantly affects acceptance scope, stop and ask before proceeding.
 - Mark completed tasks in `tasks.md`.
+- **In-place Decomposition**: If a task `T1.1` is too complex to track as a single unit, you may refine it by adding indented sub-tasks (e.g., `- [ ] T1.1.1 Sub-task`).
+- **Sub-task Guardrails**:
+  - Sub-tasks MUST NOT add new files to the `Touches:` list of the parent task.
+  - Sub-tasks MUST NOT change or expand the `AC-*` mapping of the parent task.
+  - If decomposition reveals that the original `plan.md` is flawed or needs a new implementation surface, you MUST stop and request a plan update or `repair`.
+- **Annotate Code**: Every non-trivial change must include a comment reference to the task ID and the primary Acceptance Criterion (AC) it satisfies.
+  Format: `// @ds-task <TASK_ID>: <Short Description> (<AC_ID>)`
+  Example: `// @ds-task T1.1: Add CSV export method (AC-001)`
 - Keep runtime updates short and tied to the current phase and task IDs.
 - Do not violate the constitution.
 - Leave the feature in a state that the next verify pass can inspect without guessing what changed, what remains, and why a task is done.

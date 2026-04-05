@@ -462,6 +462,152 @@ func TestFeatureCommandShowsSemanticFindings(t *testing.T) {
 	}
 }
 
+func TestFeatureCommandShowsStructuredCheckDetails(t *testing.T) {
+	root := t.TempDir()
+
+	if _, _, err := executeRoot(t, "init", root, "--git=false", "--lang", "en", "--shell", "sh"); err != nil {
+		t.Fatalf("init command returned error: %v", err)
+	}
+
+	specPath := filepath.Join(ensureSpecDir(t, root, "demo"), "spec.md")
+	specContent := "# Demo\n\n## Goal\nx\n\n## Requirements\n- RQ-001 The flow should feel fast.\n\n## Acceptance Criteria\n### AC-001 Demo\n- Given x\n- When y\n- Then z\n"
+	if err := os.WriteFile(specPath, []byte(specContent), 0o644); err != nil {
+		t.Fatalf("WriteFile(spec) returned error: %v", err)
+	}
+
+	stdout, _, err := executeRoot(t, "feature", "demo", root)
+	if err != nil {
+		t.Fatalf("feature command returned error: %v", err)
+	}
+	if !strings.Contains(stdout, "check_issues: warnings=4") {
+		t.Fatalf("expected structured check summary in feature output, got %s", stdout)
+	}
+	if !strings.Contains(stdout, `check_detail: warning [ambiguity] ambiguous wording detected in Requirements: "should"`) {
+		t.Fatalf("expected structured check detail in feature output, got %s", stdout)
+	}
+}
+
+func TestFeatureCommandJSONIncludesStructuredCheckDetails(t *testing.T) {
+	root := t.TempDir()
+
+	if _, _, err := executeRoot(t, "init", root, "--git=false", "--lang", "en", "--shell", "sh"); err != nil {
+		t.Fatalf("init command returned error: %v", err)
+	}
+
+	specPath := filepath.Join(ensureSpecDir(t, root, "demo"), "spec.md")
+	specContent := "# Demo\n\n## Goal\nx\n\n## Requirements\n- RQ-001 The flow should feel fast.\n\n## Acceptance Criteria\n### AC-001 Demo\n- Given x\n- When y\n- Then z\n"
+	if err := os.WriteFile(specPath, []byte(specContent), 0o644); err != nil {
+		t.Fatalf("WriteFile(spec) returned error: %v", err)
+	}
+
+	stdout, _, err := executeRoot(t, "feature", "demo", root, "--json")
+	if err != nil {
+		t.Fatalf("feature --json command returned error: %v", err)
+	}
+
+	var payload struct {
+		CheckSummary struct {
+			Warnings int `json:"warnings"`
+		} `json:"check_summary"`
+		CheckFindings []struct {
+			Code string `json:"code"`
+		} `json:"check_findings"`
+	}
+	if err := json.Unmarshal([]byte(stdout), &payload); err != nil {
+		t.Fatalf("failed to parse feature json output %q: %v", stdout, err)
+	}
+	if payload.CheckSummary.Warnings != 4 {
+		t.Fatalf("expected structured warnings in feature json, got %q", stdout)
+	}
+	found := false
+	for _, finding := range payload.CheckFindings {
+		if finding.Code == "ambiguous_wording" {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Fatalf("expected ambiguous_wording in feature json output, got %q", stdout)
+	}
+}
+
+func TestCheckCommandShowsStructuredCheckSummary(t *testing.T) {
+	root := t.TempDir()
+
+	if _, _, err := executeRoot(t, "init", root, "--git=false", "--lang", "en", "--shell", "sh"); err != nil {
+		t.Fatalf("init command returned error: %v", err)
+	}
+
+	specPath := filepath.Join(ensureSpecDir(t, root, "demo"), "spec.md")
+	specContent := "# Demo\n\n## Goal\nx\n\n## Requirements\n- RQ-001 The flow should feel fast.\n\n## Acceptance Criteria\n### AC-001 Demo\n- Given x\n- When y\n- Then z\n"
+	if err := os.WriteFile(specPath, []byte(specContent), 0o644); err != nil {
+		t.Fatalf("WriteFile(spec) returned error: %v", err)
+	}
+
+	stdout, _, err := executeRoot(t, "check", "demo", root)
+	if err != nil {
+		t.Fatalf("check command returned error: %v", err)
+	}
+	if !strings.Contains(stdout, "checks:   warnings=4") {
+		t.Fatalf("expected check summary in output, got %s", stdout)
+	}
+	if !strings.Contains(stdout, "warning_categories=structure=2,ambiguity=2") {
+		t.Fatalf("expected categorized warning summary, got %s", stdout)
+	}
+	if !strings.Contains(stdout, `detail:   warning [ambiguity] ambiguous wording detected in Requirements: "should"`) {
+		t.Fatalf("expected finding detail in output, got %s", stdout)
+	}
+}
+
+func TestCheckCommandJSONIncludesStructuredFindings(t *testing.T) {
+	root := t.TempDir()
+
+	if _, _, err := executeRoot(t, "init", root, "--git=false", "--lang", "en", "--shell", "sh"); err != nil {
+		t.Fatalf("init command returned error: %v", err)
+	}
+
+	specPath := filepath.Join(ensureSpecDir(t, root, "demo"), "spec.md")
+	specContent := "# Demo\n\n## Goal\nx\n\n## Requirements\n- RQ-001 The flow should feel fast.\n\n## Acceptance Criteria\n### AC-001 Demo\n- Given x\n- When y\n- Then z\n"
+	if err := os.WriteFile(specPath, []byte(specContent), 0o644); err != nil {
+		t.Fatalf("WriteFile(spec) returned error: %v", err)
+	}
+
+	stdout, _, err := executeRoot(t, "check", "demo", root, "--json")
+	if err != nil {
+		t.Fatalf("check --json command returned error: %v", err)
+	}
+
+	var payload struct {
+		CheckSummary struct {
+			Warnings          int            `json:"warnings"`
+			WarningCategories map[string]int `json:"warning_categories"`
+		} `json:"check_summary"`
+		CheckFindings []struct {
+			Code     string `json:"code"`
+			Category string `json:"category"`
+		} `json:"check_findings"`
+	}
+	if err := json.Unmarshal([]byte(stdout), &payload); err != nil {
+		t.Fatalf("failed to parse check json output %q: %v", stdout, err)
+	}
+	if payload.CheckSummary.Warnings != 4 {
+		t.Fatalf("expected warnings in check summary, got %q", stdout)
+	}
+	if payload.CheckSummary.WarningCategories["ambiguity"] == 0 {
+		t.Fatalf("expected ambiguity category in check summary, got %q", stdout)
+	}
+	found := false
+	for _, finding := range payload.CheckFindings {
+		if finding.Code == "ambiguous_wording" && finding.Category == "ambiguity" {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Fatalf("expected ambiguous_wording finding in json output, got %q", stdout)
+	}
+}
+
 func TestDoctorCommandPrefixesWorkspaceAndFeatureFindings(t *testing.T) {
 	root := t.TempDir()
 

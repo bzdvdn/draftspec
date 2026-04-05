@@ -6,6 +6,8 @@
 constitution -> spec -> inspect -> plan -> tasks -> implement -> verify -> archive
 ```
 
+For new projects (Greenfield), work begins with an extended **Constitution** phase (using the `--foundation` flag) that codifies both the process rules and the project's technical foundation.
+
 Draftspec assumes branch-based delivery: each active feature should be developed in its own git branch, with the feature spec and plan package acting as the shared source of truth instead of a mutable global memory file. The default branch naming convention is `feature/<slug>`.
 
 ## Phase Responsibilities
@@ -14,11 +16,15 @@ Draftspec assumes branch-based delivery: each active feature should be developed
 
 Defines the non-negotiable rules of the project.
 
+For from-scratch projects (Greenfield), the constitution is extended with **Tech Stack** and **Core Architecture** sections, replacing the need for a separate "zero" feature design. This creates a unified, non-archived source of truth for the entire project.
+
 Mandatory sections:
 
 - `Purpose`
 - `Core Principles`
 - `Constraints`
+- `Tech Stack`
+- `Core Architecture`
 - `Language Policy`
 - `Development Workflow`
 - `Governance`
@@ -113,6 +119,13 @@ Persisted inspect and verify reports should start with a machine-readable metada
 
 Stable acceptance IDs such as `AC-001` make traceability lighter and easier to validate.
 
+Draftspec should prefer cheap helper findings as the first evidence layer for inspect:
+
+- `check-inspect-ready` and `inspect-spec` should establish structural findings before the agent widens scope
+- helper findings may carry categories such as `structure`, `traceability`, `ambiguity`, `consistency`, and `readiness`
+- the inspect agent should preserve those findings in the report and only add reasoning where the cheap checks cannot prove the claim directly
+- helper findings should not be silently ignored just because the broader narrative sounds acceptable
+
 For cheap `spec <-> plan` consistency checks, Draftspec should prefer this scope:
 
 - always load: `constitution.md`, `spec.md`
@@ -127,6 +140,7 @@ The goal is to catch obvious drift, not to run a full architectural review. Usef
 - unjustified scope expansion
 - acceptance-critical behavior reflected at the plan level
 - plan-to-task alignment when `tasks.md` exists
+- planned implementation surfaces compared with `tasks.md` `Surface Map` and `Touches:` references when both plan and tasks exist
 - constitutional consistency
 - justification for richer plan artifacts such as `data-model.md` and `contracts/`
 
@@ -137,11 +151,16 @@ Produces technical design artifacts for one feature package:
 - `plan.md`
 - `data-model.md`
 - `contracts/`
-- optional `research.md`
+- `research.md` (optional) — used to identify and resolve technical unknowns, architecture trade-offs, or integration constraints before finalizing the implementation plan.
 
 ### `tasks`
 
 Turns the plan package into executable tasks. `tasks.md` lives next to other plan artifacts inside `.draftspec/plans/<slug>/`.
+
+Draftspec uses **Lazy Decomposition** to keep context narrow:
+
+- **Phase `tasks`**: Produces a high-level map (5-10 tasks) tied to functional boundaries. Micro-tasks (1-5 lines of code) are discouraged at this stage to save tokens.
+- **Phase `implement`**: The agent can perform **In-place Decomposition** by adding indented sub-tasks (e.g., `T1.1.1`) to the active task only.
 
 Tasks should be grouped by phase and use phase-scoped task IDs such as `T1.1`, `T1.2`, and `T2.1`.
 
@@ -154,6 +173,12 @@ AC-001 -> T1.1, T2.1
 ### `implement`
 
 Executes unfinished tasks and updates `tasks.md`.
+
+**In-place Decomposition rules**:
+
+- Sub-tasks MUST NOT add new files to the `Touches:` list of the parent task.
+- Sub-tasks MUST NOT change the `AC-*` mapping of the parent task.
+- If decomposition reveals a plan-level flaw, the agent MUST stop and request a plan update.
 
 Default behavior should remain full-run: without explicit scope flags, Draftspec continues through all unfinished tasks in task-list order.
 
@@ -168,11 +193,18 @@ When selective execution skips unfinished earlier work, Draftspec should warn ab
 
 During implementation, Draftspec should emit short runtime progress updates whenever it starts or completes a phase in the active execution scope.
 
+Every non-trivial code change should include a **traceability annotation** linking it back to the task ID and the primary acceptance criterion (AC).
+Format: `// @ds-task <TASK_ID>: <Description> (<AC_ID>)`
+
 Those phase-status updates should follow the project's configured agent language rather than defaulting to English.
 
 ### `verify`
 
 Runs a lightweight post-implementation check to confirm that completed work is aligned enough with tasks and project rules to move forward safely.
+
+Verification uses **traceability data** collected via `/.draftspec/scripts/trace.* <slug>` to confirm that implementation matches task claims and acceptance criteria (including `@ds-test` annotations).
+
+**Legacy Fallback**: For features without annotations, the agent falls back to manual inspection of the files listed in `Touches:` and running relevant tests. This ensures Draftspec remains compatible with older features while encouraging token-efficient verification for new ones.
 
 A full verification report should use a stable structure:
 

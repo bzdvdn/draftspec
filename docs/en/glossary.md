@@ -2,7 +2,7 @@
 
 ## Constitution
 
-The highest-priority project document. It defines non-negotiable rules for architecture, workflow, language policy, and governance.
+The highest-priority project document. It defines non-negotiable rules for architecture, workflow, language policy, and governance. For new projects, it also serves as the technical foundation by codifying the tech stack and core architecture.
 
 ## Spec
 
@@ -75,3 +75,19 @@ The canonical BDD markers used for acceptance criteria regardless of documentati
 ## Acceptance ID
 
 A stable identifier for an acceptance criterion, such as `AC-001`. It helps keep traceability explicit across specs, tasks, and inspection reports.
+
+## Traceability
+
+The practice of linking implementation code and tests back to tasks and acceptance criteria using stable IDs. In Draftspec, this is achieved via `@ds-task` and `@ds-test` annotations.
+
+## Lazy Decomposition
+
+A strategy to minimize context bloat by keeping initial tasks high-level and allowing the implementation agent to perform **In-place Decomposition** only for the active task.
+
+## In-place Decomposition
+
+The act of refining a complex task by adding indented sub-tasks (e.g., `T1.1.1`) directly in `tasks.md` during the implementation phase.
+
+## Smart Branching
+
+A feature that ensures Git development alignment by checking if the current branch matches the expected `feature/<slug>` pattern.

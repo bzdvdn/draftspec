@@ -21,10 +21,10 @@ Always read these first:
 
 ## Load If Present
 
-Read these only when they exist and materially affect the inspection:
+Read these only when they exist and the inspection requires cross-artifact consistency checks (spec↔plan alignment, acceptance↔task coverage):
 
-- `.draftspec/plans/<slug>/plan.md`
-- `.draftspec/plans/<slug>/tasks.md`
+- `.draftspec/plans/<slug>/plan.md` — read when checking goal alignment, scope expansion, or acceptance coverage at plan level
+- `.draftspec/plans/<slug>/tasks.md` — read when verifying that every `AC-*` is covered by at least one task
 
 ## Do Not Read By Default
 
@@ -32,7 +32,7 @@ Read these only when they exist and materially affect the inspection:
 - `.draftspec/plans/<slug>/contracts/`
 - `.draftspec/plans/<slug>/research.md`
 - broad repository history
-- implementation files unless they are needed to verify a concrete consistency claim
+- implementation files unless a finding names a specific file and the claim cannot be confirmed from spec/plan/tasks alone
 
 ## Stop Conditions
 
@@ -48,12 +48,21 @@ Stop and ask a minimal follow-up question only if:
 - If `/.draftspec/scripts/check-inspect-ready.*` is available, prefer it as the cheap first pass before deepening into artifacts.
 - Use `/.draftspec/scripts/inspect-spec.*` only as a fallback when the phase-readiness wrapper is unavailable.
 - Prefer helper script output over reading helper script source.
+- Treat helper script output as the primary structural evidence layer for inspect. When the scripts report concrete `ERROR` / `WARN` findings, use those findings as the starting point for your report instead of re-deriving the same points from scratch.
+- If helper output exposes finding categories such as structure, traceability, ambiguity, consistency, or readiness, preserve that signal in your reasoning. Expand on it only when extra context is genuinely needed.
+- Do not ignore a concrete helper finding just because your broader intuition is optimistic. Resolve or explicitly explain it.
+- Use your own reasoning mainly for what the cheap checks cannot prove directly: constitutional conflicts, invented product intent, unjustified scope expansion, contradictory assumptions, or subtle spec↔plan drift.
 - Do not read `/.draftspec/scripts/*` by default unless you are debugging the script, working on Draftspec itself, or the user explicitly asks to inspect script logic.
 - Inspect spec completeness and clarity.
 - Verify `constitution <-> spec`: the spec must not conflict with explicit constitutional constraints, workflow rules, or language policy.
 - Treat technology names, framework choices, library lists, or version pins in the spec as a `Warning` unless they clearly represent a user requirement, repository constraint, or external compatibility contract.
 - Every acceptance criterion in the spec MUST have an explicit Given/When/Then format. The `Given`, `When`, and `Then` markers remain canonical regardless of the documentation language. Missing G/W/T is an `Error`, not a `Suggestion`.
+- Any `[NEEDS CLARIFICATION: ...]` marker remaining in the spec is an `Error`. These must be resolved before planning can begin.
+- If `## Assumptions` is missing, flag it as a `Warning`. If present, check each assumption for plausibility against the constitution and known repository state — an assumption that contradicts repository reality is an `Error`.
+- If `## Success Criteria` is present, each `SC-*` must have a measurable metric and measurement method. Vague SC entries (e.g., "system should be fast") are a `Warning`.
 - If `tasks.md` exists, verify that every acceptance criterion from the spec is covered by at least one task. An uncovered criterion is an `Error`.
+- If `tasks.md` exists and has task IDs but is missing `## Surface Map`, flag it as a `Warning` — the implement agent needs this section as a batch-read manifest.
+- If `tasks.md` exists and any task line with a task ID is missing a `Touches:` field, flag it as a `Warning` — tasks without `Touches:` force the implement agent into exploratory reads.
 - If `tasks.md` uses task IDs such as `T1.1`, prefer traceability statements that reference those task IDs directly.
 - Prefer the cheapest inspection scope first: `constitution.md` and `spec.md`, then `plan.md`, then `tasks.md`, and only then deeper plan artifacts when a concrete claim requires them.
 - If no `plan.md` exists, do not widen the inspection into optional plan artifacts or implementation code.
@@ -67,10 +76,15 @@ Stop and ask a minimal follow-up question only if:
 - Check `Scope Expansion`: the plan must not introduce major new workstreams, components, or integration surfaces that are outside the spec.
 - Check `Acceptance Coverage at Plan Level`: major acceptance-critical behavior from the spec should be reflected in the plan intent, even before tasks exist.
 - Check `Constitution Consistency`: the plan must not violate constitutional rules or architectural constraints.
+- If `plan.md` exists and is missing `## Constitution Compliance`, flag it as a `Warning` — this section makes constitution adherence explicit and reviewable.
 - Check `Artifact Justification`: if the plan introduces `data-model.md` or `contracts/`, the need for those artifacts should be justified by the spec.
 - Do not turn this into a broad design review. Prefer catching obvious drift over scoring architecture quality.
 - Keep the inspection report in the project's configured documentation language when writing it to disk.
 - Prefer concrete findings over generic advice.
+- Prefer this reporting order:
+  - 1. structural findings from helper output
+  - 2. cross-artifact consistency findings confirmed from the loaded artifacts
+  - 3. narrow judgment calls that require agent reasoning
 - Default to a compact report in conversation output: always include `Verdict`, include `Errors`, `Warnings`, and `Next Step` when non-empty, and include `Questions`, `Suggestions`, or `Traceability` only when they add real signal.
 - Produce the full sectioned report only when the user explicitly asks for a full report or when the report is being persisted to a file.
 - When writing the report to disk, include a machine-readable metadata block at the top with `report_type`, `slug`, `status`, `docs_language`, and `generated_at`.
@@ -95,6 +109,7 @@ Stop and ask a minimal follow-up question only if:
 - For `pass`, name the exact next slash command.
 - For `concerns`, say whether the workflow may continue; if it may, include the exact next slash command.
 - For `blocked`, do not suggest the next phase command; state which refinement is required first.
+- Avoid duplicating the same issue in multiple sections. If helper output already established the concrete problem, keep your wording concise and move on to its consequence or required refinement.
 
 ## Spec Summary Artifact
 
@@ -114,7 +129,7 @@ Keep the summary under 25 lines. It is loaded by `tasks`, `implement`, and `veri
 - Persist to `.draftspec/specs/<slug>/inspect.md` and write `.draftspec/specs/<slug>/summary.md`
 - Summarize verdict in the conversation; prefer compact report with only non-empty sections.
 - End with a summary block: `Slug`, `Status`, `Artifacts`, `Blockers`, `Next command`
-- When ready: `Next command: /draftspec.plan <slug>` (or `/draftspec.tasks <slug>` when plan already exists)
+- When ready: `Next command: /draftspec.plan <slug>` (or `/draftspec.tasks <slug>` when plan already exists; after archive you MAY mention `/draftspec.recap` as an optional summary but don’t advertise it as required)
 
 ## Self-Check
 

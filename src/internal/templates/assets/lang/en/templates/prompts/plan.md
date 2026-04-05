@@ -21,6 +21,16 @@ Stop if: spec or inspect missing, spec too vague for architecture decisions, or 
 
 ## Flags
 
+`--update`: targeted edit mode — update a specific section, decision (`DEC-*`), implementation surface, or add a contract without rewriting the entire plan package. Similar to `spec --amend`.
+
+When `--update` is present in `$ARGUMENTS`:
+- Read the existing plan artifacts first.
+- Apply only the change described in the remaining arguments.
+- Do not restructure or rewrite sections that are not being changed.
+- If the update changes a `DEC-*`, update its `Affects` and `Validation` fields if they become stale.
+- If the update changes `data-model.md` or `contracts/`, ensure consistency with `plan.md` references.
+- Do not invalidate downstream `tasks.md` unless the change materially affects task decomposition or acceptance coverage.
+
 `--research`: enter research-first mode before producing the plan.
 
 When `--research` is present in `$ARGUMENTS`:
@@ -145,8 +155,8 @@ Before creating `research.md`, write down the concrete unknowns first:
 - `## Rollout and Compatibility` should be explicit when migration, flags, compatibility, or operational follow-up matter, and should say so plainly when they do not.
 - `## Validation` should tie checks back to `AC-*` or `DEC-*`, not just list generic test ideas.
 - Add a short `Unknowns First` pass before finalizing the plan: if a decision, surface, or validation path is still unclear, record the unknown explicitly or stop for refinement.
-- Negative examples: avoid `update backend accordingly`, `wire this through the system`, or `adjust logic as needed` as if they were implementation decisions.
 - Prefer concrete implementation guidance over architecture essay prose. If a paragraph does not reduce downstream guesswork, tighten it.
+- `## Constitution Compliance` MUST be present: state `no conflicts` or list specific conflicts with constitution sections and how the plan resolves or defers them. This makes constitution adherence explicit and reviewable instead of implicit.
 
 ## Output expectations
 

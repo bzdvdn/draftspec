@@ -12,9 +12,36 @@ import (
 
 type CheckResult struct {
 	Lines    []string
+	Findings []CheckFinding
 	Errors   int
 	Warnings int
 	Failed   bool
+}
+
+type FindingSeverity string
+type FindingCategory string
+
+const (
+	SeverityOK      FindingSeverity = "ok"
+	SeverityWarning FindingSeverity = "warning"
+	SeverityError   FindingSeverity = "error"
+
+	CategoryStructure    FindingCategory = "structure"
+	CategoryTraceability FindingCategory = "traceability"
+	CategoryAmbiguity    FindingCategory = "ambiguity"
+	CategoryConsistency  FindingCategory = "consistency"
+	CategoryReadiness    FindingCategory = "readiness"
+)
+
+type CheckFinding struct {
+	Code     string          `json:"code"`
+	Severity FindingSeverity `json:"severity"`
+	Category FindingCategory `json:"category"`
+	Artifact string          `json:"artifact,omitempty"`
+	Path     string          `json:"path,omitempty"`
+	Section  string          `json:"section,omitempty"`
+	Message  string          `json:"message"`
+	Refs     []string        `json:"refs,omitempty"`
 }
 
 type TaskStateSummary struct {
@@ -41,21 +68,87 @@ var (
 	acceptanceIDPattern  = regexp.MustCompile(`AC-[0-9][0-9][0-9]`)
 	requirementIDPattern = regexp.MustCompile(`RQ-[0-9][0-9][0-9]`)
 	decisionIDPattern    = regexp.MustCompile(`DEC-[0-9][0-9][0-9]`)
+	ambiguityPhrases     = []string{
+		"should",
+		"appropriate",
+		"fast",
+		"user-friendly",
+		"as needed",
+		"if possible",
+		"when appropriate",
+		"при необходимости",
+		"если возможно",
+		"удобн",
+		"быстр",
+		"понятн",
+	}
 )
 
 func (r *CheckResult) AddOK(message string) {
-	r.Lines = append(r.Lines, "OK: "+message)
+	r.AddStructuredOK("generic_ok", CategoryReadiness, "", message)
 }
 
 func (r *CheckResult) AddWarn(message string) {
-	r.Warnings++
-	r.Lines = append(r.Lines, "WARN: "+message)
+	r.AddStructuredWarn("generic_warning", CategoryReadiness, "", message)
 }
 
 func (r *CheckResult) AddError(message string) {
-	r.Errors++
-	r.Failed = true
-	r.Lines = append(r.Lines, "ERROR: "+message)
+	r.AddStructuredError("generic_error", CategoryReadiness, "", message)
+}
+
+func (r *CheckResult) AddFinding(f CheckFinding) {
+	r.Findings = append(r.Findings, f)
+
+	switch f.Severity {
+	case SeverityWarning:
+		r.Warnings++
+	case SeverityError:
+		r.Errors++
+		r.Failed = true
+	}
+
+	prefix := "OK"
+	switch f.Severity {
+	case SeverityWarning:
+		prefix = "WARN"
+	case SeverityError:
+		prefix = "ERROR"
+	}
+
+	r.Lines = append(r.Lines, prefix+": "+f.Message)
+}
+
+func (r *CheckResult) AddStructuredOK(code string, category FindingCategory, artifact, message string, refs ...string) {
+	r.AddFinding(CheckFinding{
+		Code:     code,
+		Severity: SeverityOK,
+		Category: category,
+		Artifact: artifact,
+		Message:  message,
+		Refs:     append([]string(nil), refs...),
+	})
+}
+
+func (r *CheckResult) AddStructuredWarn(code string, category FindingCategory, artifact, message string, refs ...string) {
+	r.AddFinding(CheckFinding{
+		Code:     code,
+		Severity: SeverityWarning,
+		Category: category,
+		Artifact: artifact,
+		Message:  message,
+		Refs:     append([]string(nil), refs...),
+	})
+}
+
+func (r *CheckResult) AddStructuredError(code string, category FindingCategory, artifact, message string, refs ...string) {
+	r.AddFinding(CheckFinding{
+		Code:     code,
+		Severity: SeverityError,
+		Category: category,
+		Artifact: artifact,
+		Message:  message,
+		Refs:     append([]string(nil), refs...),
+	})
 }
 
 func (r *CheckResult) AddRaw(line string) {
@@ -64,6 +157,7 @@ func (r *CheckResult) AddRaw(line string) {
 
 func (r *CheckResult) Merge(other CheckResult) {
 	r.Lines = append(r.Lines, other.Lines...)
+	r.Findings = append(r.Findings, other.Findings...)
 	r.Errors += other.Errors
 	r.Warnings += other.Warnings
 	if other.Failed {
@@ -348,6 +442,19 @@ func CheckImplementReady(root, slug string) (CheckResult, error) {
 		result.Merge(inspectResult)
 	}
 
+	planAbs := absFromRoot(root, planDisplay)
+	if fileExists(planAbs) && fileExists(tasksAbs) {
+		planContent, err := os.ReadFile(planAbs)
+		if err != nil {
+			return CheckResult{}, fmt.Errorf("read plan %s: %w", planDisplay, err)
+		}
+		tasksContent, err := os.ReadFile(tasksAbs)
+		if err != nil {
+			return CheckResult{}, fmt.Errorf("read tasks %s: %w", tasksDisplay, err)
+		}
+		checkPlanTaskSurfaceConsistency(&result, planDisplay, string(planContent), tasksDisplay, string(tasksContent))
+	}
+
 	constitutionResult, err := CheckConstitution(root, cfg.Project.ConstitutionFile)
 	if err != nil {
 		return CheckResult{}, err
@@ -552,6 +659,9 @@ func InspectSpec(root, specPath, tasksPath string) (CheckResult, error) {
 		result.AddWarn("no stable acceptance IDs found in acceptance criteria")
 	}
 
+	checkAmbiguousLanguage(&result, specDisplay, sections.Requirements, markdownSection(text, sections.Requirements))
+	checkAmbiguousLanguage(&result, specDisplay, sections.Acceptance, acceptanceBody)
+
 	if strings.TrimSpace(tasksPath) != "" {
 		tasksDisplay, tasksAbs := resolveUserPath(root, tasksPath)
 		if fileExists(tasksAbs) {
@@ -581,6 +691,8 @@ func InspectSpec(root, specPath, tasksPath string) (CheckResult, error) {
 			} else {
 				result.AddError(fmt.Sprintf("tasks file is missing required section: %s", sections.Coverage))
 			}
+
+			checkTaskTraceability(&result, tasksDisplay, acceptanceBody, tasksContent)
 		}
 	}
 
@@ -695,18 +807,18 @@ func resolveInspectDisplayPath(root, specsDir, slug string) (string, string) {
 
 func checkFile(result *CheckResult, displayPath, absolutePath string) {
 	if fileExists(absolutePath) {
-		result.AddOK(displayPath)
+		result.AddStructuredOK("file_present", CategoryReadiness, displayPath, displayPath)
 		return
 	}
-	result.AddError(fmt.Sprintf("missing %s", displayPath))
+	result.AddStructuredError("file_missing", CategoryReadiness, displayPath, fmt.Sprintf("missing %s", displayPath))
 }
 
 func checkPattern(result *CheckResult, content, pattern, label string) {
 	if regexp.MustCompile(pattern).FindStringIndex(content) != nil {
-		result.AddOK(label)
+		result.AddStructuredOK("pattern_present", CategoryStructure, "", label)
 		return
 	}
-	result.AddError(label)
+	result.AddStructuredError("pattern_missing", CategoryStructure, "", label)
 }
 
 func hasHeading(content, section string) bool {
@@ -715,17 +827,17 @@ func hasHeading(content, section string) bool {
 
 func checkRequiredHeading(result *CheckResult, content, section string) {
 	if hasHeading(content, section) {
-		result.AddOK(section)
+		result.AddStructuredOK("required_section_present", CategoryStructure, "spec", section, section)
 	} else {
-		result.AddError(fmt.Sprintf("missing required section: %s", section))
+		result.AddStructuredError("required_section_missing", CategoryStructure, "spec", fmt.Sprintf("missing required section: %s", section), section)
 	}
 }
 
 func checkOptionalHeading(result *CheckResult, content, section string) {
 	if hasHeading(content, section) {
-		result.AddOK(section)
+		result.AddStructuredOK("optional_section_present", CategoryStructure, "spec", section, section)
 	} else {
-		result.AddWarn(fmt.Sprintf("missing section: %s", section))
+		result.AddStructuredWarn("optional_section_missing", CategoryStructure, "spec", fmt.Sprintf("missing section: %s", section), section)
 	}
 }
 
@@ -765,6 +877,176 @@ func countMalformedCoverageLines(content string) int {
 		}
 	}
 	return count
+}
+
+func checkAmbiguousLanguage(result *CheckResult, path, section, content string) {
+	lower := strings.ToLower(content)
+	refs := ExtractUniqueMatches(content, `(?:AC|RQ)-[0-9][0-9][0-9]`)
+	for _, phrase := range ambiguityPhrases {
+		if !strings.Contains(lower, phrase) {
+			continue
+		}
+		message := fmt.Sprintf("ambiguous wording detected in %s: %q", section, phrase)
+		result.Findings = append(result.Findings, CheckFinding{
+			Code:     "ambiguous_wording",
+			Severity: SeverityWarning,
+			Category: CategoryAmbiguity,
+			Artifact: "spec",
+			Path:     path,
+			Section:  section,
+			Message:  message,
+			Refs:     append([]string(nil), refs...),
+		})
+		result.Warnings++
+		result.Lines = append(result.Lines, "WARN: "+message)
+	}
+}
+
+func checkTaskTraceability(result *CheckResult, tasksDisplay, acceptanceBody, tasksContent string) {
+	specIDs := ExtractUniqueMatches(acceptanceBody, `AC-[0-9][0-9][0-9]`)
+	if len(specIDs) == 0 {
+		return
+	}
+
+	taskIDs := extractTaskDefinitionIDs(tasksContent)
+	taskIDSet := make(map[string]struct{}, len(taskIDs))
+	for _, id := range taskIDs {
+		taskIDSet[id] = struct{}{}
+	}
+
+	if len(taskIDs) > 0 {
+		if !ContainsAny(tasksContent, "## Surface Map") {
+			result.AddStructuredWarn("surface_map_missing", CategoryTraceability, "tasks", "tasks are missing Surface Map section")
+		}
+		if countTasksWithoutTouches(tasksContent) > 0 {
+			result.AddStructuredWarn("task_touches_missing", CategoryTraceability, "tasks", "tasks contain task lines without Touches: field")
+		}
+		if hasDuplicateTaskDefinitionIDs(tasksContent) {
+			result.AddStructuredWarn("duplicate_task_ids", CategoryTraceability, "tasks", "tasks contain duplicate task IDs")
+		}
+	}
+
+	coverageSection := acceptanceCoverageSection(tasksContent)
+	specIDSet := make(map[string]struct{}, len(specIDs))
+	for _, id := range specIDs {
+		specIDSet[id] = struct{}{}
+	}
+	coverageIDs := make(map[string]struct{})
+	for _, id := range ExtractUniqueMatches(tasksContent, `AC-[0-9][0-9][0-9]\s*->`) {
+		coverageIDs[strings.TrimSpace(strings.TrimSuffix(id, "->"))] = struct{}{}
+	}
+
+	for _, taskID := range ExtractUniqueMatches(coverageSection, `T[0-9]+\.[0-9]+`) {
+		if _, ok := taskIDSet[taskID]; !ok {
+			result.AddStructuredError("unknown_task_reference", CategoryTraceability, tasksDisplay, fmt.Sprintf("acceptance coverage references unknown task ID %s", taskID), taskID)
+		}
+	}
+	for _, id := range ExtractUniqueMatches(coverageSection, `AC-[0-9][0-9][0-9]`) {
+		if _, ok := specIDSet[id]; !ok {
+			result.AddStructuredError("unknown_acceptance_reference", CategoryTraceability, tasksDisplay, fmt.Sprintf("acceptance coverage references unknown acceptance criterion %s", id), id)
+		}
+	}
+	for _, id := range specIDs {
+		if _, ok := coverageIDs[id]; !ok {
+			result.AddStructuredError("acceptance_not_covered", CategoryTraceability, tasksDisplay, fmt.Sprintf("acceptance criterion %s is not covered by tasks", id), id)
+		}
+	}
+}
+
+func checkPlanTaskSurfaceConsistency(result *CheckResult, planDisplay, planContent, tasksDisplay, tasksContent string) {
+	planSurfaces := extractPlanSurfaceRefs(planContent)
+	taskSurfaces := extractTaskSurfaceRefs(tasksContent)
+	if len(planSurfaces) == 0 || len(taskSurfaces) == 0 {
+		return
+	}
+
+	taskSurfaceSet := make(map[string]struct{}, len(taskSurfaces))
+	for _, surface := range taskSurfaces {
+		taskSurfaceSet[surface] = struct{}{}
+	}
+	for _, surface := range planSurfaces {
+		if _, ok := taskSurfaceSet[surface]; !ok {
+			result.AddStructuredWarn("plan_surface_missing_from_tasks", CategoryConsistency, tasksDisplay, fmt.Sprintf("planned surface %s is not referenced in tasks surface map or Touches:", surface), surface)
+		}
+	}
+
+	planSurfaceSet := make(map[string]struct{}, len(planSurfaces))
+	for _, surface := range planSurfaces {
+		planSurfaceSet[surface] = struct{}{}
+	}
+	for _, surface := range taskSurfaces {
+		if _, ok := planSurfaceSet[surface]; !ok {
+			result.AddStructuredWarn("task_surface_missing_from_plan", CategoryConsistency, planDisplay, fmt.Sprintf("task surface %s is not referenced in plan implementation surfaces", surface), surface)
+		}
+	}
+}
+
+func extractPlanSurfaceRefs(planContent string) []string {
+	section := markdownSection(planContent, "Implementation Surfaces")
+	if strings.TrimSpace(section) == "" {
+		section = markdownSection(planContent, "Реализационные поверхности")
+	}
+	if strings.TrimSpace(section) == "" {
+		section = markdownSection(planContent, "Поверхности реализации")
+	}
+	return extractSurfaceRefs(section)
+}
+
+func extractTaskSurfaceRefs(tasksContent string) []string {
+	var refs []string
+	refs = append(refs, extractSurfaceRefs(markdownSection(tasksContent, "Surface Map"))...)
+	refs = append(refs, extractTouchesRefs(tasksContent)...)
+	return uniqueStrings(refs)
+}
+
+func extractSurfaceRefs(content string) []string {
+	re := regexp.MustCompile(`(?:^|[\s` + "`" + `:(])([A-Za-z0-9_./-]+\.[A-Za-z0-9_./-]+|[A-Za-z0-9_./-]+/)`)
+	raw := re.FindAllStringSubmatch(content, -1)
+	refs := make([]string, 0, len(raw))
+	for _, match := range raw {
+		if len(match) != 2 {
+			continue
+		}
+		value := strings.TrimSpace(match[1])
+		if value == "" {
+			continue
+		}
+		refs = append(refs, value)
+	}
+	return uniqueStrings(refs)
+}
+
+func extractTouchesRefs(tasksContent string) []string {
+	lines := strings.Split(tasksContent, "\n")
+	var refs []string
+	for _, line := range lines {
+		idx := strings.Index(line, "Touches:")
+		if idx < 0 {
+			continue
+		}
+		part := strings.TrimSpace(line[idx+len("Touches:"):])
+		for _, piece := range strings.Split(part, ",") {
+			value := strings.TrimSpace(piece)
+			if value == "" {
+				continue
+			}
+			refs = append(refs, value)
+		}
+	}
+	return uniqueStrings(refs)
+}
+
+func uniqueStrings(values []string) []string {
+	seen := make(map[string]struct{}, len(values))
+	out := make([]string, 0, len(values))
+	for _, value := range values {
+		if _, ok := seen[value]; ok {
+			continue
+		}
+		seen[value] = struct{}{}
+		out = append(out, value)
+	}
+	return out
 }
 
 func computeTaskState(tasksPath string) (TaskStateSummary, error) {

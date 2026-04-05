@@ -28,13 +28,13 @@ Always read these before decomposing the work:
 
 ## Load If Present
 
-Read these only when the decomposition requires them:
+Read when a task being decomposed explicitly references or depends on content in these files:
 
-- `.draftspec/specs/<slug>/summary.md` if present; otherwise `.draftspec/specs/<slug>/spec.md` — when task intent, scope, or acceptance boundaries are unclear
-- `.draftspec/plans/<slug>/data-model.md` when task decomposition depends on entities, invariants, or lifecycle details
-- `.draftspec/plans/<slug>/contracts/` when tasks involve APIs, events, or integration boundaries
-- `.draftspec/plans/<slug>/research.md` only when it exists and affects implementation sequencing or risk
-- the smallest set of implementation files needed to confirm task boundaries, sequencing, or concrete outcomes
+- `.draftspec/specs/<slug>/summary.md` (or `spec.md`) — when an `AC-*` referenced by a task has ambiguous scope or acceptance boundary
+- `.draftspec/plans/<slug>/data-model.md` — when tasks must create or modify entities, fields, invariants, or state transitions
+- `.draftspec/plans/<slug>/contracts/` — when tasks must create or modify API endpoints, event payloads, or integration boundaries
+- `.draftspec/plans/<slug>/research.md` — only when a documented finding changes task sequencing or introduces a risk that affects decomposition
+- code files — only the files needed to confirm where implementation surfaces begin and end (e.g., existing function signatures, module boundaries)
 
 Do not assume `research.md` should exist; use it only when the plan clearly depends on preserved uncertainty, an external dependency, or a documented trade-off.
 
@@ -86,8 +86,8 @@ Do not jump ahead into implementation.
 - Each task MUST include a phase-scoped task ID in the form `T<phase>.<index>`.
 - Each task MUST follow the format: `- [ ] T<phase>.<index> <action verb> — <concrete measurable outcome>`
 - Each task SHOULD reference 1-2 stable IDs when possible (`AC-*`, `RQ-*`, `DEC-*`).
-- Add a `Touches:` hint to each task line whenever the implementation surface is known with confidence. This is the primary mechanism for preventing re-reads during implement — the more concrete the surfaces, the fewer exploratory reads the implement agent needs to make. Keep it compact (`Touches: auth handler, session store`) and omit only when the surface genuinely cannot be named yet.
-- After writing all task phases, add `## Surface Map` before the first phase: a two-column table mapping each unique implementation surface to the task IDs that touch it (`Surface | Tasks`). This lets `implement` batch-read all needed files in one pass without scanning `Touches:` across individual task lines.
+- Each task MUST include a `Touches:` field naming the concrete files or modules the task will create or modify. This is the primary mechanism for preventing re-reads during implement — the implement agent uses these to batch-read all needed files in one pass. Keep it compact (`Touches: src/auth/handler.ts, src/session/store.ts`). Use module-level names only when the exact file cannot be determined yet (`Touches: src/auth/`). A task without `Touches:` forces the implement agent into exploratory reads, which wastes tokens.
+- The `## Surface Map` section MUST appear before the first phase: a two-column table mapping each unique implementation surface to the task IDs that touch it (`Surface | Tasks`). This is the implement agent's batch-read manifest — without it, the agent must scan every task line to build the read list.
 - The tasks taken together MUST cover all acceptance criteria from the spec. Any uncovered criterion is a blocker.
 - The `## Acceptance Coverage` section MUST include at least one explicit coverage line for each acceptance criterion.
 - Coverage lines SHOULD reference stable acceptance IDs and task IDs such as `AC-001 -> T1.1, T2.1`.
@@ -97,17 +97,17 @@ Do not jump ahead into implementation.
 ## Content Quality Rules
 
 - Each phase should have a short goal that explains why the phase exists.
-- Prefer a few concrete tasks with measurable outcomes over many tiny bookkeeping items.
+- **Lazy Decomposition**: Prefer a few concrete tasks (5-10 per feature) with measurable outcomes over many tiny bookkeeping items. Do not create "micro-tasks" (1-5 lines of code) during the tasks phase; the implementation agent will refine them in-place if needed.
+- Focus on "milestone" tasks tied to specific files or functional boundaries.
 - Keep the outcome part of each task to ≤ 12 words. If more words are needed, the task is not concrete enough — split it or tighten the verb.
 - When the acceptance proof is simple, embed it directly in the outcome instead of requiring a spec lookup: prefer `add POST /auth/login — returns 200 with JWT token field — AC-001` over `add login handler — endpoint works — AC-001`.
 - Use action verbs tied to observable work: implement, add, migrate, validate, remove, backfill, document.
 - Keep foundational setup separate from core behavior and separate proof/validation from broad implementation.
-- If a task would benefit from a surface hint, prefer a compact `Touches: auth flow, session store` style note instead of speculative file-by-file path lists.
+- Keep `Touches:` values as concrete file paths when possible (`src/auth/handler.ts`), not abstract concepts (`auth flow`). The implement agent needs paths, not descriptions.
 - When a task exists only to prove behavior, make that explicit instead of hiding it inside a larger implementation task.
 - If a phase is unnecessary for this feature, omit it or state that it is intentionally not needed instead of filling it with generic tasks.
 - Task text should make the intended outcome obvious to a reviewer without needing to reopen the plan for every line.
 - Negative examples: avoid `misc`, `cleanup as needed`, `wire everything up`, `final polish`, or task text that hides the outcome behind a generic verb.
-- Avoid `misc`, `cleanup as needed`, `wire everything up`, `final polish`, or other vague umbrella wording.
 
 ## Output expectations
 

@@ -285,6 +285,11 @@ func validatePlan(slug, specPath, path string) []Finding {
 	}
 	if !ContainsAny(text, "## Acceptance Approach") {
 		findings = append(findings, Finding{Level: "warning", Message: fmt.Sprintf("plan is missing Acceptance Approach section for slug %s", slug)})
+	}
+	if !ContainsAny(text, "## Constitution Compliance", "## Соответствие конституции") {
+		findings = append(findings, Finding{Level: "warning", Message: fmt.Sprintf("plan is missing Constitution Compliance section for slug %s", slug)})
+	}
+	if !ContainsAny(text, "## Acceptance Approach") {
 		return findings
 	}
 
@@ -348,14 +353,26 @@ func validateTasks(slug, specPath, tasksPath string) []Finding {
 	for _, id := range taskIDs {
 		taskIDSet[id] = struct{}{}
 	}
+
+	var findings []Finding
+	if len(taskIDs) > 0 {
+		if !ContainsAny(tasksText, "## Surface Map") {
+			findings = append(findings, Finding{Level: "warning", Message: fmt.Sprintf("tasks are missing Surface Map section for slug %s", slug)})
+		}
+		if countTasksWithoutTouches(tasksText) > 0 {
+			findings = append(findings, Finding{Level: "warning", Message: fmt.Sprintf("tasks contain task lines without Touches: field for slug %s", slug)})
+		}
+	}
+
 	if hasDuplicateTaskDefinitionIDs(tasksText) {
 		// Duplicate IDs make downstream references ambiguous.
-		findings := []Finding{{Level: "warning", Message: fmt.Sprintf("tasks contain duplicate task IDs for slug %s", slug)}}
+		findings = append(findings, Finding{Level: "warning", Message: fmt.Sprintf("tasks contain duplicate task IDs for slug %s", slug)})
 		findings = append(findings, validateTaskCoverage(slug, specIDs, tasksText, taskIDSet)...)
 		return findings
 	}
 
-	return validateTaskCoverage(slug, specIDs, tasksText, taskIDSet)
+	findings = append(findings, validateTaskCoverage(slug, specIDs, tasksText, taskIDSet)...)
+	return findings
 }
 
 func validateTaskCoverage(slug string, specIDs []string, tasksText string, taskIDSet map[string]struct{}) []Finding {
@@ -440,6 +457,26 @@ func hasDuplicateTaskDefinitionIDs(content string) bool {
 		seen[match] = struct{}{}
 	}
 	return false
+}
+
+func countTasksWithoutTouches(content string) int {
+	re := regexp.MustCompile(`(?m)^- \[[ x]\]\s+T[0-9]+\.[0-9]+\b`)
+	matches := re.FindAllStringIndex(content, -1)
+	count := 0
+	for _, loc := range matches {
+		// Find the end of this line.
+		lineEnd := strings.Index(content[loc[0]:], "\n")
+		var line string
+		if lineEnd == -1 {
+			line = content[loc[0]:]
+		} else {
+			line = content[loc[0] : loc[0]+lineEnd]
+		}
+		if !strings.Contains(line, "Touches:") {
+			count++
+		}
+	}
+	return count
 }
 
 func extractTaskDefinitionIDs(content string) []string {

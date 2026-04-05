@@ -183,6 +183,7 @@ Lightweight guardrails should preserve strictness without broadening default con
 - `implement` should stay task-scoped by default and only open deeper artifacts when the active task requires them
 - `verify` should stay cheap by default and only deepen into code or wider review when explicitly requested
 - helper scripts and readiness checks should be preferred over repeated prompt-time reasoning for prerequisite validation
+- helper-script findings should become the primary structural evidence layer for agent phases; prompts should deepen or contextualize those findings, not re-derive them blindly
 - traceability should improve through stable IDs and explicit references instead of new shared summary artifacts
 - `archive` should remain a compact historical record, not a new mutable working-memory layer
 
@@ -202,6 +203,7 @@ Data-model and contract artifacts should stay compact but structurally explicit:
 - `contracts/api.md` should capture boundary purpose, trigger, inputs, outputs, errors, and ordering or idempotency assumptions
 - `contracts/events.md` should capture producer, consumer, trigger, payload, delivery expectation, retry or ordering assumptions, and failure handling
 - these details should be recorded in structured slots rather than left only in plan prose
+- cheap plan/tasks consistency checks should compare planned implementation surfaces against `Surface Map` and `Touches:` references so that missing or unexpected work surfaces are visible before implementation starts
 
 ## Plan package
 

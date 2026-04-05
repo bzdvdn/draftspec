@@ -30,14 +30,23 @@ func newFeatureCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
+			phaseResult, err := phaseCheckResult(root, state)
+			if err != nil {
+				return err
+			}
+			checkSummary := summarizeCheckFindings(phaseResult.Findings)
 
 			if jsonOutput {
 				payload, err := json.MarshalIndent(struct {
-					State    workflow.FeatureState `json:"state"`
-					Findings []workflow.Finding    `json:"findings,omitempty"`
+					State         workflow.FeatureState   `json:"state"`
+					Findings      []workflow.Finding      `json:"findings,omitempty"`
+					CheckSummary  *checkFindingSummary    `json:"check_summary,omitempty"`
+					CheckFindings []workflow.CheckFinding `json:"check_findings,omitempty"`
 				}{
-					State:    state,
-					Findings: findings,
+					State:         state,
+					Findings:      findings,
+					CheckSummary:  checkSummary,
+					CheckFindings: phaseResult.Findings,
 				}, "", "  ")
 				if err != nil {
 					return err
@@ -78,8 +87,16 @@ func newFeatureCmd() *cobra.Command {
 			fmt.Fprintf(cmd.OutOrStdout(), "archived: %t\n", state.Archived)
 			errorCount, warningCount := countFindings(findings)
 			fmt.Fprintf(cmd.OutOrStdout(), "issues: %s\n", renderIssueSummary(errorCount, warningCount))
+			if checkSummary != nil {
+				fmt.Fprintf(cmd.OutOrStdout(), "check_issues: %s\n", renderCheckSummary(*checkSummary))
+			}
 			if focus := featureFocusLine(state, errorCount, warningCount); focus != "" {
 				fmt.Fprintf(cmd.OutOrStdout(), "focus: %s\n", focus)
+			}
+			if len(phaseResult.Findings) > 0 {
+				for _, line := range topFindingLines(phaseResult.Findings, 3) {
+					fmt.Fprintf(cmd.OutOrStdout(), "check_detail: %s\n", line)
+				}
 			}
 			if len(findings) > 0 {
 				errors, warnings := splitFindings(findings)

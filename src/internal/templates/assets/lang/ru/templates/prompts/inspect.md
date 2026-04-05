@@ -21,10 +21,10 @@ Stop if: slug неоднозначен, spec отсутствует, или от
 
 ## Load If Present
 
-Читайте это только если файл существует и реально влияет на проверку:
+Читайте только если файл существует и inspect требует cross-artifact consistency checks (выравнивание spec↔plan, покрытие acceptance↔tasks):
 
-- `.draftspec/plans/<slug>/plan.md`
-- `.draftspec/plans/<slug>/tasks.md`
+- `.draftspec/plans/<slug>/plan.md` — читать при проверке goal alignment, scope expansion или acceptance coverage на уровне плана
+- `.draftspec/plans/<slug>/tasks.md` — читать при проверке, что каждый `AC-*` покрыт хотя бы одной задачей
 
 ## Do Not Read By Default
 
@@ -32,7 +32,7 @@ Stop if: slug неоднозначен, spec отсутствует, или от
 - `.draftspec/plans/<slug>/contracts/`
 - `.draftspec/plans/<slug>/research.md`
 - широкую историю репозитория
-- implementation-файлы, если они не нужны для подтверждения конкретного вывода по согласованности
+- implementation-файлы, если только finding не ссылается на конкретный файл и вывод нельзя подтвердить из spec/plan/tasks
 
 ## Stop Conditions
 
@@ -48,12 +48,21 @@ Stop if: slug неоднозначен, spec отсутствует, или от
 - Если доступен `/.draftspec/scripts/check-inspect-ready.*`, предпочитайте его как cheap first pass перед углублением в артефакты.
 - Используйте `/.draftspec/scripts/inspect-spec.*` только как fallback, когда phase readiness wrapper недоступен.
 - Предпочитайте вывод helper scripts чтению их исходников.
+- Считайте вывод helper scripts основным слоем структурных доказательств для inspect. Если скрипты уже сообщили конкретные `ERROR` / `WARN` findings, используйте их как стартовую основу отчёта, а не переизобретайте те же выводы заново.
+- Если helper output показывает категории findings вроде structure, traceability, ambiguity, consistency или readiness, сохраняйте этот сигнал в reasoning. Расширяйте его только когда действительно нужен дополнительный контекст.
+- Не игнорируйте конкретный helper finding только потому, что у вас есть более оптимистичное общее впечатление. Его нужно либо закрыть, либо явно объяснить.
+- Собственное reasoning используйте в первую очередь для того, что cheap checks не могут доказать напрямую: конфликтов с конституцией, выдуманного product intent, необоснованного scope expansion, противоречивых assumptions или тонкого drift между `spec` и `plan`.
 - Не читайте `/.draftspec/scripts/*` по умолчанию, если только не отлаживаете сам script, не работаете над самим Draftspec или пользователь явно не просит проанализировать script logic.
 - Проверяйте полноту и ясность спецификации.
 - Проверяйте `constitution <-> spec`: спецификация не должна противоречить явным ограничениям конституции, workflow-правилам или language policy.
 - Считайте technology names, framework choices, library lists или version pins в спецификации `Warning`, если они явно не выглядят как user requirement, repository constraint или внешний compatibility contract.
 - Каждый критерий приемки в спецификации ДОЛЖЕН иметь явный формат Given/When/Then. Маркеры `Given`, `When`, `Then` остаются каноническими независимо от языка документации. Отсутствие G/W/T — `Error`, а не `Suggestion`.
+- Любой оставшийся маркер `[NEEDS CLARIFICATION: ...]` в spec — это `Error`. Они должны быть закрыты до начала planning.
+- Если `## Assumptions` / `## Допущения` отсутствует, это `Warning`. Если присутствует, проверяйте каждое допущение на правдоподобность по конституции и известному состоянию репозитория — допущение, противоречащее реальности репозитория, это `Error`.
+- Если `## Success Criteria` / `## Критерии успеха` присутствует, каждый `SC-*` должен иметь измеримую метрику и метод измерения. Размытые SC (напр., «система должна быть быстрой») — `Warning`.
 - Если `tasks.md` существует, проверяйте, что каждый критерий приемки из spec покрыт хотя бы одной задачей. Непокрытый критерий — `Error`.
+- Если `tasks.md` существует, содержит task IDs, но не имеет `## Surface Map` — это `Warning`: implement-агенту нужна эта секция как манифест batch-чтения.
+- Если `tasks.md` существует и любая строка задачи с task ID не содержит поле `Touches:` — это `Warning`: задачи без `Touches:` вынуждают implement-агента к exploratory reads.
 - Если `tasks.md` использует task IDs вроде `T1.1`, предпочитайте traceability-формулировки с прямыми ссылками на эти task IDs.
 - Предпочитайте самый дешевый inspection scope: `constitution.md` и `spec.md`, затем `plan.md`, затем `tasks.md`, и только после этого более глубокие plan artifacts, если они нужны для подтверждения конкретного вывода.
 - Если `plan.md` отсутствует, не расширяйте проверку на optional plan artifacts или implementation code.
@@ -67,10 +76,15 @@ Stop if: slug неоднозначен, spec отсутствует, или от
 - Проверяйте `Scope Expansion`: plan не должен вводить крупные новые workstreams, компоненты или integration surfaces, которых нет в spec.
 - Проверяйте `Acceptance Coverage at Plan Level`: major acceptance-critical behavior из spec должно быть отражено в намерении плана, даже до появления tasks.
 - Проверяйте `Constitution Consistency`: plan не должен нарушать правила конституции или архитектурные ограничения.
+- Если `plan.md` существует и не содержит `## Соответствие конституции` / `## Constitution Compliance` — это `Warning`: эта секция делает соответствие конституции явным и проверяемым.
 - Проверяйте `Artifact Justification`: если plan вводит `data-model.md` или `contracts/`, необходимость этих артефактов должна быть оправдана spec.
 - Не превращайте это в широкий design review. Предпочитайте ловить явный drift, а не оценивать качество архитектуры целиком.
 - Если записываете отчет в файл, держите его на настроенном языке документации проекта.
 - Предпочитайте конкретные находки вместо общих советов.
+- Предпочитайте такой порядок формирования отчёта:
+  - 1. структурные findings из helper output
+  - 2. cross-artifact consistency findings, подтверждённые загруженными артефактами
+  - 3. узкие выводы, которые действительно требуют agent reasoning
 - По умолчанию делайте compact report в разговоре: всегда включайте `Verdict`, включайте `Errors`, `Warnings` и `Next Step`, если они не пусты, а `Questions`, `Suggestions` и `Traceability` — только когда они действительно добавляют сигнал.
 - Полный sectioned report используйте только если пользователь явно просит полный отчет или если отчет сохраняется в файл.
 - Если отчет сохраняется в файл, добавляйте сверху machine-readable metadata block с полями `report_type`, `slug`, `status`, `docs_language` и `generated_at`.
@@ -95,6 +109,7 @@ Stop if: slug неоднозначен, spec отсутствует, или от
 - Для `pass` указывайте точную следующую slash-команду.
 - Для `concerns` явно говорите, можно ли двигаться дальше; если можно, указывайте точную следующую slash-команду.
 - Для `blocked` не подсказывайте следующую фазу; вместо этого указывайте, какой refinement нужен сначала.
+- Не дублируйте одну и ту же проблему в нескольких секциях. Если helper output уже зафиксировал конкретную проблему, формулируйте её кратко и переходите к следствию или нужному refinement.
 
 ## Артефакт краткого описания спецификации
 
@@ -113,7 +128,7 @@ Summary ДОЛЖЕН содержать только:
 
 - Сохраняйте отчет в `.draftspec/specs/<slug>/inspect.md` и записывайте `.draftspec/specs/<slug>/summary.md`; кратко суммируйте verdict в разговоре compact report с непустыми секциями
 - Завершайте разговор summary block: `Slug`, `Status`, `Artifacts`, `Blockers`, `Next command`
-- Когда можно продолжать: в `## Next Step` указывайте точную slash-команду следующей фазы
+- Когда можно продолжать: в `## Next Step` указывайте точную slash-команду следующей фазы; после archive можно упомянуть `/draftspec.recap` как опциональный итог, но не рассматривайте его как обязательный
 - Если сначала нужен refinement — говорите об этом прямо
 
 ## Self-Check
