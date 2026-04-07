@@ -9,7 +9,7 @@ import (
 )
 
 func printInitOutput(w io.Writer, result project.InitResult) {
-	color := shouldUseColor(w)
+	color := useColor(w)
 
 	agentTargets := "none"
 	if len(result.AgentTargets) > 0 {
@@ -29,7 +29,7 @@ func printInitOutput(w io.Writer, result project.InitResult) {
 	fmt.Fprintln(w)
 
 	if color {
-		fmt.Fprintln(w, "\x1b[32mProject ready.\x1b[0m")
+		fmt.Fprintln(w, styleOK(w, "Project ready."))
 	} else {
 		fmt.Fprintln(w, "Project ready.")
 	}
@@ -37,31 +37,31 @@ func printInitOutput(w io.Writer, result project.InitResult) {
 
 	printPanel(w, "Agent Folder Security", []string{
 		"Some agents may store credentials, auth tokens, or other private artifacts",
-		"inside project-level agent folders (e.g. " + stylePath(".claude/", color) + ", " + stylePath(".cursor/", color) + ", " + stylePath(".kilocode/", color) + ").",
+		"inside project-level agent folders (e.g. " + stylePath(w, ".claude/") + ", " + stylePath(w, ".cursor/") + ", " + stylePath(w, ".kilocode/") + ").",
 		"Consider adding them (or parts of them) to .gitignore to prevent leaks.",
 	})
 
 	printPanel(w, "Next Steps", []string{
 		"1. You're already in the project directory.",
 		"2. Start using slash commands with your AI agent:",
-		"   2.1 " + styleCmd("/draftspec.constitution", color) + "  - Establish project principles",
-		"   2.2 " + styleCmd("/draftspec.spec", color) + "          - Create a baseline specification",
-		"   2.3 " + styleCmd("/draftspec.plan", color) + "          - Create an implementation plan",
-		"   2.4 " + styleCmd("/draftspec.tasks", color) + "         - Generate actionable tasks",
-		"   2.5 " + styleCmd("/draftspec.implement", color) + "     - Execute implementation",
+		"   2.1 " + styleCmd(w, "/draftspec.constitution") + "  - Establish project principles",
+		"   2.2 " + styleCmd(w, "/draftspec.spec") + "          - Create a baseline specification",
+		"   2.3 " + styleCmd(w, "/draftspec.plan") + "          - Create an implementation plan",
+		"   2.4 " + styleCmd(w, "/draftspec.tasks") + "         - Generate actionable tasks",
+		"   2.5 " + styleCmd(w, "/draftspec.implement") + "     - Execute implementation",
 	})
 
 	printPanel(w, "Enhancement Commands", []string{
-		styleCmd("/draftspec.challenge", color) + " (optional) - adversarial review of spec/plan",
-		styleCmd("/draftspec.scope", color) + " (optional)     - scope boundary check",
-		styleCmd("/draftspec.recap", color) + " (optional)     - recap active features",
+		styleCmd(w, "/draftspec.challenge") + " (optional) - adversarial review of spec/plan",
+		styleCmd(w, "/draftspec.scope") + " (optional)     - scope boundary check",
+		styleCmd(w, "/draftspec.recap") + " (optional)     - recap active features",
 	})
 
 	printPanel(w, "Useful CLI Commands", []string{
-		styleCmd("draftspec doctor .", color) + "        - workspace health check",
-		styleCmd("draftspec list-specs .", color) + "    - list active specs",
-		styleCmd("draftspec check <slug> .", color) + "  - feature status",
-		styleCmd("draftspec dashboard .", color) + "     - visual dashboard",
+		styleCmd(w, "draftspec doctor .") + "        - workspace health check",
+		styleCmd(w, "draftspec list-specs .") + "    - list active specs",
+		styleCmd(w, "draftspec check <slug> .") + "  - feature status",
+		styleCmd(w, "draftspec dashboard .") + "     - visual dashboard",
 	})
 }
 
@@ -118,17 +118,17 @@ func printStepLine(w io.Writer, step initStep, last bool, color bool) {
 func renderStepStatus(status string, color bool) string {
 	switch status {
 	case "ok":
-		return colorize("●", "\x1b[32m", color)
+		return colorize("●", ansiGreen, color)
 	case "updated":
-		return colorize("●", "\x1b[36m", color)
+		return colorize("●", ansiCyan, color)
 	case "kept":
-		return colorize("●", "\x1b[33m", color)
+		return colorize("●", ansiYellow, color)
 	case "skipped":
-		return colorize("○", "\x1b[90m", color)
+		return colorize("○", ansiGray, color)
 	case "initialized":
-		return colorize("●", "\x1b[32m", color)
+		return colorize("●", ansiGreen, color)
 	default:
-		return colorize("●", "\x1b[32m", color)
+		return colorize("●", ansiGreen, color)
 	}
 }
 
@@ -141,19 +141,4 @@ func renderStepSuffix(status string, detail string) string {
 		return label
 	}
 	return label + ": " + detail
-}
-
-func colorize(s string, code string, enabled bool) string {
-	if !enabled {
-		return s
-	}
-	return code + s + "\x1b[0m"
-}
-
-func styleCmd(s string, enabled bool) string {
-	return colorize(s, "\x1b[36m", enabled)
-}
-
-func stylePath(s string, enabled bool) string {
-	return colorize(s, "\x1b[33m", enabled)
 }

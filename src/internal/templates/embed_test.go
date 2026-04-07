@@ -312,10 +312,10 @@ func TestImplementPromptSupportsFullRunAndScopedExecution(t *testing.T) {
 	content := fileContentByTarget(t, files, "templates/prompts/implement.md")
 	requiredSnippets := []string{
 		"Default behavior: if the user does not restrict scope, execute only the first unfinished phase or the smallest contiguous unfinished task cluster needed for forward progress.",
-		"Scoped behavior: if the user explicitly provides `--phase <number>`, execute only that phase.",
-		"Scoped behavior: if the user explicitly provides `--tasks <task-id-list>`, execute only those task IDs.",
+		"`--phase <number>`: execute only the specified phase.",
+		"`--tasks <task-id-list>`: execute only the specified task IDs.",
 		"Do not accept `--phase` and `--tasks` together in the same run.",
-		"If scoped execution skips unfinished earlier work, warn about the ordering risk",
+		"`--continue`: resume mode",
 		"the selected work would force changes across another feature package or slug",
 		"the next safe step would require inventing new tasks or acceptance coverage",
 		"Leave the feature in a state that the next verify pass can inspect without guessing",

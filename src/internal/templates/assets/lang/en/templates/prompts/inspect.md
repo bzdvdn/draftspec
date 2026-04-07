@@ -12,6 +12,19 @@ Inputs: `.draftspec/constitution.md`, `.draftspec/specs/<slug>/spec.md`; optiona
 Outputs: `.draftspec/specs/<slug>/inspect.md` with verdict `pass`, `concerns`, or `blocked`.
 Stop if: slug ambiguous, spec missing, or report would require inventing product intent.
 
+## Flags
+
+`--delta`: incremental re-check mode — verify only the sections that changed since the last inspect report instead of running a full inspection.
+
+When `--delta` is present in `$ARGUMENTS`:
+- Read the existing `.draftspec/specs/<slug>/inspect.md` first to establish the baseline.
+- Compare the current `spec.md` against the previous inspect report to identify changed sections (new or modified AC, scope changes, assumption changes).
+- Re-check only the changed sections and their cross-artifact implications.
+- Preserve findings from the previous report that are still valid; do not re-derive them.
+- Update the verdict only if the delta changes it. If a previous `blocked` finding is resolved and no new errors appear, upgrade to `pass` or `concerns`.
+- Update the `generated_at` timestamp and add a `delta_from: <previous_generated_at>` field to the metadata block.
+- If the changes are too broad (more than 50% of the spec rewritten), fall back to a full inspection and note: "Delta mode fell back to full inspection due to broad changes."
+
 ## Load First
 
 Always read these first:

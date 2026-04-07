@@ -26,13 +26,13 @@ Read based on the inferred phase — only the artifacts that exist and contribut
 - `.draftspec/specs/<slug>/inspect.md` — read the verdict line to populate `## Current Phase` and detect blockers
 - `.draftspec/plans/<slug>/plan.md` — read `DEC-*` entries to populate `## Key Decisions` when the feature is in plan phase or later
 - `.draftspec/plans/<slug>/tasks.md` — read task checkboxes to populate `## Open Work` and `## Completed` when the feature is in tasks/implement phase or later
+- `.draftspec/plans/<slug>/verify.md` — read the metadata block and verdict line to populate `## Current Phase` and detect verification concerns or blockers
 
 ## Do Not Read By Default
 
 - `.draftspec/plans/<slug>/data-model.md`
 - `.draftspec/plans/<slug>/contracts/`
 - `.draftspec/plans/<slug>/research.md`
-- `.draftspec/plans/<slug>/verify.md`
 - unrelated specs or plan packages
 - implementation files
 - script source files

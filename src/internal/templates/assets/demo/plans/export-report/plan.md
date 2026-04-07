@@ -1,63 +1,103 @@
-# Plan: export-report
+# Export Report (CSV) Plan
+
+## Phase Contract
+
+Inputs: spec and minimal repo context for this feature.
+Outputs: plan, data model, and contracts when required.
+Stop if: the spec is too vague to plan safely.
 
 ## Goal
 
-Add a `GET /reports/export` endpoint that streams a CSV of the current filtered table view to the browser. Reuse the existing filter parsing from the table handler. Wire a frontend button that passes the current filter state as query parameters.
+Add an authenticated export endpoint that produces a CSV matching the current filtered report table view, with stable column header + order, and a consistent filename.
+
+## Scope
+
+- Server-side endpoint to export the filtered view as CSV
+- Client-side action to trigger the download from the current view
+- Tests proving filter parity, header order, empty-result behavior, and authentication
 
 ## Implementation Surfaces
 
-- **`handlers/reports.go`** (existing) — add `ExportHandler` alongside the existing table handler; reuse `parseFilters()` already present in this file
-- **`services/csv.go`** (new) — CSV generation service: accepts rows + column order, returns `io.Reader`
-- **`middleware/auth.go`** (existing) — apply `RequireAuth` middleware already used by other report endpoints
-- **`ui/components/TableToolbar`** (existing) — add "Export as CSV" button; on click, build export URL from current filter state and trigger download
+- `server/report_export` (new) — export handler: parse filters, query rows, render CSV
+- `server/auth` (existing) — enforce authentication on the export endpoint
+- `server/report_filters` (existing) — reuse filter parsing and validation shared with table view
+- `client/report_table_toolbar` (existing) — add "Export as CSV" button that calls the endpoint with the current filter state
+- `tests/report_export` (new) — integration + unit coverage for CSV output and auth
+
+## Architecture Impact
+
+- No new persistent state.
+- Adds one new endpoint and a small CSV rendering component.
 
 ## Acceptance Approach
 
-- AC-001: `ExportHandler` calls `parseFilters()`, queries rows, passes result to `csv.Generate()`; integration test asserts row count and headers match filtered table response
-- AC-002: `ExportHandler` sets `Content-Disposition: attachment; filename="report-YYYY-MM-DD.csv"` using `time.Now()` on the server side
-- AC-003: `csv.Generate()` with empty row slice must produce a header-only output; unit test covers this path explicitly
-- RQ-003: `RequireAuth` middleware already returns 401 for missing/invalid session; add route-level test asserting 401 on unauthenticated export request
-
-## Decisions
-
-### DEC-001 — Synchronous export, no streaming
-**Why**: Dataset is capped at 50k rows (out of scope per spec). Synchronous generation keeps the handler simple and avoids background job infrastructure.
-**Tradeoff**: Response latency scales with row count; acceptable for the stated scope.
-**Affects**: AC-001, AC-003
-**Validation**: Load test with 50k rows must complete within 10s on CI hardware.
-
-### DEC-002 — Reuse parseFilters() from table handler
-**Why**: Filter logic is already tested and handles all edge cases (missing params, invalid values). Duplicating it would create a maintenance gap.
-**Affects**: AC-001, RQ-001
-**Validation**: Existing filter unit tests cover the shared code path.
-
-### DEC-003 — Column order driven by server-side column registry
-**Why**: Visible column order is managed server-side; the client must not dictate column order to avoid inconsistency between table view and export.
-**Affects**: RQ-002
-**Validation**: Integration test compares CSV header order against the column registry order for the same table view.
+- AC-001 Implement export handler that reuses the same filter parsing path as the table view; integration test asserts parity between table view and export for the same filter state.
+- AC-002 Set `Content-Disposition` with `report-YYYY-MM-DD.csv` filename derived from server-side date; unit or integration test asserts header.
+- AC-003 Ensure CSV renderer outputs a header-only CSV for empty result sets; unit test for renderer + integration smoke test.
+- RQ-003 Validate unauthenticated requests return 401; integration test.
 
 ## Data and Contracts
 
-No new persistent state. See `data-model.md` for the `ExportRequest` value object.
-Export endpoint contract: `GET /reports/export?<filter_params>` → `text/csv` with `Content-Disposition` header.
+- Endpoint: `GET /reports/export?<filter_params>` → `text/csv`
+- Response headers:
+  - `Content-Type: text/csv`
+  - `Content-Disposition: attachment; filename="report-YYYY-MM-DD.csv"`
+
+## Implementation Strategy
+
+- DEC-001 Synchronous export (no background jobs)
+  Why: the scope caps datasets at 50k rows and does not require history or scheduling.
+  Tradeoff: response time scales with row count.
+  Affects: AC-001, AC-003
+  Validation: load test and timeout budget in CI.
+
+- DEC-002 Reuse filter parsing from the table view
+  Why: prevents divergence between "what you see" and "what you export".
+  Tradeoff: export handler becomes coupled to shared filter semantics.
+  Affects: AC-001, RQ-001
+  Validation: parity integration test.
+
+- DEC-003 Column order is server-owned
+  Why: avoids client-driven inconsistency and keeps CSV stable.
+  Tradeoff: client cannot request arbitrary column reorder.
+  Affects: RQ-002
+  Validation: unit test for column registry → CSV header order.
+
+## Incremental Delivery
+
+### MVP (First Value)
+
+- Backend export endpoint with auth + header-only empty export
+- Minimal UI button to trigger download
+- Integration tests for auth + filter parity
+
+### Iterative Expansion
+
+- Add performance budget checks and improvements for large exports
+- Improve client UX (spinner, error toast) without changing export contract
 
 ## Sequencing Notes
 
-Phase 1 (backend) must complete before Phase 2 (frontend) can be tested end-to-end. Within Phase 1, T1.1 and T1.2 are the prerequisite for T1.3–T1.5.
+- Build backend + CSV renderer first, then wire UI.
+- Add tests before polishing UX so correctness stays locked in.
 
 ## Risks
 
-- `parseFilters()` has one known edge case with date range params (see inline TODO in `handlers/reports.go`). If that edge case affects export, T1.2 may take longer.
-  - Mitigation: inspect the TODO before T1.2, escalate if the fix is non-trivial.
+- Filter edge cases (date ranges, invalid values) could diverge between table and export.
+  Mitigation: reuse the same filter path and add parity tests.
 
 ## Rollout and Compatibility
 
-No migration needed. No feature flag required — the endpoint is new. The UI button is additive.
+- No migration needed.
+- Additive endpoint and UI control; can be shipped behind a feature flag if desired.
 
 ## Validation
 
-- Unit: `csv.Generate()` with empty rows → header-only output (AC-003)
-- Unit: `csv.Generate()` column order matches registry order (DEC-003)
-- Integration: authenticated export with active filter → correct row count (AC-001)
-- Integration: unauthenticated request → 401 (RQ-003)
-- Manual: filename pattern `report-YYYY-MM-DD.csv` in browser download dialog (AC-002)
+- Unit: CSV renderer header order + empty result handling
+- Integration: authenticated export equals table view results for the same filter set
+- Integration: unauthenticated export returns 401
+- Manual: filename pattern in browser download dialog
+
+## Constitution Compliance
+
+- no conflicts

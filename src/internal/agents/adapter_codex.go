@@ -43,13 +43,18 @@ func renderCodex(spec CommandDefinition, lang string) string {
 
 %s
 
+%s
+
 Вход пользователя: {{arguments}}
 
 Дополнительно:
-- если доступны связанные scripts, сначала запускайте их и опирайтесь на их вывод; не читайте исходники scripts по умолчанию
+- %s
+- %s
 - %s
 %s
-`, title, spec.PromptPath, commandHint(spec.Name, lang), toolInvocationHint(lang), bulletList(spec.Extras))
+
+%s
+`, title, spec.PromptPath, commandHint(spec.Name, lang), workflowChainHint(lang), scriptExecutionHint(lang), toolInvocationHint(lang), helpDiscoveryHint(lang), scriptListBlock(spec.Extras, lang), antiPatternHint(lang))
 	}
 
 	return fmt.Sprintf(`# Draftspec %s
@@ -58,11 +63,16 @@ Follow %q.
 
 %s
 
+%s
+
 User input: {{arguments}}
 
 Additional context:
-- when related scripts are available, run them first and rely on their output; do not read script source by default
+- %s
+- %s
 - %s
 %s
-`, title, spec.PromptPath, commandHint(spec.Name, lang), toolInvocationHint(lang), bulletList(spec.Extras))
+
+%s
+`, title, spec.PromptPath, commandHint(spec.Name, lang), workflowChainHint(lang), scriptExecutionHint(lang), toolInvocationHint(lang), helpDiscoveryHint(lang), scriptListBlock(spec.Extras, lang), antiPatternHint(lang))
 }

@@ -3,6 +3,7 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"strings"
 
 	"draftspec/src/internal/workflow"
@@ -224,48 +225,46 @@ func nextCommand(state workflow.FeatureState) string {
 func printCheck(cmd *cobra.Command, state workflow.FeatureState, result checkResult) {
 	w := cmd.OutOrStdout()
 
-	fmt.Fprintf(w, "feature:  %s\n", state.Slug)
-	fmt.Fprintf(w, "phase:    %s\n", state.Phase)
-	fmt.Fprintln(w)
-
-	fmt.Fprintln(w, "artifacts:")
-	fmt.Fprintf(w, "  spec      %s\n", artifactLine(state.SpecExists, ""))
-	fmt.Fprintf(w, "  inspect   %s\n", artifactLine(state.InspectExists, state.InspectStatus))
-
-	tasksDetail := ""
-	if state.TasksExists {
-		tasksDetail = fmt.Sprintf("%d/%d done", state.TasksCompleted, state.TasksTotal)
-		if state.TasksOpen > 0 {
-			tasksDetail += fmt.Sprintf("  (%d open)", state.TasksOpen)
-		}
+	nextLine := "-"
+	if result.NextCommand != "" {
+		nextLine = styleCmd(w, result.NextCommand)
 	}
-	fmt.Fprintf(w, "  plan      %s\n", artifactLine(state.PlanExists, ""))
-	fmt.Fprintf(w, "  tasks     %s\n", artifactLine(state.TasksExists, tasksDetail))
-	fmt.Fprintf(w, "  verify    %s\n", artifactLine(state.VerifyExists, state.VerifyStatus))
+	verdictLine := styleOK(w, "ready")
+	if state.Blocked {
+		verdictLine = styleError(w, "blocked")
+	}
+
+	printPanel(w, "draftspec check", []string{
+		"feature: " + state.Slug,
+		"phase: " + strings.ToUpper(state.Phase),
+		"verdict: " + verdictLine,
+		"next: " + nextLine,
+	})
+
+	printPanel(w, "Artifacts", []string{
+		"spec: " + artifactLine(w, state.SpecExists, ""),
+		"inspect: " + artifactLine(w, state.InspectExists, state.InspectStatus),
+		"plan: " + artifactLine(w, state.PlanExists, ""),
+		"tasks: " + artifactLine(w, state.TasksExists, taskDetail(state)),
+		"verify: " + artifactLine(w, state.VerifyExists, state.VerifyStatus),
+	})
 
 	if state.BranchMismatch {
-		fmt.Fprintln(w)
-		fmt.Fprintf(w, "warning:  branch mismatch\n")
-		fmt.Fprintf(w, "          current:  %s\n", state.CurrentBranch)
-		fmt.Fprintf(w, "          expected: feature/%s\n", state.Slug)
+		printPanel(w, "Branch Mismatch", []string{
+			"current: " + state.CurrentBranch,
+			"expected: feature/" + state.Slug,
+		})
 	}
 
+	// Keep stable lines for grep/tests and scripting.
 	fmt.Fprintln(w)
-
-	if state.Blocked {
-		fmt.Fprintf(w, "verdict:  blocked\n")
-	} else {
-		fmt.Fprintf(w, "verdict:  ready\n")
-	}
-
+	fmt.Fprintf(w, "verdict:  %s\n", result.Verdict)
 	if result.NextCommand != "" {
 		fmt.Fprintf(w, "next:     %s\n", result.NextCommand)
 	}
-
 	if result.CheckSummary != nil && (result.CheckSummary.Errors > 0 || result.CheckSummary.Warnings > 0) {
 		fmt.Fprintf(w, "checks:   %s\n", renderCheckSummary(*result.CheckSummary))
 	}
-
 	if len(result.CheckFindings) > 0 {
 		for _, line := range topFindingLines(result.CheckFindings, 3) {
 			fmt.Fprintf(w, "detail:   %s\n", line)
@@ -278,13 +277,25 @@ func printCheck(cmd *cobra.Command, state workflow.FeatureState, result checkRes
 	}
 }
 
-func artifactLine(present bool, detail string) string {
-	if !present {
-		return "-  missing"
+func taskDetail(state workflow.FeatureState) string {
+	if !state.TasksExists {
+		return ""
 	}
-	parts := []string{"✓"}
+	tasksDetail := fmt.Sprintf("%d/%d done", state.TasksCompleted, state.TasksTotal)
+	if state.TasksOpen > 0 {
+		tasksDetail += fmt.Sprintf("  (%d open)", state.TasksOpen)
+	}
+	return tasksDetail
+}
+
+func artifactLine(w io.Writer, present bool, detail string) string {
+	if !present {
+		return styleError(w, "missing")
+	}
+
+	parts := []string{styleOK(w, "✓")}
 	if detail != "" {
-		parts = append(parts, " ", detail)
+		parts = append(parts, " ", styleMuted(w, detail))
 	}
 	return strings.Join(parts, "")
 }
@@ -293,48 +304,70 @@ func printCheckAll(cmd *cobra.Command, states []workflow.FeatureState, results [
 	w := cmd.OutOrStdout()
 
 	if len(results) == 0 {
-		fmt.Fprintln(w, "no features found")
+		printPanel(w, "draftspec check --all", []string{"no features found"})
 		return
 	}
-
-	// Compute column widths.
-	slugWidth := len("feature")
-	phaseWidth := len("phase")
-	for _, r := range results {
-		if len(r.Slug) > slugWidth {
-			slugWidth = len(r.Slug)
-		}
-		if len(r.Phase) > phaseWidth {
-			phaseWidth = len(r.Phase)
-		}
-	}
-
-	format := fmt.Sprintf("%%-%ds  %%-%ds  %%-8s  %%s\n", slugWidth, phaseWidth)
-	fmt.Fprintf(w, format, "feature", "phase", "verdict", "next")
-	fmt.Fprintf(w, format,
-		strings.Repeat("-", slugWidth),
-		strings.Repeat("-", phaseWidth),
-		"-------",
-		"----",
-	)
 
 	blockedCount := 0
 	for i, r := range results {
 		_ = states[i]
-		verdict := "ready"
 		if r.Blocked {
-			verdict = "blocked"
 			blockedCount++
 		}
-		fmt.Fprintf(w, format, r.Slug, r.Phase, verdict, r.NextCommand)
 	}
 
-	fmt.Fprintln(w)
 	if blockedCount > 0 {
-		fmt.Fprintf(w, "verdict:  %d of %d features blocked\n", blockedCount, len(results))
+		printPanel(w, "draftspec check --all", []string{
+			fmt.Sprintf("verdict: %s", styleError(w, fmt.Sprintf("%d of %d features blocked", blockedCount, len(results)))),
+		})
 	} else {
-		fmt.Fprintf(w, "verdict:  all %d features ready\n", len(results))
+		printPanel(w, "draftspec check --all", []string{
+			fmt.Sprintf("verdict: %s", styleOK(w, fmt.Sprintf("all %d features ready", len(results)))),
+		})
 	}
+
+	slugWidth := visibleRuneLen("feature")
+	phaseWidth := visibleRuneLen("phase")
+	for _, r := range results {
+		if l := visibleRuneLen(r.Slug); l > slugWidth {
+			slugWidth = l
+		}
+		if l := visibleRuneLen(r.Phase); l > phaseWidth {
+			phaseWidth = l
+		}
+	}
+
+	header := fmt.Sprintf("%s  %s  %-8s  %s",
+		padRightVisible("feature", slugWidth),
+		padRightVisible("phase", phaseWidth),
+		"verdict",
+		"next",
+	)
+	fmt.Fprintln(w, header)
+	fmt.Fprintln(w, fmt.Sprintf("%s  %s  %-8s  %s",
+		strings.Repeat("-", slugWidth),
+		strings.Repeat("-", phaseWidth),
+		"-------",
+		"----",
+	))
+
+	for _, r := range results {
+		verdict := styleOK(w, "ready")
+		if r.Blocked {
+			verdict = styleError(w, "blocked")
+		}
+		next := r.NextCommand
+		if next != "" {
+			next = styleCmd(w, next)
+		}
+		fmt.Fprintf(w, "%s  %s  %-8s  %s\n",
+			padRightVisible(r.Slug, slugWidth),
+			padRightVisible(r.Phase, phaseWidth),
+			padRightVisible(verdict, 8),
+			next,
+		)
+	}
+	fmt.Fprintln(w)
 }
 
 func phaseCheckResult(root string, state workflow.FeatureState) (workflow.CheckResult, error) {

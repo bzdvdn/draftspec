@@ -126,6 +126,16 @@ The summary MUST contain only:
 
 Keep the summary under 60 lines. It is loaded by `implement`, `tasks`, and `verify` instead of the full constitution to reduce context overhead. The summary is not a substitute for the full constitution in phases that require constitutional consistency checks (spec, inspect, plan).
 
+## Post-Update Impact Check
+
+After writing or patching `constitution.md`, check whether existing active specs may now conflict with the changed rules:
+
+- Run `.draftspec/scripts/list-specs.*` (if available) to enumerate active specs.
+- For each active spec, compare its `## Goal`, `## Scope`, and `## Acceptance Criteria` against the changed constitutional sections.
+- If a spec may conflict with the updated constitution, flag it as `NEEDS RE-INSPECT: <slug> — <reason>` in the output.
+- Do not modify the specs themselves — only report which ones need re-inspection.
+- If no active specs exist or none conflict, state: "No active specs affected by this update."
+
 ## Output expectations
 
 - Write the updated `.draftspec/constitution.md` and `.draftspec/constitution.summary.md`

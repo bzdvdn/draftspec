@@ -383,6 +383,88 @@ func TestInitAndStatusCommandsFollowFeatureLifecycle(t *testing.T) {
 	})
 }
 
+func TestDashboardCommandJSONOutput(t *testing.T) {
+	root := t.TempDir()
+
+	if _, _, err := executeRoot(t, "init", root, "--git=false", "--lang", "en", "--shell", "sh"); err != nil {
+		t.Fatalf("init command returned error: %v", err)
+	}
+
+	specPath := filepath.Join(ensureSpecDir(t, root, "demo"), "spec.md")
+	if err := os.WriteFile(specPath, []byte("# Demo\n"), 0o644); err != nil {
+		t.Fatalf("WriteFile(spec) returned error: %v", err)
+	}
+
+	stdout, _, err := executeRoot(t, "dashboard", root, "--json")
+	if err != nil {
+		t.Fatalf("dashboard --json returned error: %v", err)
+	}
+
+	var payload struct {
+		Showing        string `json:"showing"`
+		DisplayedCount int    `json:"displayed_count"`
+		Features       []struct {
+			Slug     string `json:"slug"`
+			Archived bool   `json:"archived"`
+		} `json:"features"`
+	}
+	if err := json.Unmarshal([]byte(stdout), &payload); err != nil {
+		t.Fatalf("failed to parse dashboard json output %q: %v", stdout, err)
+	}
+	if payload.Showing != "active" {
+		t.Fatalf("showing = %q, want active", payload.Showing)
+	}
+	if payload.DisplayedCount != 1 || len(payload.Features) != 1 || payload.Features[0].Slug != "demo" || payload.Features[0].Archived {
+		t.Fatalf("unexpected dashboard payload: %+v", payload)
+	}
+}
+
+func TestDashboardCommandJSONIncludesArchivedWithAllFlag(t *testing.T) {
+	root := t.TempDir()
+
+	if _, _, err := executeRoot(t, "init", root, "--git=false", "--lang", "en", "--shell", "sh"); err != nil {
+		t.Fatalf("init command returned error: %v", err)
+	}
+
+	archiveSlugDir := filepath.Join(root, ".draftspec", "archive", "old")
+	if err := os.MkdirAll(archiveSlugDir, 0o755); err != nil {
+		t.Fatalf("MkdirAll(archiveSlugDir) returned error: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(archiveSlugDir, "summary.md"), []byte("archived"), 0o644); err != nil {
+		t.Fatalf("WriteFile(archive summary) returned error: %v", err)
+	}
+
+	stdout, _, err := executeRoot(t, "dashboard", root, "--all", "--json")
+	if err != nil {
+		t.Fatalf("dashboard --all --json returned error: %v", err)
+	}
+
+	var payload struct {
+		Showing        string `json:"showing"`
+		DisplayedCount int    `json:"displayed_count"`
+		Features       []struct {
+			Slug     string `json:"slug"`
+			Archived bool   `json:"archived"`
+		} `json:"features"`
+	}
+	if err := json.Unmarshal([]byte(stdout), &payload); err != nil {
+		t.Fatalf("failed to parse dashboard json output %q: %v", stdout, err)
+	}
+	if payload.Showing != "active+archived" {
+		t.Fatalf("showing = %q, want active+archived", payload.Showing)
+	}
+	var foundOld bool
+	for _, f := range payload.Features {
+		if f.Slug == "old" && f.Archived {
+			foundOld = true
+			break
+		}
+	}
+	if !foundOld || payload.DisplayedCount != len(payload.Features) {
+		t.Fatalf("expected archived feature in payload, got %+v", payload)
+	}
+}
+
 func TestFeaturesCommandSummarizesProjectWorkflow(t *testing.T) {
 	root := t.TempDir()
 

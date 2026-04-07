@@ -43,6 +43,12 @@ Agent-facing workflow в Draftspec:
 - уважать configured documentation language и agent language
 - считать конституцию документом с наивысшим приоритетом
 
+Каждая сгенерированная обёртка для агента включает:
+
+- **Hint цепочки workflow**: `constitution → spec → inspect → plan → tasks → implement → verify → archive` — не позволяет агентам пропускать фазы или забегать вперёд
+- **Дисциплина выполнения скриптов**: явная инструкция выполнять скрипты как shell-команды, доверять stdout/exit code и никогда не читать исходники скриптов
+- **Блок anti-patterns**: типичные ошибки, которых следует избегать — пропуск readiness scripts, перепланирование во время implement, отметка задач без observable proof, чтение всего репозитория когда нужен минимальный контекст
+
 `spec` должен оставаться branch-first:
 
 - перед записью `.draftspec/specs/<slug>/spec.md` он должен создавать или переключать `feature/<slug>`, когда окружение это позволяет

@@ -45,16 +45,21 @@ argument-hint: [request]
 
 %s
 
+%s
+
 Аргументы пользователя:
 $ARGUMENTS
 
 Требования:
 - сначала прочитайте .draftspec/constitution.md, если это требуется prompt-файлом
 - используйте только минимально нужный контекст репозитория
-- если доступны, сначала запускайте связанные scripts и опирайтесь на их вывод; не читайте исходники scripts по умолчанию:
+- %s
 %s
+- %s
 - обновляйте только релевантные артефакты и кратко сообщайте об итогах и блокерах
-`, spec.Description, spec.PromptPath, commandHint(spec.Name, lang), bulletList(spec.Extras))
+
+%s
+`, spec.Description, spec.PromptPath, commandHint(spec.Name, lang), workflowChainHint(lang), scriptExecutionHint(lang), scriptListBlock(spec.Extras, lang), helpDiscoveryHint(lang), antiPatternHint(lang))
 	}
 
 	return fmt.Sprintf(`---
@@ -66,14 +71,19 @@ Follow %q.
 
 %s
 
+%s
+
 User arguments:
 $ARGUMENTS
 
 Requirements:
 - read .draftspec/constitution.md first when the prompt requires it
 - use only the minimum repository context needed
-- when available, run related scripts first and rely on their output; do not read script source by default:
+- %s
 %s
+- %s
 - update only the relevant artifacts and report outcomes and blockers briefly
-`, spec.Description, spec.PromptPath, commandHint(spec.Name, lang), bulletList(spec.Extras))
+
+%s
+`, spec.Description, spec.PromptPath, commandHint(spec.Name, lang), workflowChainHint(lang), scriptExecutionHint(lang), scriptListBlock(spec.Extras, lang), helpDiscoveryHint(lang), antiPatternHint(lang))
 }

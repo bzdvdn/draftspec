@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"fmt"
+	"strings"
 
 	"draftspec/src/internal/project"
 	"github.com/spf13/cobra"
@@ -34,9 +34,31 @@ populated so you can explore the workflow and try slash commands immediately.`,
 				return err
 			}
 
-			for _, line := range result.Messages {
-				fmt.Fprintln(cmd.OutOrStdout(), line)
+			w := cmd.OutOrStdout()
+			printPanel(w, "draftspec demo", []string{
+				"path: " + result.RootAbs,
+				"script type: " + result.Shell,
+				"agent targets: " + formatTargets(result.AgentTargets),
+				"example feature: " + result.ExampleSlug,
+			})
+
+			if len(result.Created) > 0 {
+				var lines []string
+				for _, p := range result.Created {
+					lines = append(lines, stylePath(w, p))
+				}
+				printPanel(w, "Created Demo Artifacts", lines)
 			}
+
+			printPanel(w, "Try It", []string{
+				styleCmd(w, "cd "+result.RootAbs),
+				styleCmd(w, "draftspec dashboard ."),
+				styleCmd(w, "draftspec check "+result.ExampleSlug+" ."),
+				"agent flow:",
+				"  " + styleCmd(w, "/draftspec.challenge "+result.ExampleSlug) + "  (optional)",
+				"  " + styleCmd(w, "/draftspec.scope "+result.ExampleSlug) + "      (optional)",
+				"  " + styleCmd(w, "/draftspec.handoff "+result.ExampleSlug) + "    (optional)",
+			})
 
 			return nil
 		},
@@ -46,4 +68,11 @@ populated so you can explore the workflow and try slash commands immediately.`,
 	cmd.Flags().StringSliceVar(&agentTargets, "agents", nil, "generate agent command files for one or more targets: claude, codex, copilot, cursor, kilocode, trae, windsurf, roocode, aider, all")
 
 	return cmd
+}
+
+func formatTargets(targets []string) string {
+	if len(targets) == 0 {
+		return "none"
+	}
+	return strings.Join(targets, ", ")
 }

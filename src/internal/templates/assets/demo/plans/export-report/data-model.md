@@ -1,26 +1,28 @@
-# Data Model: export-report
+# Export Report (CSV) Data Model
 
 ## ExportRequest
 
-Value object passed from `ExportHandler` to `csv.Generate()`. Not persisted.
+Value object passed from the export handler to the CSV renderer. Not persisted.
 
-| Field     | Type       | Notes                                      |
-|-----------|------------|--------------------------------------------|
-| Filters   | FilterSet  | Parsed from query params via parseFilters()|
-| Columns   | []Column   | Ordered list from server-side column registry (DEC-003) |
+| Field | Type | Notes |
+|------|------|-------|
+| Filters | FilterSet | Parsed from query params using the same filter parsing path as the report table view |
+| Columns | []Column | Ordered list from the server-owned column registry (DEC-003) |
+| ExportDate | Date | Server-side date used for filename formatting (AC-002) |
 
-**Invariants**:
-- `Columns` must be non-nil; an empty slice is valid and produces a header-only CSV (AC-003)
-- `Filters` must be a valid `FilterSet`; invalid filters are rejected by `parseFilters()` before reaching this type
+Invariants:
+
+- `Columns` must be non-nil; an empty slice is valid and produces a header-only CSV (AC-003).
+- `Filters` must be valid; invalid filters are rejected before creating this value.
 
 ## Column
 
-| Field   | Type   | Notes                              |
-|---------|--------|------------------------------------|
-| Key     | string | Internal field name                |
-| Header  | string | Display label used as CSV header   |
+| Field | Type | Notes |
+|------|------|-------|
+| Key | string | Internal column key |
+| Header | string | Display label used as CSV header |
 
-**Justification**: AC-001 (column headers in first row), RQ-002 (column order matches visible table order)
+Justification: AC-001 (headers), RQ-002 (order matches table view).
 
 ## No New Persistent Entities
 

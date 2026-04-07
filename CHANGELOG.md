@@ -10,9 +10,16 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - `plan.md` template: new `## Incremental Delivery` section with `MVP (First Value)` and `Iterative Expansion` subsections — guides agents to define the smallest testable increment and plan subsequent value delivery steps while maintaining AC traceability
+- `/draftspec.inspect --delta`: incremental re-check mode — after `spec --amend`, re-checks only changed sections and preserves valid findings from the previous report; falls back to full inspection when changes exceed 50%
+- `/draftspec.tasks --repair <task-id-list>`: targeted repair mode — fixes specific tasks identified by verify or review without rewriting the full task list; suggests `plan --update` if the repair reveals a plan-level flaw
+- `/draftspec.implement --continue`: resume mode — starts from the first unfinished task, trusts previously checked-off tasks, batch-reads only remaining surfaces; useful after session interruptions
+- `/draftspec.verify --persist`: explicit flag to write the verification report to `.draftspec/plans/<slug>/verify.md`; without it the report stays in the conversation only
+- Constitution post-update impact check: after updating `constitution.md`, the agent scans active specs for conflicts and flags them as `NEEDS RE-INSPECT` without modifying the specs
+- Handoff now loads `verify.md` metadata — verdict and verification status are included in handoff documents for better session continuity
 
 ### Changed
 
+- Agent adapters now include **workflow chain hint** (`constitution → spec → inspect → plan → tasks → implement → verify → archive`), **explicit script execution discipline** (execute as shell commands, trust stdout/exit code, never read source), and an **anti-pattern block** (do not skip readiness scripts, re-plan during implement, mark done without proof, or read full repo when minimal context is required)
 - `inspect` helper flow now treats readiness/script output as the primary structural evidence layer: categorized findings (`structure`, `traceability`, `ambiguity`, `consistency`, `readiness`) are surfaced in `draftspec check`, `draftspec feature`, and inspect prompts so agents deepen findings instead of re-deriving them
 - phase readiness checks now emit structured findings for ambiguity and acceptance/task traceability; implement readiness also warns when plan implementation surfaces drift from `tasks.md` `Surface Map` or `Touches:` references
 - `/draftspec.archive` now uses **move-based** archiving by default — active files (`specs/<slug>/` and `plans/<slug>/`) are deleted after copying to `.draftspec/archive/`; pass `--copy` to keep originals in place (useful for `deferred` features)

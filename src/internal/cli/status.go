@@ -3,6 +3,7 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 
 	"draftspec/src/internal/status"
 	"github.com/spf13/cobra"
@@ -12,9 +13,11 @@ func newStatusCmd() *cobra.Command {
 	var jsonOutput bool
 
 	cmd := &cobra.Command{
-		Use:   "status <slug> [path]",
-		Short: "Show feature workflow status for one slug",
-		Args:  cobra.RangeArgs(1, 2),
+		Use:     "status <slug> [path]",
+		Short:   "Show feature workflow status for one slug",
+		Long:    "Shows the current workflow phase and artifact readiness for a single feature.",
+		Example: "  draftspec status export-report .\n  draftspec status export-report . --json",
+		Args:    cobra.RangeArgs(1, 2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			root := "."
 			if len(args) == 2 {
@@ -35,31 +38,63 @@ func newStatusCmd() *cobra.Command {
 				return nil
 			}
 
-			fmt.Fprintf(cmd.OutOrStdout(), "slug: %s\n", result.Slug)
-			fmt.Fprintf(cmd.OutOrStdout(), "phase: %s\n", result.Phase)
-			fmt.Fprintf(cmd.OutOrStdout(), "spec_exists: %t\n", result.SpecExists)
-			fmt.Fprintf(cmd.OutOrStdout(), "inspect_exists: %t\n", result.InspectExists)
-			fmt.Fprintf(cmd.OutOrStdout(), "plan_exists: %t\n", result.PlanExists)
-			fmt.Fprintf(cmd.OutOrStdout(), "tasks_exists: %t\n", result.TasksExists)
-			fmt.Fprintf(cmd.OutOrStdout(), "verify_exists: %t\n", result.VerifyExists)
-			if result.TasksExists {
-				fmt.Fprintf(cmd.OutOrStdout(), "tasks: total=%d completed=%d open=%d\n", result.TasksTotal, result.TasksCompleted, result.TasksOpen)
-			}
-			if result.InspectPath != "" {
-				fmt.Fprintf(cmd.OutOrStdout(), "inspect_path: %s\n", result.InspectPath)
-			}
-			if result.VerifyPath != "" {
-				fmt.Fprintf(cmd.OutOrStdout(), "verify_path: %s\n", result.VerifyPath)
-			}
-			fmt.Fprintf(cmd.OutOrStdout(), "archived: %t\n", result.Archived)
+			w := cmd.OutOrStdout()
+			next := "-"
 			if result.ReadyFor != "" {
-				fmt.Fprintf(cmd.OutOrStdout(), "ready_for: %s\n", result.ReadyFor)
+				next = styleCmd(w, "/draftspec."+result.ReadyFor+" "+result.Slug)
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "blocked: %t\n", result.Blocked)
+			blocked := styleOK(w, "false")
+			if result.Blocked {
+				blocked = styleError(w, "true")
+			}
+
+			printPanel(w, "draftspec status", []string{
+				"slug: " + result.Slug,
+				"phase: " + result.Phase,
+				"ready_for: " + result.ReadyFor,
+				"blocked: " + blocked,
+				"next: " + next,
+			})
+
+			printPanel(w, "Artifacts", []string{
+				"spec: " + boolArtifact(w, result.SpecExists),
+				"inspect: " + boolArtifact(w, result.InspectExists),
+				"plan: " + boolArtifact(w, result.PlanExists),
+				"tasks: " + boolArtifact(w, result.TasksExists),
+				"verify: " + boolArtifact(w, result.VerifyExists),
+				"archived: " + boolArtifact(w, result.Archived),
+			})
+
+			if result.TasksExists {
+				printPanel(w, "Tasks", []string{
+					fmt.Sprintf("total: %d", result.TasksTotal),
+					fmt.Sprintf("completed: %d", result.TasksCompleted),
+					fmt.Sprintf("open: %d", result.TasksOpen),
+				})
+			}
+
+			if result.InspectPath != "" || result.VerifyPath != "" {
+				lines := []string{}
+				if result.InspectPath != "" {
+					lines = append(lines, "inspect_path: "+stylePath(w, result.InspectPath))
+				}
+				if result.VerifyPath != "" {
+					lines = append(lines, "verify_path: "+stylePath(w, result.VerifyPath))
+				}
+				printPanel(w, "Paths", lines)
+			}
+
 			return nil
 		},
 	}
 
 	cmd.Flags().BoolVar(&jsonOutput, "json", false, "Output feature status as JSON")
 	return cmd
+}
+
+func boolArtifact(w io.Writer, present bool) string {
+	if present {
+		return styleOK(w, "present")
+	}
+	return styleError(w, "missing")
 }

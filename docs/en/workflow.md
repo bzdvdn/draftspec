@@ -30,6 +30,8 @@ Mandatory sections:
 - `Governance`
 - `Last Updated`
 
+After updating the constitution, the agent checks whether any active specs conflict with the changed rules and flags them as `NEEDS RE-INSPECT` without modifying the specs themselves.
+
 ### `spec`
 
 Captures one feature request as a concrete spec. Acceptance criteria should use canonical `Given / When / Then` markers even when the surrounding document language is Russian.
@@ -85,6 +87,8 @@ If the request is ambiguous, combines multiple features, or asks to derive one s
 Checks consistency and quality for a single feature. It can flag missing scenarios, weak acceptance criteria, constitutional conflicts, plan drift, or missing task coverage.
 
 `inspect` is mandatory before `plan`. Planning should not proceed until the feature has a persisted inspect report at the canonical path.
+
+`--delta`: incremental re-check mode. After a `spec --amend`, re-checks only the changed sections instead of running a full inspection. Preserves valid findings from the previous report. Falls back to full inspection when changes are too broad (>50% rewritten).
 
 A full inspection report should use a stable structure:
 
@@ -170,6 +174,8 @@ Acceptance coverage should reference those task IDs directly:
 AC-001 -> T1.1, T2.1
 ```
 
+`--repair <task-id-list>`: targeted repair mode. Fixes specific tasks identified by verify or review (e.g. `--repair T2.3,T3.1`) without rewriting the full task list. If the repair reveals a plan-level flaw, suggests `/draftspec.plan --update` instead.
+
 ### `implement`
 
 Executes unfinished tasks and updates `tasks.md`.
@@ -186,6 +192,8 @@ Selective execution is allowed when the user explicitly narrows scope:
 
 - `--phase <number>` for one implementation phase
 - `--tasks <task-id-list>` for one or more specific task IDs such as `T1.1,T2.1`
+
+`--continue`: resume mode. Starts from the first unfinished task, trusting that all previously checked-off tasks are correctly completed. Batch-reads only the surfaces from remaining unfinished tasks. Useful after session interruptions (timeout, context overflow).
 
 `--phase` and `--tasks` should not be combined in the same run.
 
@@ -243,7 +251,7 @@ Suggested semantics:
 
 Use `concerns` rather than `pass` when the evidence is partial but no concrete contradiction has been found.
 
-When a verification report should be persisted to disk, Draftspec should prefer `.draftspec/plans/<slug>/verify.md`.
+`--persist`: write the report to `.draftspec/plans/<slug>/verify.md` in addition to conversation output. Without this flag, the report stays in the conversation only.
 
 Use `.draftspec/templates/verify-report.md` as the canonical template when the report is written to disk.
 

@@ -7,6 +7,10 @@ You are creating or updating one feature spec.
 Produce a clear feature specification at `.draftspec/specs/<slug>/spec.md` that is compliant with the constitution.
 
 Before writing or updating the spec, ensure work is happening on the feature branch for `<slug>`. The default branch naming convention is `feature/<slug>`.
+If the repo is under git, do this explicitly and reproducibly:
+- Determine the target branch: `--branch <name>` (when provided) else `feature/<slug>`
+- If you are not on the target branch: switch to it, and if it does not exist, create and switch (`git switch <branch>` or `git switch -c <branch>`)
+- If switching/creating the branch is not possible (no git, detached HEAD, environment constraints), stop and report the reason briefly before changing files
 
 ## Phase Contract
 

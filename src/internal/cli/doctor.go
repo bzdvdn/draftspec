@@ -16,6 +16,7 @@ func newDoctorCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "doctor [path]",
 		Short: "Check Draftspec workspace health and agent target consistency",
+		Long:  "Runs a health check over the Draftspec workspace structure, required files, and feature lifecycle readiness.",
 		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			root := "."
@@ -35,16 +36,30 @@ func newDoctorCmd() *cobra.Command {
 				return nil
 			}
 
+			w := cmd.OutOrStdout()
 			errorCount, warningCount, okCount := doctorFindingCounts(result.Findings)
-			fmt.Fprintf(cmd.OutOrStdout(), "summary: %d error(s), %d warning(s), %d ok\n", errorCount, warningCount, okCount)
+			printPanel(w, "draftspec doctor", []string{
+				fmt.Sprintf("errors: %d", errorCount),
+				fmt.Sprintf("warnings: %d", warningCount),
+				fmt.Sprintf("ok: %d", okCount),
+			})
+
+			fmt.Fprintf(w, "summary: %d error(s), %d warning(s), %d ok\n", errorCount, warningCount, okCount)
 			for _, group := range []string{"error", "warning", "ok"} {
 				lines := doctorLinesForLevel(result.Findings, group)
 				if len(lines) == 0 {
 					continue
 				}
-				fmt.Fprintf(cmd.OutOrStdout(), "%ss:\n", group)
+				fmt.Fprintf(w, "%ss:\n", group)
 				for _, line := range lines {
-					fmt.Fprintf(cmd.OutOrStdout(), "- %s\n", line)
+					switch group {
+					case "error":
+						fmt.Fprintf(w, "- %s\n", styleError(w, line))
+					case "warning":
+						fmt.Fprintf(w, "- %s\n", styleWarn(w, line))
+					default:
+						fmt.Fprintf(w, "- %s\n", styleOK(w, line))
+					}
 				}
 			}
 			return nil

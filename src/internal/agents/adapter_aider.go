@@ -30,19 +30,22 @@ func renderAiderCommands(commands []CommandDefinition, language string) string {
 		sections = append(sections, "Используйте `.draftspec/` как основной источник проектного контекста. Следуйте соответствующим prompt-файлам в `.draftspec/templates/prompts/`.")
 		sections = append(sections, "")
 		sections = append(sections, "Загружайте этот файл через `--read .aider/CONVENTIONS.md` или добавьте `read: .aider/CONVENTIONS.md` в `.aider.conf.yml`.")
+		sections = append(sections, "")
+		sections = append(sections, workflowChainHint(lang))
 		for _, cmd := range commands {
 			sections = append(sections, "")
 			sections = append(sections, fmt.Sprintf("## /draftspec.%s", cmd.Name))
 			sections = append(sections, fmt.Sprintf("- Основной prompt: %s", cmd.PromptPath))
 			sections = append(sections, fmt.Sprintf("- %s", commandHint(cmd.Name, lang)))
 			sections = append(sections, "- Используйте только минимально нужный контекст репозитория")
-			sections = append(sections, "- Если доступны связанные scripts, сначала запускайте их и опирайтесь на их вывод")
-			sections = append(sections, "- Не читайте исходники scripts по умолчанию")
+			sections = append(sections, fmt.Sprintf("- %s", scriptExecutionHint(lang)))
+			sections = append(sections, fmt.Sprintf("- %s", helpDiscoveryHint(lang)))
 			if len(cmd.Extras) > 0 {
-				sections = append(sections, "- Связанные scripts:")
-				sections = append(sections, bulletList(cmd.Extras))
+				sections = append(sections, scriptListBlock(cmd.Extras, lang))
 			}
 		}
+		sections = append(sections, "")
+		sections = append(sections, antiPatternHint(lang))
 		return strings.Join(sections, "\n") + "\n"
 	}
 
@@ -52,18 +55,21 @@ func renderAiderCommands(commands []CommandDefinition, language string) string {
 	sections = append(sections, "Use `.draftspec/` as the primary source of project context. Follow the matching prompt files under `.draftspec/templates/prompts/`.")
 	sections = append(sections, "")
 	sections = append(sections, "Load this file via `--read .aider/CONVENTIONS.md` or add `read: .aider/CONVENTIONS.md` to `.aider.conf.yml`.")
+	sections = append(sections, "")
+	sections = append(sections, workflowChainHint(lang))
 	for _, cmd := range commands {
 		sections = append(sections, "")
 		sections = append(sections, fmt.Sprintf("## /draftspec.%s", cmd.Name))
 		sections = append(sections, fmt.Sprintf("- Primary prompt: %s", cmd.PromptPath))
 		sections = append(sections, fmt.Sprintf("- %s", commandHint(cmd.Name, lang)))
 		sections = append(sections, "- Use only the minimum repository context required")
-		sections = append(sections, "- When related scripts are available, run them first and rely on their output")
-		sections = append(sections, "- Do not read script source by default")
+		sections = append(sections, fmt.Sprintf("- %s", scriptExecutionHint(lang)))
+		sections = append(sections, fmt.Sprintf("- %s", helpDiscoveryHint(lang)))
 		if len(cmd.Extras) > 0 {
-			sections = append(sections, "- Related scripts:")
-			sections = append(sections, bulletList(cmd.Extras))
+			sections = append(sections, scriptListBlock(cmd.Extras, lang))
 		}
 	}
+	sections = append(sections, "")
+	sections = append(sections, antiPatternHint(lang))
 	return strings.Join(sections, "\n") + "\n"
 }

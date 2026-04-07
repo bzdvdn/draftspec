@@ -43,6 +43,19 @@ Do not assume `research.md` should exist; use it only when the plan clearly depe
 - implementation files that are not needed to decompose the work
 - broad repository history
 
+## Flags
+
+`--repair <task-id-list>`: targeted repair mode — fix specific tasks identified by verify or review without rewriting the full task list.
+
+When `--repair` is present in `$ARGUMENTS`:
+- Read the existing `tasks.md` first.
+- Locate only the tasks named in the argument (e.g., `--repair T2.3,T3.1`).
+- For each named task: update the description, outcome, `Touches:`, or `AC-*` mapping as needed.
+- Do not restructure phases, renumber other tasks, or rewrite sections that are not being repaired.
+- If the repair reveals that the plan itself is flawed, stop and suggest `/draftspec.plan <slug> --update` instead of silently expanding scope.
+- Update the `## Acceptance Coverage` section only if the repaired tasks change coverage mapping.
+- Update the `## Surface Map` section only if `Touches:` values changed.
+
 ## Stop Conditions
 
 Stop and ask for refinement if:

@@ -43,6 +43,12 @@ Each prompt is designed to:
 - respect the configured documentation and agent languages
 - preserve constitutional authority over specs, plans, tasks, and implementation
 
+Each generated agent wrapper includes:
+
+- **Workflow chain hint**: `constitution → spec → inspect → plan → tasks → implement → verify → archive` — prevents agents from skipping phases or jumping ahead
+- **Script execution discipline**: explicit instruction to execute scripts as shell commands, trust stdout/exit code, and never read or inspect script source
+- **Anti-pattern block**: common mistakes to avoid — skipping readiness scripts, re-planning during implement, marking tasks done without observable proof, reading the full repository when minimal context is required
+
 `spec` should stay branch-first:
 
 - it should create or switch to `feature/<slug>` before writing `.draftspec/specs/<slug>/spec.md` when the environment allows it

@@ -30,3 +30,6 @@ go.work.sum
 .vscode/
 TESTS/*
 .claude
+
+# Demo recording workspace
+demo/_work/

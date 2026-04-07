@@ -10,6 +10,8 @@
 
 `--deep`: режим полной валидации реализации — читает все plan artifacts и проверяет реальный код для каждой завершённой задачи и acceptance criterion, а не только структурные проверки. Выдаёт comprehensive отчёт с per-AC evidence. Без этого флага verification остаётся структурным и cheap по умолчанию.
 
+`--persist`: записать отчёт верификации в `.draftspec/plans/<slug>/verify.md` в дополнение к выводу в чат. Без этого флага отчёт выводится только в чат. Когда `--persist` присутствует, используйте `.draftspec/templates/verify-report.md` как канонический шаблон и включите machine-readable metadata block.
+
 ## Phase Contract
 
 Inputs: `.draftspec/constitution.md`, `.draftspec/plans/<slug>/tasks.md`; spec, plan, код — только для подтверждения конкретных выводов (или все артефакты в режиме `--deep`).
@@ -111,7 +113,7 @@ Stop if: slug неоднозначен, tasks.md отсутствует, или 
 
 ## Output expectations
 
-- Выведите отчет в разговор, если пользователь не просит сохранить его в файл; если нужно сохранить без явного пути — `.draftspec/plans/<slug>/verify.md`
+- Выведите отчёт в чат по умолчанию; сохраните в `.draftspec/plans/<slug>/verify.md` когда присутствует `--persist` или пользователь явно просит
 - Кратко суммируйте verdict, выполненные проверки, оставшиеся concerns и можно ли безопасно архивировать фичу
 - Завершайте разговор summary block: `Slug`, `Status`, `Artifacts`, `Blockers` и `Next command` / `Return to`
 - Если фичу можно архивировать: `Следующая команда: /draftspec.archive <slug>`; при возврате на раннюю фазу — называйте её явно со slash-командой

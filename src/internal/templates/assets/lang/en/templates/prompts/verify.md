@@ -10,6 +10,8 @@ Confirm whether the implemented work is aligned enough with tasks and project ru
 
 `--deep`: full implementation validation mode — read all plan artifacts and inspect actual code for every completed task and acceptance criterion, not just structural checks. Produces a comprehensive report with per-AC evidence. Without this flag, verification stays structural and cheap by default.
 
+`--persist`: write the verification report to `.draftspec/plans/<slug>/verify.md` in addition to conversation output. Without this flag, the report is output to the conversation only. When `--persist` is present, use `.draftspec/templates/verify-report.md` as the canonical template and include the machine-readable metadata block.
+
 ## Phase Contract
 
 Inputs: `.draftspec/constitution.md`, `.draftspec/plans/<slug>/tasks.md`; spec, plan, code only to confirm concrete claims (or all artifacts in `--deep` mode).
@@ -111,7 +113,7 @@ Stop and ask for clarification only if:
 
 ## Output expectations
 
-- Output the report to the conversation unless the user asks to persist it; if persisted without explicit path, use `.draftspec/plans/<slug>/verify.md`
+- Output the report to the conversation by default; persist to `.draftspec/plans/<slug>/verify.md` when `--persist` is present or the user explicitly asks
 - Summarize the verdict, completed checks, remaining concerns, and whether the feature is safe to archive
 - End with a summary block: `Slug`, `Status`, `Artifacts`, `Blockers`, and either `Next command` or `Return to`
 - When safe to archive: `Next command: /draftspec.archive <slug>`; when returning to an earlier phase, name it explicitly with its slash command

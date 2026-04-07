@@ -11,7 +11,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-//go:embed assets/scripts/* assets/scripts/powershell/* assets/lang/* assets/lang/*/* assets/lang/*/templates/* assets/lang/*/templates/prompts/* assets/lang/*/templates/contracts/* assets/lang/*/templates/archive/* assets/demo/specs/* assets/demo/plans/export-report/*
+//go:embed assets/scripts/* assets/scripts/powershell/* assets/lang/* assets/lang/*/* assets/lang/*/templates/* assets/lang/*/templates/prompts/* assets/lang/*/templates/contracts/* assets/lang/*/templates/archive/* assets/demo/* assets/demo/specs/* assets/demo/plans/export-report/*
 var embedded embed.FS
 
 type File struct {
@@ -260,6 +260,7 @@ func DemoFiles() ([]File, error) {
 		assetPath  string
 		targetPath string
 	}{
+		{"assets/demo/constitution.md", "constitution.md"},
 		{"assets/demo/specs/export-report.md", "specs/export-report/spec.md"},
 		{"assets/demo/specs/export-report.inspect.md", "specs/export-report/inspect.md"},
 		{"assets/demo/plans/export-report/plan.md", "plans/export-report/plan.md"},

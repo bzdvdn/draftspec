@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"draftspec/src/internal/templates"
 )
@@ -13,7 +14,14 @@ type DemoOptions struct {
 	AgentTargets []string
 }
 
-type DemoResult struct{ Messages []string }
+type DemoResult struct {
+	RootAbs      string
+	Shell        string
+	AgentTargets []string
+
+	ExampleSlug string
+	Created     []string // paths relative to the project root
+}
 
 func Demo(root string, options DemoOptions) (DemoResult, error) {
 	shell := options.Shell
@@ -21,10 +29,10 @@ func Demo(root string, options DemoOptions) (DemoResult, error) {
 		shell = "sh"
 	}
 
-	initResult, err := Initialize(root, InitOptions{
-		InitGit:  false,
-		DefaultLang: "en",
-		Shell:    shell,
+	_, err := Initialize(root, InitOptions{
+		InitGit:      false,
+		DefaultLang:  "en",
+		Shell:        shell,
 		AgentTargets: options.AgentTargets,
 	})
 	if err != nil {
@@ -42,7 +50,7 @@ func Demo(root string, options DemoOptions) (DemoResult, error) {
 	}
 
 	draftspecDir := filepath.Join(absRoot, ".draftspec")
-	messages := append([]string(nil), initResult.Messages...)
+	var created []string
 
 	for _, file := range demoFiles {
 		target := filepath.Join(draftspecDir, file.TargetPath)
@@ -52,14 +60,14 @@ func Demo(root string, options DemoOptions) (DemoResult, error) {
 		if err := os.WriteFile(target, []byte(file.Content), file.Mode); err != nil {
 			return DemoResult{}, err
 		}
-		messages = append(messages, fmt.Sprintf("created demo artifact %s", rel(absRoot, target)))
+		created = append(created, rel(absRoot, target))
 	}
 
-	messages = append(messages, "")
-	messages = append(messages, "Demo workspace ready. Example feature: export-report (phase: implement, 2/6 tasks done)")
-	messages = append(messages, "Try: /draftspec.scope export-report")
-	messages = append(messages, "Try: /draftspec.challenge export-report")
-	messages = append(messages, "Try: /draftspec.handoff export-report")
-
-	return DemoResult{Messages: messages}, nil
+	return DemoResult{
+		RootAbs:      absRoot,
+		Shell:        strings.ToLower(shell),
+		AgentTargets: append([]string(nil), options.AgentTargets...),
+		ExampleSlug:  "export-report",
+		Created:      created,
+	}, nil
 }

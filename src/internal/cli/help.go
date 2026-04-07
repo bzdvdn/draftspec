@@ -35,7 +35,7 @@ Examples:
 				title = "draftspec help: " + target.CommandPath()
 			}
 			printPanel(cmd.OutOrStdout(), title, []string{
-				"Tip: add " + styleCmd("--help", shouldUseColor(cmd.OutOrStdout())) + " to any command.",
+				"Tip: add " + styleCmd(cmd.OutOrStdout(), "--help") + " to any command.",
 			})
 
 			target.InitDefaultHelpFlag()

@@ -148,7 +148,7 @@ func scriptPath(name, shell string) string {
 	if shell == "powershell" {
 		ext = ".ps1"
 	}
-	return ".draftspec/scripts/" + name + ext
+	return "./.draftspec/scripts/" + name + ext
 }
 
 func commandHint(name, lang string) string {
@@ -165,6 +165,13 @@ func toolInvocationHint(lang string) string {
 	return "Use tools directly through the agent runtime; do not print raw JSON/XML/tool-call payloads or expose internal reasoning about tool choice."
 }
 
+func helpDiscoveryHint(lang string) string {
+	if lang == "ru" {
+		return "Не запускайте `draftspec ... --help`/`draftspec help` для «разведки»; вместо этого опирайтесь на prompt-файл и readiness scripts."
+	}
+	return "Do not run `draftspec ... --help`/`draftspec help` for discovery; rely on the prompt file and readiness scripts instead."
+}
+
 func titleCase(value string) string {
 	if value == "" {
 		return value
@@ -172,10 +179,48 @@ func titleCase(value string) string {
 	return strings.ToUpper(value[:1]) + value[1:]
 }
 
-func bulletList(items []string) string {
-	lines := make([]string, 0, len(items))
+func workflowChainHint(lang string) string {
+	if lang == "ru" {
+		return "Цепочка workflow: constitution → spec → inspect → plan → tasks → implement → verify → archive. Не пропускайте фазы и не забегайте вперёд."
+	}
+	return "Workflow chain: constitution → spec → inspect → plan → tasks → implement → verify → archive. Do not skip phases or jump ahead."
+}
+
+func antiPatternHint(lang string) string {
+	if lang == "ru" {
+		return `Запрещено:
+- пропускать readiness scripts и переходить к фазе напрямую
+- читать или анализировать исходный код scripts
+- перепланировать или редизайнить во время implement
+- отмечать таск завершённым без observable proof
+- читать весь репозиторий, когда промпт говорит "минимальный контекст"`
+	}
+	return `Do not:
+- skip readiness scripts and proceed to the phase directly
+- read or inspect script source code
+- re-plan or re-design during implement
+- mark a task as done without observable proof
+- read the full repository when the prompt says "minimum context"`
+}
+
+func scriptExecutionHint(lang string) string {
+	if lang == "ru" {
+		return "Когда для фазы есть связанные scripts — выполняйте их как shell-команды (например `bash ./path/to/script.sh`). Доверяйте stdout и exit-коду скрипта. Не читайте, не анализируйте и не модифицируйте исходный код скриптов. Если скрипт завершился с ошибкой (exit code ≠ 0), сообщите пользователю вывод ошибки и остановитесь."
+	}
+	return "When related scripts are listed for a phase, execute them as shell commands (e.g. `bash ./path/to/script.sh`). Trust the script stdout and exit code as-is. Do not read, inspect, or modify the script source. If a script exits with a non-zero code, report the error output to the user and stop."
+}
+
+func scriptListBlock(items []string, lang string) string {
+	if len(items) == 0 {
+		return ""
+	}
+	header := "Scripts to execute:"
+	if lang == "ru" {
+		header = "Scripts для выполнения (запускать через shell):"
+	}
+	lines := []string{"- " + header}
 	for _, item := range items {
-		lines = append(lines, "- "+item)
+		lines = append(lines, fmt.Sprintf("  - `%s`", item))
 	}
 	return strings.Join(lines, "\n")
 }

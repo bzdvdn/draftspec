@@ -12,6 +12,23 @@ Inputs: `.draftspec/constitution.md`, `.draftspec/plans/<slug>/tasks.md`; deeper
 Outputs: implementation code, updated task checkboxes in `tasks.md`.
 Stop if: tasks.md missing, next task not concrete, scope requires inventing new tasks, or all tasks already done.
 
+## Flags
+
+`--continue`: resume mode — start from the first unfinished task, trusting that all previously checked-off tasks are correctly completed.
+
+When `--continue` is present in `$ARGUMENTS`:
+- Read `tasks.md` and skip all tasks already marked `[x]`.
+- Do not re-verify, re-read, or re-implement completed tasks.
+- Begin the session-start batch read using only the `Touches:` surfaces from the remaining unfinished tasks.
+- If the first unfinished task depends on outputs from a completed task that are not visible in the expected files, stop and report the inconsistency instead of silently re-doing work.
+- Progress output should start from the first unfinished task ID, not from T1.1.
+
+`--phase <number>`: execute only the specified phase.
+
+`--tasks <task-id-list>`: execute only the specified task IDs.
+
+Do not accept `--phase` and `--tasks` together in the same run.
+
 ## Operating Mode
 
 - Use `tasks.md` as the execution entrypoint.
@@ -65,10 +82,8 @@ Do not broaden scope to solve these problems.
 ## Scope Rules
 
 - Default behavior: if the user does not restrict scope, execute only the first unfinished phase or the smallest contiguous unfinished task cluster needed for forward progress.
-- Scoped behavior: if the user explicitly provides `--phase <number>`, execute only that phase.
-- Scoped behavior: if the user explicitly provides `--tasks <task-id-list>`, execute only those task IDs.
-- Do not accept `--phase` and `--tasks` together in the same run.
-- In scoped mode, keep the execution order from `tasks.md` rather than inventing a new order from the request text.
+- In `--continue` mode, start from the first unfinished task regardless of phase boundaries.
+- In `--phase` or `--tasks` mode, keep the execution order from `tasks.md` rather than inventing a new order from the request text.
 - If the selected phase or task IDs do not exist in `tasks.md`, stop and request refinement.
 - If scoped execution skips unfinished earlier work, warn about the ordering risk but do not silently broaden scope.
 

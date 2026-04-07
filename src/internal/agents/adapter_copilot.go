@@ -42,13 +42,18 @@ func renderCopilot(spec CommandDefinition, lang string) string {
 
 %s
 
+%s
+
 Что нужно сделать:
 - обработать запрос пользователя для одной фазы %q
 - применять только минимально нужный контекст репозитория
-- при необходимости сначала запускайте связанные scripts и опирайтесь на их вывод; не читайте исходники scripts по умолчанию:
+- %s
 %s
+- %s
 - кратко сообщить о результатах и блокерах
-`, spec.Name, spec.PromptPath, commandHint(spec.Name, lang), spec.Name, bulletList(spec.Extras))
+
+%s
+`, spec.Name, spec.PromptPath, commandHint(spec.Name, lang), workflowChainHint(lang), spec.Name, scriptExecutionHint(lang), scriptListBlock(spec.Extras, lang), helpDiscoveryHint(lang), antiPatternHint(lang))
 	}
 
 	return fmt.Sprintf(`# Draftspec %s
@@ -57,11 +62,16 @@ Use %q as the primary workflow prompt.
 
 %s
 
+%s
+
 What to do:
 - handle the user request for the %q phase
 - use only the minimum repository context required
-- when needed, run related scripts first and rely on their output; do not read script source by default:
+- %s
 %s
+- %s
 - report outcomes and blockers briefly
-`, spec.Name, spec.PromptPath, commandHint(spec.Name, lang), spec.Name, bulletList(spec.Extras))
+
+%s
+`, spec.Name, spec.PromptPath, commandHint(spec.Name, lang), workflowChainHint(lang), spec.Name, scriptExecutionHint(lang), scriptListBlock(spec.Extras, lang), helpDiscoveryHint(lang), antiPatternHint(lang))
 }

@@ -2,7 +2,6 @@ package cli
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -25,7 +24,7 @@ func init() {
 
 func renderDraftspecBanner(cmd *cobra.Command) string {
 	out := cmd.OutOrStdout()
-	color := shouldUseColor(out)
+	color := useColor(out)
 
 	art := strings.TrimLeft(draftspecASCII, "\n") + "\n"
 	tagline := "Draftspec — Spec-Driven Development Toolkit\n"
@@ -37,26 +36,5 @@ func renderDraftspecBanner(cmd *cobra.Command) string {
 		return art + tagline + "\n"
 	}
 
-	cyan := "\x1b[36m"
-	yellow := "\x1b[33m"
-	reset := "\x1b[0m"
-	return cyan + art + reset + yellow + tagline + reset + "\n"
-}
-
-func shouldUseColor(w any) bool {
-	if os.Getenv("NO_COLOR") != "" {
-		return false
-	}
-	if strings.EqualFold(os.Getenv("TERM"), "dumb") {
-		return false
-	}
-	f, ok := w.(*os.File)
-	if !ok {
-		return false
-	}
-	info, err := f.Stat()
-	if err != nil {
-		return false
-	}
-	return (info.Mode() & os.ModeCharDevice) != 0
+	return ansiCyan + art + ansiReset + ansiYellow + tagline + ansiReset + "\n"
 }

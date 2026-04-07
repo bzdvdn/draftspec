@@ -3,30 +3,46 @@ report_type: inspect
 slug: export-report
 status: pass
 docs_language: en
-generated_at: 2026-03-15
+generated_at: 2026-04-06
 ---
 
 # Inspect Report: export-report
 
 ## Scope
 
-Reviewed: `.draftspec/constitution.md`, `.draftspec/specs/export-report/spec.md`
+- snapshot: CSV export from the current filtered report table view
+- artifacts:
+  - .draftspec/constitution.md
+  - .draftspec/specs/export-report/spec.md
 
 ## Verdict
 
-pass
+- status: pass
+
+## Errors
+
+- none
 
 ## Warnings
 
-- AC-001 says "all rows matching the active filter" but does not state a row-count upper bound. RQ-001 is clear, but a note on expected volume would help planning choose between synchronous and streaming approaches.
+- AC-001 references "all rows matching the active filter". The scope mentions a 50k row cap, but the spec should explicitly state whether the export is synchronous or streaming to avoid surprises at implementation time.
+
+## Questions
+
+- none
+
+## Suggestions
+
+- In the plan, record a decision on synchronous vs streaming export behavior (DEC-001).
+- Ensure the acceptance approach validates both header order and data row order.
 
 ## Traceability
 
-AC-001 → T1.1, T1.2
-AC-002 → T1.3
-AC-003 → T1.4
-RQ-003 → T1.5
+- AC-001 -> T1.2, T2.1, T3.1
+- AC-002 -> T2.2, T3.1
+- AC-003 -> T2.2, T3.1
+- RQ-003 -> T2.1, T3.1
 
 ## Next Step
 
-Ready for planning. Run `/draftspec.plan export-report`
+- safe to continue to plan

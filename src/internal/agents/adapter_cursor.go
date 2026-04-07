@@ -45,13 +45,17 @@ alwaysApply: false
 
 %s
 
+%s
+
 Используйте эту rule, когда запрос явно относится к фазе %q или к команде /draftspec.%s.
 
-Если доступны связанные scripts, сначала запускайте их и опирайтесь на их вывод. Не читайте исходники scripts по умолчанию.
-
-Связанные scripts:
 %s
-`, spec.Name, spec.PromptPath, commandHint(spec.Name, lang), spec.Name, spec.Name, bulletList(spec.Extras))
+
+- %s
+%s
+
+%s
+`, spec.Name, spec.PromptPath, commandHint(spec.Name, lang), workflowChainHint(lang), spec.Name, spec.Name, scriptExecutionHint(lang), helpDiscoveryHint(lang), scriptListBlock(spec.Extras, lang), antiPatternHint(lang))
 	}
 
 	return fmt.Sprintf(`---
@@ -63,11 +67,15 @@ Follow %q.
 
 %s
 
+%s
+
 Use this rule when the request clearly maps to the %q phase or the /draftspec.%s command.
 
-When related scripts are available, run them first and rely on their output. Do not read script source by default.
-
-Related scripts:
 %s
-`, spec.Name, spec.PromptPath, commandHint(spec.Name, lang), spec.Name, spec.Name, bulletList(spec.Extras))
+
+- %s
+%s
+
+%s
+`, spec.Name, spec.PromptPath, commandHint(spec.Name, lang), workflowChainHint(lang), spec.Name, spec.Name, scriptExecutionHint(lang), helpDiscoveryHint(lang), scriptListBlock(spec.Extras, lang), antiPatternHint(lang))
 }

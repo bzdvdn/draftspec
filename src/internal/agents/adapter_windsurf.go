@@ -44,13 +44,17 @@ trigger: manual
 
 %s
 
+%s
+
 Используйте это rule, когда запрос явно относится к фазе %q или команде /draftspec.%s.
 
-Если доступны связанные scripts, сначала запускайте их и опирайтесь на их вывод. Не читайте исходники scripts по умолчанию.
-
-Связанные scripts:
 %s
-`, spec.PromptPath, commandHint(spec.Name, lang), spec.Name, spec.Name, bulletList(spec.Extras))
+
+- %s
+%s
+
+%s
+`, spec.PromptPath, commandHint(spec.Name, lang), workflowChainHint(lang), spec.Name, spec.Name, scriptExecutionHint(lang), helpDiscoveryHint(lang), scriptListBlock(spec.Extras, lang), antiPatternHint(lang))
 	}
 
 	return fmt.Sprintf(`---
@@ -61,11 +65,15 @@ Follow %q.
 
 %s
 
+%s
+
 Use this rule when the request clearly maps to the %q phase or the /draftspec.%s command.
 
-When related scripts are available, run them first and rely on their output. Do not read script source by default.
-
-Related scripts:
 %s
-`, spec.PromptPath, commandHint(spec.Name, lang), spec.Name, spec.Name, bulletList(spec.Extras))
+
+- %s
+%s
+
+%s
+`, spec.PromptPath, commandHint(spec.Name, lang), workflowChainHint(lang), spec.Name, spec.Name, scriptExecutionHint(lang), helpDiscoveryHint(lang), scriptListBlock(spec.Extras, lang), antiPatternHint(lang))
 }

@@ -87,31 +87,31 @@ func TestRenderEmphasizesRunningScriptsFirst(t *testing.T) {
 			name:   "claude en",
 			target: "claude",
 			lang:   "en",
-			want:   "run related scripts first and rely on their output; do not read script source by default",
+			want:   "execute them as shell commands",
 		},
 		{
 			name:   "codex ru",
 			target: "codex",
 			lang:   "ru",
-			want:   "сначала запускайте их и опирайтесь на их вывод; не читайте исходники scripts по умолчанию",
+			want:   "выполняйте их как shell-команды",
 		},
 		{
 			name:   "copilot en",
 			target: "copilot",
 			lang:   "en",
-			want:   "run related scripts first and rely on their output; do not read script source by default",
+			want:   "Do not read, inspect, or modify the script source",
 		},
 		{
 			name:   "cursor ru",
 			target: "cursor",
 			lang:   "ru",
-			want:   "Если доступны связанные scripts, сначала запускайте их и опирайтесь на их вывод. Не читайте исходники scripts по умолчанию.",
+			want:   "Доверяйте stdout и exit-коду скрипта",
 		},
 		{
 			name:   "kilocode en",
 			target: "kilocode",
 			lang:   "en",
-			want:   "When related scripts are available, run them first and rely on their output. Do not read script source by default.",
+			want:   "Trust the script stdout and exit code as-is",
 		},
 	}
 
@@ -134,12 +134,12 @@ func TestRenderTraeEmphasizesRunningScriptsFirst(t *testing.T) {
 		{
 			name: "en",
 			lang: "en",
-			want: "- When related scripts are available, run them first and rely on their output",
+			want: "execute them as shell commands",
 		},
 		{
 			name: "ru",
 			lang: "ru",
-			want: "- Если доступны связанные scripts, сначала запускайте их и опирайтесь на их вывод",
+			want: "выполняйте их как shell-команды",
 		},
 	}
 
@@ -170,7 +170,7 @@ func TestRenderIncludesCommandHints(t *testing.T) {
 		{name: "codex tasks en", target: "codex", lang: "en", spec: "tasks", want: "Command: `/draftspec.tasks [request]`"},
 		{name: "copilot implement ru", target: "copilot", lang: "ru", spec: "implement", want: "Команда: `/draftspec.implement [request]`"},
 		{name: "cursor verify en", target: "cursor", lang: "en", spec: "verify", want: "Command: `/draftspec.verify [request]`"},
-		{name: "kilocode archive ru", target: "kilocode", lang: "ru", spec: "archive", want: "Команда: `/draftspec.archive [request]`"},
+		{name: "kilocode archive ru", target: "kilocode", lang: "ru", spec: "archive", want: "Запуск (Kilo workflow): \"/draftspec-archive.md\""},
 	}
 
 	for _, tt := range tests {
