@@ -47,7 +47,7 @@ Stop and ask only if:
 
 ## All-Features Mode
 
-When called without a slug (no slug in `$ARGUMENTS`):
+When called without a slug (no slug in the user arguments):
 - Run `.draftspec/scripts/list-specs.*` to enumerate active features; do not read its source.
 - For each active feature, generate its handoff document at `.draftspec/handoff/<slug>.md` using the same rules as single-feature mode.
 - Output a brief inline summary table: one row per feature with slug, phase, and next command.

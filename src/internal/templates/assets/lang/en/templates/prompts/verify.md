@@ -69,7 +69,7 @@ Stop and ask for clarification only if:
 - When `tasks.md` uses task IDs such as `T1.1`, reference those IDs directly in checks, findings, and conclusions.
 - Prefer `concerns` over `pass` when the evidence is partial but no contradiction has been found.
 - Keep default verification structural and cheap by default.
-- When `--deep` is present in `$ARGUMENTS`, switch to full validation mode:
+- When `--deep` is present in the user arguments, switch to full validation mode:
   - Read all plan artifacts (`plan.md`, `data-model.md`, `contracts/`, `research.md`).
   - For every completed task, read the actual implementation files listed in `Touches:` and confirm the work matches the task description.
   - For every `AC-*`, trace through the code to confirm the acceptance criterion is satisfied with concrete evidence.

@@ -16,7 +16,7 @@ Stop if: slug ambiguous, spec missing, or report would require inventing product
 
 `--delta`: incremental re-check mode — verify only the sections that changed since the last inspect report instead of running a full inspection.
 
-When `--delta` is present in `$ARGUMENTS`:
+When `--delta` is present in the user arguments:
 - Read the existing `.draftspec/specs/<slug>/inspect.md` first to establish the baseline.
 - Compare the current `spec.md` against the previous inspect report to identify changed sections (new or modified AC, scope changes, assumption changes).
 - Re-check only the changed sections and their cross-artifact implications.

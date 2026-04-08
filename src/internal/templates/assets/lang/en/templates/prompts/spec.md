@@ -21,7 +21,7 @@ Stop if: goal ambiguous, multiple features in one request, or AC would be invent
 ## Flags
 
 `--amend`: targeted edit mode — update one section, add a single requirement or acceptance criterion, or adjust scope without rewriting the entire spec.
-When `--amend` is present in `$ARGUMENTS`:
+When `--amend` is present in the user arguments:
 - Read the existing spec first
 - Apply only the change described in the remaining arguments
 - Do not restructure or rewrite sections that are not being changed
@@ -149,7 +149,7 @@ If the spec already exists and is current, say so and do not modify the file.
 
 ## Output expectations
 
-- Create or switch to `feature/<slug>` before editing the spec when branch creation is available, unless the user explicitly provides `--branch`.
+- **Before writing any file**: create or switch to `feature/<slug>` (or the explicit `--branch` value). This step is mandatory and must happen first — do not skip it even if the spec file already exists.
 - Write or patch `.draftspec/specs/<slug>/spec.md`
 - Summarize goal, scope, acceptance criteria, and open questions
 - End with a summary block: `Slug`, `Status`, `Artifacts`, `Blockers`, `Next command`
@@ -157,6 +157,7 @@ If the spec already exists and is current, say so and do not modify the file.
 
 ## Self-Check
 
+- Did I switch to or create the feature branch before writing any file?
 - Did I stay within one feature?
 - Did every acceptance criterion get a stable ID and Given/When/Then form?
 - Would a human reviewer understand the primary user flow and scope boundary without additional explanation?

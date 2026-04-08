@@ -18,12 +18,14 @@ Stop if: spec or inspect missing, spec too vague for architecture decisions, or 
 - Prefer patching existing artifacts over broad rewrites.
 - Keep context narrow and repository-grounded.
 - Produce only the artifacts justified by the feature.
+- **Do not create or switch branches.** The feature branch must already exist from the spec phase. If you are not on the expected feature branch, stop and report — do not create it.
+- **Do not create `tasks.md`.** Task decomposition is a separate phase triggered by `/draftspec.tasks`. Stop after writing plan artifacts and output the next-command line.
 
 ## Flags
 
 `--update`: targeted edit mode — update a specific section, decision (`DEC-*`), implementation surface, or add a contract without rewriting the entire plan package. Similar to `spec --amend`.
 
-When `--update` is present in `$ARGUMENTS`:
+When `--update` is present in the user arguments:
 - Read the existing plan artifacts first.
 - Apply only the change described in the remaining arguments.
 - Do not restructure or rewrite sections that are not being changed.
@@ -33,7 +35,7 @@ When `--update` is present in `$ARGUMENTS`:
 
 `--research`: enter research-first mode before producing the plan.
 
-When `--research` is present in `$ARGUMENTS`:
+When `--research` is present in the user arguments:
 - Read the spec and inspect report, then identify the 1–5 concrete unknowns that currently block planning.
 - Write them to `.draftspec/plans/<slug>/research.md`.
 - Stop after writing `research.md` and ask: "Research complete — proceed to full plan?"

@@ -16,7 +16,7 @@ Stop if: tasks.md missing, next task not concrete, scope requires inventing new 
 
 `--continue`: resume mode — start from the first unfinished task, trusting that all previously checked-off tasks are correctly completed.
 
-When `--continue` is present in `$ARGUMENTS`:
+When `--continue` is present in the user arguments:
 - Read `tasks.md` and skip all tasks already marked `[x]`.
 - Do not re-verify, re-read, or re-implement completed tasks.
 - Begin the session-start batch read using only the `Touches:` surfaces from the remaining unfinished tasks.

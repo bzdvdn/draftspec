@@ -72,7 +72,7 @@ Stop and ask a minimal follow-up question if:
 
 ## Restore Rules
 
-When `--restore` is present in `$ARGUMENTS`:
+When `--restore` is present in the user arguments:
 
 - Locate the most recent snapshot under `.draftspec/archive/<slug>/` (by date directory name).
 - If active files already exist for the slug (`specs/<slug>/spec.md` or `plans/<slug>/`), stop and ask the user — restoring would overwrite active work.

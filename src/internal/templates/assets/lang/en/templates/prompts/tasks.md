@@ -47,7 +47,7 @@ Do not assume `research.md` should exist; use it only when the plan clearly depe
 
 `--repair <task-id-list>`: targeted repair mode — fix specific tasks identified by verify or review without rewriting the full task list.
 
-When `--repair` is present in `$ARGUMENTS`:
+When `--repair` is present in the user arguments:
 - Read the existing `tasks.md` first.
 - Locate only the tasks named in the argument (e.g., `--repair T2.3,T3.1`).
 - For each named task: update the description, outcome, `Touches:`, or `AC-*` mapping as needed.

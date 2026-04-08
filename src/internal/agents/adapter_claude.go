@@ -48,7 +48,7 @@ argument-hint: [request]
 %s
 
 Аргументы пользователя:
-$ARGUMENTS
+{{arguments}}
 
 Требования:
 - сначала прочитайте .draftspec/constitution.md, если это требуется prompt-файлом
@@ -74,7 +74,7 @@ Follow %q.
 %s
 
 User arguments:
-$ARGUMENTS
+{{arguments}}
 
 Requirements:
 - read .draftspec/constitution.md first when the prompt requires it
