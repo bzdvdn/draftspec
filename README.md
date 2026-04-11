@@ -1,3 +1,5 @@
+migratio to new repo and new product name SpecGate - https://github.com/bzdvdn/specgate
+
 # draftspec
 
 Русская версия: [README.ru.md](README.ru.md)
