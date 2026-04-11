@@ -1,4 +1,4 @@
-migratio to new repo and new product name SpecGate - https://github.com/bzdvdn/specgate
+migratio to new repo and new product name SpecKeep - https://github.com/bzdvdn/speckeep
 
 # draftspec
 
